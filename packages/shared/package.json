@@ -1,0 +1,18 @@
+{
+  "name": "@life-tracker/common",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test:db": "NODE_OPTIONS='--loader ts-node/esm' node src/test-db.ts"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.1.0",
+    "prisma": "^6.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "22.10.2",
+    "ts-node": "^10.9.2",
+    "typescript": "5.7.2"
+  }
+}
