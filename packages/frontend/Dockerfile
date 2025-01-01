@@ -14,6 +14,7 @@ COPY pnpm-workspace.yaml ./
 COPY pnpm-lock.yaml ./
 COPY package.json ./
 COPY packages/frontend/package.json ./packages/frontend/
+COPY packages/db/package.json ./packages/db/
 
 RUN pnpm install --frozen-lockfile
 
@@ -26,7 +27,18 @@ RUN corepack enable && corepack prepare pnpm@latest --activate
 
 COPY --from=deps /app/node_modules ./node_modules
 COPY --from=deps /app/packages/frontend/node_modules ./packages/frontend/node_modules
+COPY --from=deps /app/packages/db/node_modules ./packages/db/node_modules
 
+# build prisma client
+ARG DATABASE_URL
+ENV DATABASE_URL=${DATABASE_URL}
+
+COPY packages/db/package.json ./packages/db/
+COPY packages/db/index.ts ./packages/db/
+COPY packages/db/prisma ./packages/db/prisma
+RUN cd packages/db && npx prisma generate
+
+# build frontend
 COPY packages/frontend/package.json ./packages/frontend/
 COPY packages/frontend/src ./packages/frontend/src
 COPY packages/frontend/public ./packages/frontend/public
@@ -57,7 +69,7 @@ RUN adduser --system --uid 1001 nextjs
 
 COPY --from=builder /app/packages/frontend/public ./packages/frontend/public
 COPY --from=builder /app/packages/frontend/.next/standalone/. ./
-COPY --from=builder /app/packages/frontend/.next/static /.next/static
+COPY --from=builder /app/packages/frontend/.next/static ./packages/frontend/static
 
 USER nextjs
 

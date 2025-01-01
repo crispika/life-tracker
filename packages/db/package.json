@@ -1,10 +1,13 @@
 {
-  "name": "@life-tracker/common",
+  "name": "@life-tracker/db",
   "version": "1.0.0",
   "private": true,
   "type": "module",
+  "main": "src/index.ts",
   "scripts": {
-    "test:db": "NODE_OPTIONS='--loader ts-node/esm' node src/test-db.ts"
+    "test:db": "NODE_OPTIONS='--loader ts-node/esm' node test-db.ts",
+    "generate": "prisma generate",
+    "migrate": "prisma migrate deploy"
   },
   "dependencies": {
     "@prisma/client": "^6.1.0",

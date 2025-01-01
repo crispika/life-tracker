@@ -3,5 +3,6 @@
   "version": "1.0.0",
   "private": true,
   "main": "index.js",
-  "license": "UNLICENSED"
+  "license": "UNLICENSED",
+  "packageManager": "pnpm@9.15.1"
 }
