@@ -1,9 +1,9 @@
-import { prisma} from '@life-tracker/db';
+import { prisma } from '@life-tracker/db';
 type Test = {
   id: number;
   name: string;
   createdAt: Date;
-}
+};
 
 export default async function Home() {
   // FIXME why can't I use the api route?
@@ -30,10 +30,19 @@ export default async function Home() {
   } catch (error: unknown) {
     console.error('错误:', error);
     if (error instanceof Error) {
-      return <>
-      <div>Error loading data {JSON.stringify({ error: error.message, stack: error.stack }, null, 2)} </div>
-      <div>{ process.env.DATABASE_URL}</div>
-      </>;
+      return (
+        <>
+          <div>
+            Error loading data{' '}
+            {JSON.stringify(
+              { error: error.message, stack: error.stack },
+              null,
+              2
+            )}{' '}
+          </div>
+          <div>{process.env.DATABASE_URL}</div>
+        </>
+      );
     }
     return <div>发生未知错误</div>;
   }
