@@ -1,4 +1,3 @@
-version: '3.8'
 services:
   db:
     image: mysql:8.0
@@ -6,12 +5,13 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: password123
       MYSQL_DATABASE: life_tracker
+    networks:
+      app-network:
+        ipv4_address: 172.18.0.2
     ports:
       - '3306:3306'
     volumes:
       - mysql_data:/var/lib/mysql
-    networks:
-      - app-network
     healthcheck:
       test:
         [
@@ -28,17 +28,20 @@ services:
       timeout: 5s
       retries: 5
       start_period: 30s
+    command:
+      ['mysqld', '--require_secure_transport=OFF', '--ssl=0', '--skip_ssl']
 
   web:
     build:
       context: .
       dockerfile: packages/frontend/Dockerfile
+      target: runner
       args:
-        - DATABASE_URL=mysql://root:password123@db:3306/life_tracker?sslaccept=ignore
+        - DATABASE_URL=mysql://root:password123@db:3306/life_tracker?connect_timeout=300
     ports:
       - '3000:3000'
     environment:
-      - DATABASE_URL=mysql://root:password123@db:3306/life_tracker?sslaccept=ignore
+      - DEBUG=prisma:client
     depends_on:
       db:
         condition: service_healthy
@@ -53,3 +56,6 @@ volumes:
 networks:
   app-network:
     driver: bridge
+    ipam:
+      config:
+        - subnet: 172.18.0.0/16

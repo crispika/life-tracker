@@ -24,6 +24,6 @@
     "typescript": "5.7.2"
   },
   "devDependencies": {
-    "@prisma/nextjs-monorepo-workaround-plugin": "^6.1.0"
+    "@prisma/nextjs-monorepo-workaround-plugin": "^6.2.1"
   }
 }
