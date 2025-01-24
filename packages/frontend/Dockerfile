@@ -25,36 +25,19 @@ WORKDIR /app
 # Reinstall pnpm because new docker stage builder 
 RUN corepack enable && corepack prepare pnpm@latest --activate
 
+
+COPY . .
 COPY --from=deps /app/node_modules ./node_modules
 COPY --from=deps /app/packages/frontend/node_modules ./packages/frontend/node_modules
 COPY --from=deps /app/packages/db/node_modules ./packages/db/node_modules
 
-# build prisma client
-ARG DATABASE_URL
-ENV DATABASE_URL=${DATABASE_URL}
-
-COPY packages/db/package.json ./packages/db/
-COPY packages/db/index.ts ./packages/db/
-COPY packages/db/prisma ./packages/db/prisma
-RUN cd packages/db && npx prisma generate
-
-# build frontend
-COPY packages/frontend/package.json ./packages/frontend/
-COPY packages/frontend/src ./packages/frontend/src
-COPY packages/frontend/public ./packages/frontend/public
-COPY packages/frontend/next.config.js ./packages/frontend/
-COPY packages/frontend/tsconfig.json ./packages/frontend/
-COPY packages/frontend/postcss.config.js ./packages/frontend/
-COPY packages/frontend/tailwind.config.js ./packages/frontend/
-COPY pnpm-workspace.yaml ./
-COPY pnpm-lock.yaml ./
-COPY package.json ./
 
 # Next.js collects completely anonymous telemetry data about general usage.
 # Learn more here: https://nextjs.org/telemetry
 # Uncomment the following line in case you want to disable telemetry during the build.
 ENV NEXT_TELEMETRY_DISABLED=1
 
+RUN cd packages/db && npx prisma generate
 RUN cd packages/frontend && pnpm build
 
 # Production image, copy all the files and run next
@@ -81,4 +64,5 @@ ENV HOSTNAME="0.0.0.0"
 
 # server.js is created by next build from the standalone output
 # https://nextjs.org/docs/pages/api-reference/config/next-config-js/output
-CMD ["node", "packages/frontend/server.js"]
+# CMD ["node", "packages/frontend/server.js"]
+CMD ["sh", "-c", "npx prisma migrate deploy --schema=packages/db/prisma/schema.prisma && node packages/frontend/server.js"]

@@ -6,7 +6,6 @@ type Test = {
 };
 
 export default async function Home() {
-  // FIXME why can't I use the api route?
   try {
     console.log('开始获取数据...');
     const tests = await prisma.test.findMany();
@@ -47,3 +46,5 @@ export default async function Home() {
     return <div>发生未知错误</div>;
   }
 }
+
+export const dynamic = 'force-dynamic';

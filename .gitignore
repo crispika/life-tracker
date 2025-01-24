@@ -1,2 +1,59 @@
+# Node.js dependencies
 node_modules
+
+# Environment variables
 .env*
+.DS_Store
+
+# Logs
+logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Next.js build files
+.next
+out
+
+# Production
+build
+
+# Miscellaneous
+*.pem
+
+# Debug
+coverage
+
+# Local env files
+.env*.local
+
+# Vercel
+.vercel
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
+# Prisma
+prisma/migrations
+prisma/.env
+
+# Ignore lock files
+pnpm-lock.yaml
+yarn.lock
+package-lock.json
+
+# Ignore IDE specific files
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# Ignore macOS specific files
+.DS_Store
+
+# Ignore temporary files
+*.tmp
+*.swp

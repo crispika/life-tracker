@@ -5,9 +5,6 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: password123
       MYSQL_DATABASE: life_tracker
-    networks:
-      app-network:
-        ipv4_address: 172.18.0.2
     ports:
       - '3306:3306'
     volumes:
@@ -41,21 +38,13 @@ services:
     ports:
       - '3000:3000'
     environment:
-      - DEBUG=prisma:client
+      - DEBUG=prisma:client,prisma:engine
+      - DATABASE_URL=mysql://root:password123@db:3306/life_tracker?connect_timeout=300
     depends_on:
       db:
         condition: service_healthy
-    networks:
-      - app-network
     env_file:
       - .env
 
 volumes:
   mysql_data:
-
-networks:
-  app-network:
-    driver: bridge
-    ipam:
-      config:
-        - subnet: 172.18.0.0/16
