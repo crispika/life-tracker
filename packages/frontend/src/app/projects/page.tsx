@@ -5,28 +5,48 @@ import {
   formatTimeEstimate,
   minutesToTimeEstimate
 } from './projects.type'
+import { Badge } from '@/components/ui/badge'
 
 export default async function Projects() {
   return (
     <main className="min-h-screen px-24 pt-8">
       <h1 className="text-2xl font-bold">Projects</h1>
       <div className="mt-8">
-        <h2 className="text-xl font-bold mb-4">项目列表</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="space-y-4">
           {mockProjects.map((project) => (
-            <div key={project.id} className="bg-white p-6 rounded-lg shadow-md">
-              <h3 className="text-lg font-bold mb-2">{project.summary}</h3>
-              <p className="text-gray-600 mb-4">{project.description}</p>
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-500">
-                  {project.startDate.toLocaleDateString()} -{' '}
-                  {project.dueDate.toLocaleDateString()}
-                </span>
-                <span className="text-sm text-gray-500">
-                  {formatTimeEstimate(
-                    minutesToTimeEstimate(project.originalEstimateMinutes)
-                  )}
-                </span>
+            <div
+              key={project.id}
+              className="flex items-center p-4 bg-white rounded-lg shadow-md"
+            >
+              <Badge
+                className="mr-4 p-2"
+                style={{ backgroundColor: project.color }}
+              />
+              <div className="flex-1">
+                <div className="flex justify-between items-center">
+                  <span className="font-bold">{project.projectCode}</span>
+                  <span className="text-sm text-gray-500">{project.goal}</span>
+                </div>
+                <div className="flex justify-between items-center mt-2">
+                  <span className="text-lg font-semibold">
+                    {project.summary}
+                  </span>
+                  <span className="text-sm text-gray-500">
+                    {project.startDate.toLocaleDateString()} -{' '}
+                    {project.dueDate.toLocaleDateString()}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center mt-2">
+                  <span className="text-sm text-gray-500">
+                    {formatTimeEstimate(
+                      minutesToTimeEstimate(project.originalEstimateMinutes)
+                    )}{' '}
+                    /{' '}
+                    {formatTimeEstimate(
+                      minutesToTimeEstimate(project.timeSpentMinutes)
+                    )}
+                  </span>
+                </div>
               </div>
             </div>
           ))}
