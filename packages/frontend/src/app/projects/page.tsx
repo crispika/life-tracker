@@ -3,50 +3,97 @@ import {
   Project,
   generateProjectCode,
   formatTimeEstimate,
-  minutesToTimeEstimate
+  minutesToTimeEstimate,
+  goalMap
 } from './projects.type'
 import { Badge } from '@/components/ui/badge'
+import TableHeader from './components/TableHeader'
 
-export default async function Projects() {
+function sortProjects(
+  projects: Project[],
+  sortBy: string | null | undefined,
+  direction: string | null | undefined
+): Project[] {
+  if (!sortBy || !direction) return projects
+
+  return [...projects].sort((a, b) => {
+    const factor = direction === 'asc' ? 1 : -1
+
+    switch (sortBy) {
+      case 'goal':
+        return factor * goalMap[a.goal].name.localeCompare(goalMap[b.goal].name)
+      case 'startDate':
+        return factor * (a.startDate.getTime() - b.startDate.getTime())
+      case 'dueDate':
+        return factor * (a.dueDate.getTime() - b.dueDate.getTime())
+      case 'estimate':
+        return factor * (a.originalEstimateMinutes - b.originalEstimateMinutes)
+      case 'timeSpent':
+        return factor * (a.timeSpentMinutes - b.timeSpentMinutes)
+      case 'summary':
+        return factor * a.summary.localeCompare(b.summary)
+      default:
+        return 0
+    }
+  })
+}
+
+export default async function Projects({
+  searchParams
+}: {
+  searchParams: { sort?: string; dir?: string }
+}) {
+  // 获取排序参数
+  const { sort, dir } = searchParams
+
+  // 排序项目
+  const sortedProjects = sortProjects(mockProjects, sort, dir)
+
   return (
-    <main className="min-h-screen px-24 pt-8">
+    <main className="min-h-screen px-24 py-8">
       <h1 className="text-2xl font-bold">Projects</h1>
+
       <div className="mt-8">
-        <div className="space-y-4">
-          {mockProjects.map((project) => (
+        {/* 表头 - 使用客户端组件 */}
+        <TableHeader currentSort={sort} currentDirection={dir} />
+
+        {/* 项目列表 */}
+        <div className="space-y-1">
+          {sortedProjects.map((project) => (
             <div
               key={project.id}
-              className="flex items-center p-4 bg-white rounded-lg shadow-md"
+              className="flex items-center p-3 bg-white rounded-none border-b last:rounded-b-lg hover:bg-gray-50 transition-colors"
             >
               <Badge
-                className="mr-4 p-2"
+                className="w-6 h-4 mr-6"
                 style={{ backgroundColor: project.color }}
               />
-              <div className="flex-1">
-                <div className="flex justify-between items-center">
-                  <span className="font-bold">{project.projectCode}</span>
-                  <span className="text-sm text-gray-500">{project.goal}</span>
-                </div>
-                <div className="flex justify-between items-center mt-2">
-                  <span className="text-lg font-semibold">
-                    {project.summary}
-                  </span>
-                  <span className="text-sm text-gray-500">
-                    {project.startDate.toLocaleDateString()} -{' '}
-                    {project.dueDate.toLocaleDateString()}
-                  </span>
-                </div>
-                <div className="flex justify-between items-center mt-2">
-                  <span className="text-sm text-gray-500">
-                    {formatTimeEstimate(
-                      minutesToTimeEstimate(project.originalEstimateMinutes)
-                    )}{' '}
-                    /{' '}
-                    {formatTimeEstimate(
-                      minutesToTimeEstimate(project.timeSpentMinutes)
-                    )}
-                  </span>
-                </div>
+              <div className="w-24 font-mono text-sm">
+                {project.projectCode}
+              </div>
+              <div className="w-20 text-sm">
+                <Badge variant="outline" className="font-normal">
+                  {goalMap[project.goal].name}
+                </Badge>
+              </div>
+              <div className="flex-1 font-medium truncate">
+                {project.summary}
+              </div>
+              <div className="w-28 text-sm text-gray-500 px-1">
+                {project.startDate.toLocaleDateString()}
+              </div>
+              <div className="w-28 text-sm text-gray-500 px-1">
+                {project.dueDate.toLocaleDateString()}
+              </div>
+              <div className="w-24 text-sm text-gray-500 px-1">
+                {formatTimeEstimate(
+                  minutesToTimeEstimate(project.originalEstimateMinutes)
+                )}
+              </div>
+              <div className="w-24 text-sm text-gray-500 px-1">
+                {formatTimeEstimate(
+                  minutesToTimeEstimate(project.timeSpentMinutes)
+                )}
               </div>
             </div>
           ))}

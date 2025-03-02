@@ -47,6 +47,9 @@ importers:
       '@life-tracker/db':
         specifier: workspace:*
         version: link:../db
+      '@radix-ui/react-slot':
+        specifier: ^1.1.2
+        version: 1.1.2(@types/react@19.0.2)(react@19.0.0)
       '@types/node':
         specifier: 22.10.2
         version: 22.10.2
@@ -598,6 +601,30 @@ packages:
       {
         integrity: sha512-pUiLbQJQPvH4U8b6Ow984L+0Sz+yMfv9oOPjBj+RKs/ds9/8APnXyRlTaolmKFG+5uMWdGpll+cVN+eFt+CFEg==
       }
+
+  '@radix-ui/react-compose-refs@1.1.1':
+    resolution:
+      {
+        integrity: sha512-Y9VzoRDSJtgFMUCoiZBDVo084VQ5hfpXxVE+NgkdNsjiDBByiImMZKKhxMwCbdHvhlENG6a833CbFkOQvTricw==
+      }
+    peerDependencies:
+      '@types/react': '*'
+      react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
+
+  '@radix-ui/react-slot@1.1.2':
+    resolution:
+      {
+        integrity: sha512-YAKxaiGsSQJ38VzKH86/BPRC4rh+b1Jpa+JneA5LRE7skmLPNAyeG8kPJj/oo4STLvlrs8vkf/iYyc3A5stYCQ==
+      }
+    peerDependencies:
+      '@types/react': '*'
+      react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
 
   '@rtsao/scc@1.1.0':
     resolution:
@@ -3502,6 +3529,19 @@ snapshots:
       '@prisma/debug': 6.2.1
 
   '@prisma/nextjs-monorepo-workaround-plugin@6.2.1': {}
+
+  '@radix-ui/react-compose-refs@1.1.1(@types/react@19.0.2)(react@19.0.0)':
+    dependencies:
+      react: 19.0.0
+    optionalDependencies:
+      '@types/react': 19.0.2
+
+  '@radix-ui/react-slot@1.1.2(@types/react@19.0.2)(react@19.0.0)':
+    dependencies:
+      '@radix-ui/react-compose-refs': 1.1.1(@types/react@19.0.2)(react@19.0.0)
+      react: 19.0.0
+    optionalDependencies:
+      '@types/react': 19.0.2
 
   '@rtsao/scc@1.1.0': {}
 
