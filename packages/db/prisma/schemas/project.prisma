@@ -1,0 +1,29 @@
+model Project {
+  id                     String   @id @default(cuid())
+  projectCode            String   @unique // 项目编号，如 WK-001
+  summary                String   // 项目名称
+  description            String?  // 项目描述
+  startDate              DateTime // 开始日期
+  dueDate                DateTime // 截止日期
+  originalEstimateMinutes Int     // 预估时间（分钟）
+  timeSpentMinutes       Int      // 实际花费时间（分钟）
+  color                  String   // 颜色
+  status                 ProjectStatus @default(IN_PROGRESS) // 项目状态
+  
+  // 关联目标
+  goalId                 String
+  goal                   Goal     @relation(fields: [goalId], references: [id], onDelete: Cascade)
+  
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+  
+  @@index([goalId])
+}
+
+enum ProjectStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  COMPLETED
+  ON_HOLD
+  CANCELLED
+}
