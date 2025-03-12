@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS UC_GOAL (
   goal_id INT(8) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   user_id INT(8) UNSIGNED NOT NULL COMMENT '所属用户ID',
   --   code VARCHAR(8) UNIQUE NOT NULL,
-  -- TODO code # by different code
+  -- TODO code # by different code sequence
 --   sequence INT NOT NULL DEFAULT 0 COMMENT '当前序列号，用于生成项目编号',
   color VARCHAR(7) NOT NULL,
   summary VARCHAR(100) NOT NULL,

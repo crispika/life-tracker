@@ -1,14 +1,21 @@
 services:
   db:
     image: mysql:8.0
+    container_name: life_tracker_mysql
     restart: always
-    environment:
-      MYSQL_ROOT_PASSWORD: password123
-      MYSQL_DATABASE: life_tracker
     ports:
       - '3306:3306'
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: life_tracker
     volumes:
+      # 挂载数据库数据
       - mysql_data:/var/lib/mysql
+      # 挂载初始化脚本
+      - ./packages/db/mysql/docker-init:/docker-entrypoint-initdb.d
+      # 挂载 schema 和 seeds 目录
+      - ./packages/db/mysql/schema:/docker-entrypoint-initdb.d/schema
+      - ./packages/db/mysql/seeds:/docker-entrypoint-initdb.d/seeds
     healthcheck:
       test:
         [
@@ -19,7 +26,7 @@ services:
           'localhost',
           '-u',
           'root',
-          '--password=password123'
+          '-ppassword123'
         ]
       interval: 5s
       timeout: 5s
@@ -34,12 +41,12 @@ services:
       dockerfile: packages/frontend/Dockerfile
       target: runner
       args:
-        - DATABASE_URL=mysql://root:password123@db:3306/life_tracker?connect_timeout=300
+        - DATABASE_URL=mysql://root:${DB_ROOT_PASSWORD}@db:3306/life_tracker?connect_timeout=300
     ports:
       - '3000:3000'
     environment:
       - DEBUG=prisma:client,prisma:engine
-      - DATABASE_URL=mysql://root:password123@db:3306/life_tracker?connect_timeout=300
+      - DATABASE_URL=mysql://root:${DB_ROOT_PASSWORD}@db:3306/life_tracker?connect_timeout=300
     depends_on:
       db:
         condition: service_healthy

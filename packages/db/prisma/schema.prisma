@@ -15,8 +15,5 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Test {
-  id        Int      @id @default(autoincrement())
-  name      String
-  createdAt DateTime @default(now())
-}
+// 这里将是您的数据模型定义
+// Prisma 会从数据库中自动生成
