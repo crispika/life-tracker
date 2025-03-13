@@ -33,7 +33,14 @@ services:
       retries: 5
       start_period: 30s
     command:
-      ['mysqld', '--require_secure_transport=OFF', '--ssl=0', '--skip_ssl']
+      [
+        'mysqld',
+        '--character-set-server=utf8mb4',
+        '--collation-server=utf8mb4_unicode_ci',
+        '--require_secure_transport=OFF',
+        '--ssl=0',
+        '--skip_ssl'
+      ]
 
   web:
     build:
@@ -46,7 +53,7 @@ services:
       - '3000:3000'
     environment:
       - DEBUG=prisma:client,prisma:engine
-      - DATABASE_URL=mysql://root:${DB_ROOT_PASSWORD}@db:3306/life_tracker?connect_timeout=300
+      - DATABASE_URL=mysql://root:${DB_ROOT_PASSWORD}@db:3306/life_tracker?connect_timeout=300&charset=utf8mb4
     depends_on:
       db:
         condition: service_healthy

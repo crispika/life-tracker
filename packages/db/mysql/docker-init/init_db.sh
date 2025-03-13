@@ -1,6 +1,19 @@
 #!/bin/bash
 set -e
 
+echo "=== 设置Docker容器执行环境的字符集 ==="
+
+# 设置环境变量
+export LANG=C.UTF-8
+export LC_ALL=C.UTF-8
+export LANGUAGE=C.UTF-8
+
+# 显示当前环境字符集
+echo "当前环境字符集设置:"
+echo "LANG=$LANG"
+echo "LC_ALL=$LC_ALL"
+echo "LANGUAGE=$LANGUAGE"
+
 # 颜色定义
 GREEN='\033[0;32m'
 RED='\033[0;31m'
