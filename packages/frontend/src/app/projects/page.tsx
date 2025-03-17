@@ -8,6 +8,7 @@ import {
 } from './projects.type'
 import { Badge } from '@/components/ui/badge'
 import TableHeader from './components/TableHeader'
+import { projectQueries, prisma } from '@life-tracker/db'
 
 function sortProjects(
   projects: Project[],
@@ -41,10 +42,12 @@ function sortProjects(
 export default async function Projects({
   searchParams
 }: {
-  searchParams: { sort?: string; dir?: string }
+  searchParams: Promise<{ sort?: string; dir?: string }>
 }) {
-  // 获取排序参数
-  const { sort, dir } = searchParams
+  const { sort, dir } = await searchParams
+
+  const projects = await projectQueries.getProjectsByUserId(prisma, 100000)
+  console.log(projects)
 
   // 排序项目
   const sortedProjects = sortProjects(mockProjects, sort, dir)
