@@ -1,7 +1,7 @@
 generator client {
   provider        = "prisma-client-js"
-  binaryTargets   = ["native", "darwin-arm64", "linux-musl-arm64-openssl-3.0.x"]
   previewFeatures = ["typedSql"]
+  binaryTargets   = ["native", "darwin-arm64", "linux-musl-arm64-openssl-3.0.x"]
 }
 
 datasource db {
@@ -11,24 +11,21 @@ datasource db {
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model GOAL_STATE {
-  state_id     Int       @id @default(autoincrement()) @db.UnsignedInt
-  name         String    @db.VarChar(50)
-  display_name String    @db.VarChar(50)
-  created_at   DateTime  @default(now())
-  updated_at   DateTime  @default(now())
-  UC_GOAL      UC_GOAL[]
+  state_id   Int       @id @default(autoincrement()) @db.UnsignedInt
+  name       String    @db.VarChar(50)
+  created_at DateTime  @default(now())
+  updated_at DateTime  @default(now())
+  UC_GOAL    UC_GOAL[]
 
   @@index([name], map: "idx_goal_state_name")
 }
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model PROJECT_STATE_TEMPLATE {
-  template_id  Int      @id @default(autoincrement()) @db.UnsignedInt
-  name         String   @db.VarChar(50)
-  display_name String   @db.VarChar(50)
-  is_default   Boolean  @default(true)
-  created_at   DateTime @default(now())
-  updated_at   DateTime @default(now())
+  template_id Int      @id @default(autoincrement()) @db.UnsignedInt
+  name        String   @db.VarChar(50)
+  created_at  DateTime @default(now())
+  updated_at  DateTime @default(now())
 }
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
@@ -84,14 +81,14 @@ model UC_PROJECT {
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model UC_PROJECT_STATE {
-  state_id     Int          @id @default(autoincrement()) @db.UnsignedInt
-  user_id      Int          @db.UnsignedInt
-  name         String       @db.VarChar(50)
-  display_name String       @db.VarChar(50)
-  created_at   DateTime     @default(now())
-  updated_at   DateTime     @default(now())
-  UC_PROJECT   UC_PROJECT[]
-  USER         USER         @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_uc_project_state_user")
+  state_id   Int          @id @default(autoincrement()) @db.UnsignedInt
+  user_id    Int          @db.UnsignedInt
+  name       String       @db.VarChar(50)
+  is_default Boolean      @default(false)
+  created_at DateTime     @default(now())
+  updated_at DateTime     @default(now())
+  UC_PROJECT UC_PROJECT[]
+  USER       USER         @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_uc_project_state_user")
 
   @@unique([user_id, name], map: "uk_uc_project_state_name")
   @@index([name], map: "idx_uc_project_state_name")

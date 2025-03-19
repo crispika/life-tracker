@@ -1,18 +1,26 @@
 USE life_tracker;
 
 -- 插入目标状态
-INSERT INTO GOAL_STATE (name, display_name) VALUES
-('ACTIVE', '活跃'),
-('ON_HOLD', '暂停'),
-('COMPLETED', '完成'),
-('ABORTED', '已取消'),
-('ARCHIVED', '已归档');
+INSERT INTO GOAL_STATE (name) VALUES
+('ACTIVE'),
+('ON_HOLD'),
+('COMPLETED'),
+('ABORTED'),
+('ARCHIVED');
 
 -- 插入项目状态模板
-INSERT INTO PROJECT_STATE_TEMPLATE (name, display_name, is_default) VALUES
-('OPEN', '未开始', TRUE),
-('IN_PROGRESS', '进行中', TRUE),
-('COMPLETED', '已完成', TRUE),
-('ON_HOLD', '已暂停', TRUE),
-('ABORTED', '已取消', TRUE),
-('ARCHIVED', '已归档', TRUE);
+INSERT INTO PROJECT_STATE_TEMPLATE (name) VALUES
+('OPEN'),
+('IN_PROGRESS'),
+('COMPLETED'),
+('ON_HOLD'),
+('ABORTED'),
+('ARCHIVED');
+
+-- 为示例用户插入默认项目状态
+INSERT INTO UC_PROJECT_STATE (user_id, name, is_default)
+SELECT 
+  (SELECT user_id FROM USER WHERE email = 'demo@example.com'),
+  name,
+  TRUE
+FROM PROJECT_STATE_TEMPLATE;

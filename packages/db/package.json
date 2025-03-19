@@ -5,10 +5,9 @@
   "type": "module",
   "main": "src/index.ts",
   "scripts": {
-    "test:db": "NODE_OPTIONS='--loader ts-node/esm' node test-db.ts",
-    "generate": "prisma generate",
+    "generate": "npx npx prisma generate",
     "migrate": "prisma migrate deploy",
-    "start:db": "bash ./mysql/scripts/start_local_db.sh"
+    "db:start": "bash ./mysql/scripts/start_local_db.sh"
   },
   "dependencies": {
     "@prisma/client": "^6.2.1",
