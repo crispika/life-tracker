@@ -7,6 +7,7 @@ CREATE PROCEDURE create_default_project_states(IN p_user_id INT UNSIGNED)
 BEGIN
   DECLARE user_exists INT;
   DECLARE states_count INT;
+  DECLARE open_state_id INT UNSIGNED;
   
   -- 检查用户是否存在
   SELECT COUNT(*) INTO user_exists FROM USER WHERE user_id = p_user_id;
@@ -21,9 +22,18 @@ BEGIN
   -- 只有当用户没有状态时才创建
   IF states_count = 0 THEN
     -- 从模板表中获取默认状态并插入到用户状态表
-    INSERT INTO UC_PROJECT_STATE (user_id, name, is_default, created_at, updated_at)
-    SELECT p_user_id, name, TRUE, NOW(3), NOW(3)
+    INSERT INTO UC_PROJECT_STATE (user_id, name, created_at, updated_at)
+    SELECT p_user_id, name, NOW(3), NOW(3)
     FROM PROJECT_STATE_TEMPLATE;
+    
+    -- 获取OPEN状态的ID
+    SELECT state_id INTO open_state_id
+    FROM UC_PROJECT_STATE
+    WHERE user_id = p_user_id AND name = 'OPEN';
+    
+    -- 设置用户的默认初始化状态
+    INSERT INTO UC_PROJECT_INIT_STATE (user_id, state_id)
+    VALUES (p_user_id, open_state_id);
   END IF;
 END //
 
@@ -62,6 +72,11 @@ BEGIN
     -- 使用父目标的前缀ID
     SET p_prefix_id = v_parent_prefix_id;
   ELSE
+    -- 检查前缀是否为空
+    IF p_prefix IS NULL THEN
+      SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = '顶级目标必须指定前缀';
+    END IF;
+    
     -- 检查前缀是否已存在
     IF EXISTS (SELECT 1 FROM UC_GOAL_PREFIX WHERE user_id = p_user_id AND prefix = p_prefix) THEN
       SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = '该前缀已被使用';
@@ -98,7 +113,6 @@ CREATE PROCEDURE create_project(
   IN p_start_date DATETIME(3),
   IN p_due_date DATETIME(3),
   IN p_original_estimate_minutes INT,
-  IN p_state_id INT UNSIGNED,
   IN p_goal_id INT UNSIGNED,
   OUT p_project_id INT UNSIGNED,
   OUT p_code VARCHAR(30)
@@ -106,8 +120,24 @@ CREATE PROCEDURE create_project(
 BEGIN
   DECLARE v_prefix VARCHAR(15);
   DECLARE v_next_seq INT UNSIGNED;
+  DECLARE v_default_state_id INT UNSIGNED;
   
   START TRANSACTION;
+  
+  -- 检查用户是否存在
+  IF NOT EXISTS (SELECT 1 FROM USER WHERE user_id = p_user_id) THEN
+    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = '用户不存在';
+  END IF;
+  
+  -- 检查前缀是否存在
+  IF NOT EXISTS (SELECT 1 FROM UC_GOAL_PREFIX WHERE prefix_id = p_prefix_id AND user_id = p_user_id) THEN
+    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = '前缀不存在';
+  END IF;
+  
+  -- 如果有目标ID，检查目标是否存在
+  IF p_goal_id IS NOT NULL AND NOT EXISTS (SELECT 1 FROM UC_GOAL WHERE goal_id = p_goal_id AND user_id = p_user_id) THEN
+    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = '目标不存在';
+  END IF;
   
   -- 获取并锁定前缀记录
   SELECT prefix, next_seq_number 
@@ -124,6 +154,16 @@ BEGIN
   -- 生成代码
   SET p_code = CONCAT(v_prefix, '-', v_next_seq);
   
+  -- 获取用户的默认初始化状态
+  SELECT state_id INTO v_default_state_id
+  FROM UC_PROJECT_INIT_STATE
+  WHERE user_id = p_user_id;
+  
+  -- 如果没有设置默认状态，报错
+  IF v_default_state_id IS NULL THEN
+    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = '未找到默认项目状态，请先初始化项目状态';
+  END IF;
+  
   -- 插入项目记录
   INSERT INTO UC_PROJECT (
     code, user_id, color, summary, description,
@@ -132,7 +172,7 @@ BEGIN
   ) VALUES (
     p_code, p_user_id, p_color, p_summary, p_description,
     p_start_date, p_due_date, p_original_estimate_minutes,
-    p_state_id, p_goal_id
+    v_default_state_id, p_goal_id
   );
   
   -- 获取新插入的项目ID
