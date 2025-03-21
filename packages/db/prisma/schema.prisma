@@ -88,6 +88,7 @@ model UC_PROJECT_STATE {
   state_id              Int                     @id @default(autoincrement()) @db.UnsignedInt
   user_id               Int                     @db.UnsignedInt
   name                  String                  @db.VarChar(50)
+  system_defined        Boolean                 @default(false)
   created_at            DateTime                @default(now())
   updated_at            DateTime                @default(now())
   UC_PROJECT            UC_PROJECT[]

@@ -1,42 +1,12 @@
 import { Badge } from '@/components/ui/badge'
 import { projectQueries } from '@life-tracker/db'
 import TableHeader from './components/TableHeader'
+import { Project } from './projects.type'
 import {
-  Project,
   formatTimeEstimate,
-  minutesToTimeEstimate
-} from './projects.type'
-
-function sortProjects(
-  projects: Project[],
-  sortBy: string | null | undefined,
-  direction: string | null | undefined
-): Project[] {
-  if (!sortBy || !direction) return projects
-
-  return [...projects].sort((a, b) => {
-    const factor = direction === 'asc' ? 1 : -1
-
-    switch (sortBy) {
-      case 'goal':
-        return factor * (a.goalSummary || '').localeCompare(b.goalSummary || '')
-      case 'state':
-        return factor * (a.state || '').localeCompare(b.state || '')
-      case 'startDate':
-        return factor * (a.startDate.getTime() - b.startDate.getTime())
-      case 'dueDate':
-        return factor * (a.dueDate.getTime() - b.dueDate.getTime())
-      case 'estimate':
-        return factor * (a.originalEstimate - b.originalEstimate)
-      case 'timeSpent':
-        return factor * (a.timeSpent - b.timeSpent)
-      case 'summary':
-        return factor * a.summary.localeCompare(b.summary)
-      default:
-        return 0
-    }
-  })
-}
+  minutesToTimeEstimate,
+  sortProjects
+} from './projects.util'
 
 export default async function Projects({
   searchParams
