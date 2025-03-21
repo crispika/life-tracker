@@ -1,32 +1,13 @@
 import { PrismaClient } from '@prisma/client'
 import { projectQueries } from './queries/project'
 
-// declare global variable to support hot reload in development mode.
-declare global {
-  var prisma: undefined | PrismaClient
-}
+//Prevent hot reloading from creating new instances of PrismaClient
+//each instance of PrismaClient manages a connection pool, which means that a large number of clients can exhaust the database connection limit.
+//https://www.prisma.io/docs/orm/prisma-client/setup-and-configuration/databases-connections#prevent-hot-reloading-from-creating-new-instances-of-prismaclient
+const globalForPrisma = globalThis as unknown as { prisma: PrismaClient }
 
-const prisma =
-  globalThis.prisma ??
-  new PrismaClient({
-    log: ['query', 'info', 'warn', 'error']
-  })
+const prisma = globalForPrisma.prisma || new PrismaClient()
 
-// support hot reload in development mode. avoid creating multiple prisma instances.
-if (process.env.NODE_ENV !== 'production') {
-  globalThis.prisma = prisma
-}
-
-process.on('exit', () => {
-  prisma.$disconnect()
-})
-
-process.on('SIGINT', () => {
-  prisma.$disconnect().then(() => process.exit())
-})
-
-process.on('SIGTERM', () => {
-  prisma.$disconnect().then(() => process.exit())
-})
+if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma
 
 export { prisma, projectQueries }

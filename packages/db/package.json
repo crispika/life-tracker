@@ -5,8 +5,8 @@
   "type": "module",
   "main": "src/index.ts",
   "scripts": {
-    "generate": "npx npx prisma generate",
-    "migrate": "prisma migrate deploy",
+    "client:generate": "npx prisma generate",
+    "db:pull": "npx prisma db pull",
     "db:start": "bash ./mysql/scripts/start_local_db.sh"
   },
   "dependencies": {

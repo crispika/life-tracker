@@ -5,6 +5,7 @@ import { ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react'
 
 type SortOption =
   | 'goal'
+  | 'state'
   | 'startDate'
   | 'dueDate'
   | 'estimate'
@@ -67,10 +68,16 @@ export default function TableHeader({
     <div className="flex items-center p-3 bg-gray-100 rounded-t-lg font-medium text-gray-700">
       <div className="w-6 h-4 mr-6 text-sm">#</div>
       <div className="w-24 text-sm">编号</div>
-      <div className="w-20 text-sm" onClick={() => toggleSort('goal')}>
+      <div className="w-32 text-sm" onClick={() => toggleSort('goal')}>
         <div className={getHeaderItemClass('goal')}>
           目标
           {getSortIcon('goal')}
+        </div>
+      </div>
+      <div className="w-24 text-sm" onClick={() => toggleSort('state')}>
+        <div className={getHeaderItemClass('state')}>
+          状态
+          {getSortIcon('timeSpent')}
         </div>
       </div>
       <div className="flex-1 text-sm" onClick={() => toggleSort('summary')}>
@@ -99,7 +106,7 @@ export default function TableHeader({
       </div>
       <div className="w-24 text-sm" onClick={() => toggleSort('timeSpent')}>
         <div className={getHeaderItemClass('timeSpent')}>
-          实际时间
+          已花费时间
           {getSortIcon('timeSpent')}
         </div>
       </div>

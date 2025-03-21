@@ -7,65 +7,27 @@ export type Goal = {
   sequence: number // 当前序列号，用于生成项目编号
 }
 
+// 项目类型
+export type Project = {
+  id: number
+  code: string
+  summary: string
+  description: string | null
+  startDate: Date
+  dueDate: Date
+  originalEstimate: number
+  timeSpent: number
+  goalSummary?: string
+  goalColor?: string
+  state: string
+}
+
 // 时间估计类型（UI 显示用）
 export type TimeEstimate = {
   weeks: number
   days: number
   hours: number
   minutes: number
-}
-
-// 项目类型
-export type Project = {
-  id: string
-  goal: ProjectGoal
-  projectCode: string
-  summary: string
-  description: string
-  startDate: Date
-  dueDate: Date
-  originalEstimateMinutes: number // 存储为分钟总数
-  timeSpentMinutes: number // 存储为分钟总数
-  color: string
-}
-
-// 目标类型枚举
-export enum ProjectGoal {
-  HEALTH = 'health',
-  WORK = 'work',
-  RELAX = 'relax'
-}
-
-// 目标映射表
-export const goalMap: Record<ProjectGoal, Goal> = {
-  [ProjectGoal.WORK]: {
-    id: '1',
-    name: '工作',
-    key: 'WK',
-    color: '#4A6FDC',
-    sequence: 0
-  },
-  [ProjectGoal.HEALTH]: {
-    id: '2',
-    name: '健康',
-    key: 'HT',
-    color: '#36B37E',
-    sequence: 0
-  },
-  [ProjectGoal.RELAX]: {
-    id: '3',
-    name: '休闲',
-    key: 'RX',
-    color: '#FF8B00',
-    sequence: 0
-  }
-}
-
-// 生成项目编号并更新序列
-export function generateProjectCode(goal: ProjectGoal): string {
-  const goalData = goalMap[goal]
-  goalData.sequence += 1
-  return `${goalData.key}-${goalData.sequence.toString().padStart(3, '0')}`
 }
 
 // 辅助函数：将分钟转换为 TimeEstimate 对象
