@@ -134,9 +134,14 @@ BEGIN
     SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = '前缀不存在';
   END IF;
   
-  -- 如果有目标ID，检查目标是否存在
-  IF p_goal_id IS NOT NULL AND NOT EXISTS (SELECT 1 FROM UC_GOAL WHERE goal_id = p_goal_id AND user_id = p_user_id) THEN
-    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = '目标不存在';
+  -- 检查目标ID是否为空
+  IF p_goal_id IS NULL THEN
+    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'goal_id不能为空';
+  END IF;
+
+  -- 检查目标是否存在
+  IF NOT EXISTS (SELECT 1 FROM UC_GOAL WHERE goal_id = p_goal_id AND user_id = p_user_id) THEN
+    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'goal不存在';
   END IF;
   
   -- 获取并锁定前缀记录

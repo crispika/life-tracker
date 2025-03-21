@@ -11,14 +11,17 @@ SET @relax_prefix_id = (SELECT prefix_id FROM UC_GOAL_PREFIX WHERE user_id = @de
 SET @family_prefix_id = (SELECT prefix_id FROM UC_GOAL_PREFIX WHERE user_id = @demo_user_id AND prefix = 'FM');
 
 -- 获取目标ID
-SET @dev_id = (SELECT goal_id FROM UC_GOAL WHERE user_id = @demo_user_id AND summary = '技术开发能力');
-SET @mgmt_id = (SELECT goal_id FROM UC_GOAL WHERE user_id = @demo_user_id AND summary = '项目管理能力');
-SET @exe_id = (SELECT goal_id FROM UC_GOAL WHERE user_id = @demo_user_id AND summary = '日常锻炼');
-SET @diet_id = (SELECT goal_id FROM UC_GOAL WHERE user_id = @demo_user_id AND summary = '健康饮食');
-SET @read_id = (SELECT goal_id FROM UC_GOAL WHERE user_id = @demo_user_id AND summary = '阅读计划');
-SET @travel_id = (SELECT goal_id FROM UC_GOAL WHERE user_id = @demo_user_id AND summary = '旅行计划');
-SET @prog_id = (SELECT goal_id FROM UC_GOAL WHERE user_id = @demo_user_id AND summary = '编程语言学习');
+SET @health_sport_id = (SELECT goal_id FROM UC_GOAL WHERE user_id = @demo_user_id AND summary = '运动健身');
+SET @health_diet_id = (SELECT goal_id FROM UC_GOAL WHERE user_id = @demo_user_id AND summary = '健康饮食');
+SET @work_dev_id = (SELECT goal_id FROM UC_GOAL WHERE user_id = @demo_user_id AND summary = '项目开发');
+SET @work_mgmt_id = (SELECT goal_id FROM UC_GOAL WHERE user_id = @demo_user_id AND summary = '项目管理能力');
+SET @work_career_id = (SELECT goal_id FROM UC_GOAL WHERE user_id = @demo_user_id AND summary = '职业发展规划');
+SET @learning_tech_id = (SELECT goal_id FROM UC_GOAL WHERE user_id = @demo_user_id AND summary = '技术学习');
+SET @learning_lang_id = (SELECT goal_id FROM UC_GOAL WHERE user_id = @demo_user_id AND summary = '外语学习计划');
+SET @relax_read_id = (SELECT goal_id FROM UC_GOAL WHERE user_id = @demo_user_id AND summary = '阅读计划');
+SET @relax_travel_id = (SELECT goal_id FROM UC_GOAL WHERE user_id = @demo_user_id AND summary = '旅行计划');
 SET @family_act_id = (SELECT goal_id FROM UC_GOAL WHERE user_id = @demo_user_id AND summary = '家庭活动计划');
+SET @family_finance_id = (SELECT goal_id FROM UC_GOAL WHERE user_id = @demo_user_id AND summary = '家庭财务规划');
 
 -- 获取项目状态ID
 SET @open_state_id = (SELECT state_id FROM UC_PROJECT_STATE WHERE user_id = @demo_user_id AND name = 'OPEN');
@@ -30,17 +33,17 @@ SET @archived_state_id = (SELECT state_id FROM UC_PROJECT_STATE WHERE user_id = 
 
 -- 创建项目
 CALL create_project(
-  @health_prefix_id, -- prefix_id
-  @demo_user_id, -- user_id
-  '#FF0000', -- color
-  '每周跑步计划', -- summary
-  '每周进行3次跑步训练', -- description
-  NOW(3), -- start_date
-  DATE_ADD(NOW(3), INTERVAL 1 MONTH), -- due_date
-  180, -- original_estimate_minutes
-  @health_sport_goal_id, -- goal_id
-  @health_sport_project_id, -- project_id
-  @health_sport_project_code -- code
+  @health_prefix_id,
+  @demo_user_id,
+  '#FF0000',
+  '每周跑步计划',
+  '每周进行3次跑步训练',
+  NOW(3),
+  DATE_ADD(NOW(3), INTERVAL 1 MONTH),
+  180,
+  @health_sport_id,
+  @health_sport_project_id,
+  @health_sport_project_code
 );
 
 CALL create_project(
@@ -52,7 +55,7 @@ CALL create_project(
   NOW(3),
   DATE_ADD(NOW(3), INTERVAL 3 MONTH),
   120,
-  @health_diet_goal_id,
+  @health_diet_id,
   @health_diet_project_id,
   @health_diet_project_code
 );
@@ -66,7 +69,7 @@ CALL create_project(
   NOW(3),
   DATE_ADD(NOW(3), INTERVAL 2 MONTH),
   240,
-  @health_sport_goal_id,
+  @health_sport_id,
   @health_sleep_project_id,
   @health_sleep_project_code
 );
@@ -80,7 +83,7 @@ CALL create_project(
   NOW(3),
   DATE_ADD(NOW(3), INTERVAL 2 MONTH),
   480,
-  @work_dev_goal_id,
+  @work_dev_id,
   @work_refactor_project_id,
   @work_refactor_project_code
 );
@@ -94,7 +97,7 @@ CALL create_project(
   NOW(3),
   DATE_ADD(NOW(3), INTERVAL 3 MONTH),
   360,
-  @mgmt_id,
+  @work_mgmt_id,
   @work_mgmt_project_id,
   @work_mgmt_project_code
 );
@@ -108,7 +111,7 @@ CALL create_project(
   NOW(3),
   DATE_ADD(NOW(3), INTERVAL 1 MONTH),
   180,
-  @mgmt_id,
+  @work_career_id,
   @work_career_project_id,
   @work_career_project_code
 );
@@ -122,7 +125,7 @@ CALL create_project(
   NOW(3),
   DATE_ADD(NOW(3), INTERVAL 1 MONTH),
   240,
-  @learning_tech_goal_id,
+  @learning_tech_id,
   @learning_ts_project_id,
   @learning_ts_project_code
 );
@@ -136,23 +139,9 @@ CALL create_project(
   NOW(3),
   DATE_ADD(NOW(3), INTERVAL 6 MONTH),
   720,
-  @prog_id,
+  @learning_lang_id,
   @learning_english_project_id,
   @learning_english_project_code
-);
-
-CALL create_project(
-  @learning_prefix_id,
-  @demo_user_id,
-  '#FF5630',
-  '摄影技巧学习',
-  '学习专业摄影技巧',
-  NOW(3),
-  DATE_ADD(NOW(3), INTERVAL 2 MONTH),
-  300,
-  @prog_id,
-  @learning_photo_project_id,
-  @learning_photo_project_code
 );
 
 CALL create_project(
@@ -164,7 +153,7 @@ CALL create_project(
   NOW(3),
   DATE_ADD(NOW(3), INTERVAL 6 MONTH),
   720,
-  @travel_id,
+  @relax_travel_id,
   @relax_hiking_project_id,
   @relax_hiking_project_code
 );
@@ -178,7 +167,7 @@ CALL create_project(
   NOW(3),
   DATE_ADD(NOW(3), INTERVAL 3 MONTH),
   180,
-  @read_id,
+  @relax_read_id,
   @relax_music_project_id,
   @relax_music_project_code
 );
@@ -192,7 +181,7 @@ CALL create_project(
   NOW(3),
   DATE_ADD(NOW(3), INTERVAL 6 MONTH),
   360,
-  @read_id,
+  @relax_read_id,
   @relax_movie_project_id,
   @relax_movie_project_code
 );
@@ -220,7 +209,7 @@ CALL create_project(
   NOW(3),
   DATE_ADD(NOW(3), INTERVAL 2 MONTH),
   240,
-  @family_act_id,
+  @family_finance_id,
   @family_finance_project_id,
   @family_finance_project_code
 );
@@ -249,7 +238,7 @@ CALL create_project(
   '2023-01-01 00:00:00',
   '2023-03-31 23:59:59',
   4800,
-  @dev_id,
+  @work_dev_id,
   @react_project_id,
   @react_project_code
 );
@@ -263,7 +252,7 @@ CALL create_project(
   '2023-04-01 00:00:00',
   '2023-06-30 23:59:59',
   7200,
-  @dev_id,
+  @work_dev_id,
   @nextjs_project_id,
   @nextjs_project_code
 );
@@ -277,7 +266,7 @@ CALL create_project(
   '2023-07-01 00:00:00',
   '2023-09-30 23:59:59',
   3600,
-  @dev_id,
+  @work_dev_id,
   @ts_project_id,
   @ts_project_code
 );
@@ -291,7 +280,7 @@ CALL create_project(
   '2023-02-01 00:00:00',
   '2023-05-31 23:59:59',
   6000,
-  @mgmt_id,
+  @work_mgmt_id,
   @agile_project_id,
   @agile_project_code
 );
@@ -305,7 +294,7 @@ CALL create_project(
   '2023-03-01 00:00:00',
   '2023-10-31 23:59:59',
   9000,
-  @exe_id,
+  @health_sport_id,
   @marathon_project_id,
   @marathon_project_code
 );
@@ -319,7 +308,7 @@ CALL create_project(
   '2023-02-01 00:00:00',
   '2023-05-31 23:59:59',
   1800,
-  @read_id,
+  @relax_read_id,
   @three_body_project_id,
   @three_body_project_code
 );
@@ -333,7 +322,7 @@ CALL create_project(
   '2023-06-01 00:00:00',
   '2023-07-31 23:59:59',
   1200,
-  @read_id,
+  @relax_read_id,
   @sapiens_project_id,
   @sapiens_project_code
 );
@@ -347,7 +336,7 @@ CALL create_project(
   '2023-05-01 00:00:00',
   '2023-10-31 23:59:59',
   4800,
-  @travel_id,
+  @relax_travel_id,
   @domestic_travel_project_id,
   @domestic_travel_project_code
 );
@@ -361,7 +350,7 @@ CALL create_project(
   '2023-01-01 00:00:00',
   '2023-03-31 23:59:59',
   3600,
-  @prog_id,
+  @learning_tech_id,
   @rust_project_id,
   @rust_project_code
 );
