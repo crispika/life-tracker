@@ -3,7 +3,7 @@ USE life_tracker;
 DELIMITER //
 
 -- 为用户创建默认项目状态的存储过程
-CREATE PROCEDURE create_default_project_states(IN p_user_id INT UNSIGNED)
+CREATE PROCEDURE create_default_project_states_for_user(IN p_user_id INT UNSIGNED)
 BEGIN
   DECLARE user_exists INT;
   DECLARE states_count INT;
@@ -22,8 +22,8 @@ BEGIN
   -- 只有当用户没有状态时才创建
   IF states_count = 0 THEN
     -- 从模板表中获取默认状态并插入到用户状态表
-    INSERT INTO UC_PROJECT_STATE (user_id, name, created_at, updated_at)
-    SELECT p_user_id, name, NOW(3), NOW(3)
+    INSERT INTO UC_PROJECT_STATE (user_id, name, system_defined, created_at, updated_at)
+    SELECT p_user_id, name, TRUE, NOW(3), NOW(3)
     FROM PROJECT_STATE_TEMPLATE;
     
     -- 获取OPEN状态的ID

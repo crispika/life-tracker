@@ -7,7 +7,7 @@ CREATE TRIGGER after_user_insert
 AFTER INSERT ON USER
 FOR EACH ROW
 BEGIN
-  CALL create_default_project_states(NEW.user_id);
+  CALL create_default_project_states_for_user(NEW.user_id);
 END //
 
 -- 用户删除前删除相关项目的触发器
