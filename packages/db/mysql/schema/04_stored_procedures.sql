@@ -60,7 +60,7 @@ BEGIN
   -- 获取ACTIVE状态ID
   SELECT state_id INTO v_active_state_id FROM GOAL_STATE WHERE name = 'ACTIVE';
   
-  -- 如果有父目标，检查父目标是否存在
+  -- 如果有父目标，检查父目标是否存在并获取其前缀ID
   IF p_parent_id IS NOT NULL THEN
     IF NOT EXISTS (SELECT 1 FROM UC_GOAL WHERE goal_id = p_parent_id AND user_id = p_user_id) THEN
       SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = '父目标不存在';
@@ -69,10 +69,15 @@ BEGIN
     -- 获取父目标的前缀ID
     SELECT prefix_id INTO v_parent_prefix_id FROM UC_GOAL WHERE goal_id = p_parent_id;
     
+    -- 子目标必须使用父目标的前缀ID
+    IF p_prefix IS NOT NULL THEN
+      SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = '子目标不能指定新的前缀，必须继承父目标的前缀';
+    END IF;
+    
     -- 使用父目标的前缀ID
     SET p_prefix_id = v_parent_prefix_id;
   ELSE
-    -- 检查前缀是否为空
+    -- 顶级目标必须指定前缀
     IF p_prefix IS NULL THEN
       SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = '顶级目标必须指定前缀';
     END IF;
