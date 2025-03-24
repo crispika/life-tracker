@@ -7,6 +7,7 @@ import {
   minutesToTimeEstimate,
   sortProjects
 } from './projects.util'
+import Link from 'next/link'
 
 export default async function Projects({
   searchParams
@@ -29,54 +30,49 @@ export default async function Projects({
 
   return (
     <main className="min-h-screen px-24 py-8">
-      <h1 className="text-2xl font-bold">Projects</h1>
+      {/* 表头 - 使用客户端组件 */}
+      <TableHeader currentSort={sort} currentDirection={dir} />
 
-      <div className="mt-8">
-        {/* 表头 - 使用客户端组件 */}
-        <TableHeader currentSort={sort} currentDirection={dir} />
-
-        {/* 项目列表 */}
-        <div className="space-y-1">
-          {sortedProjects.map((project) => (
-            <div
-              key={project.id}
-              className="flex items-center p-3 bg-white rounded-none border-b last:rounded-b-lg hover:bg-gray-50 transition-colors"
-            >
-              <Badge
-                className="w-6 h-4 mr-6"
-                style={{ backgroundColor: project.goalColor || '#808080' }}
-              />
-              <div className="w-24 font-mono text-sm">{project.code}</div>
-              <div className="w-32 text-sm">
-                <Badge variant="outline" className="font-normal">
-                  {project.goalSummary || '无目标'}
-                </Badge>
-              </div>
-              <div className="w-24 text-sm">
-                <Badge variant="secondary" className="font-normal">
-                  {project.state}
-                </Badge>
-              </div>
-              <div className="flex-1 font-medium truncate">
-                {project.summary}
-              </div>
-              <div className="w-28 text-sm text-gray-500 px-1">
-                {project.startDate.toLocaleDateString()}
-              </div>
-              <div className="w-28 text-sm text-gray-500 px-1">
-                {project.dueDate.toLocaleDateString()}
-              </div>
-              <div className="w-24 text-sm text-gray-500 px-1">
-                {formatTimeEstimate(
-                  minutesToTimeEstimate(project.originalEstimate)
-                )}
-              </div>
-              <div className="w-24 text-sm text-gray-500 px-1">
-                {formatTimeEstimate(minutesToTimeEstimate(project.timeSpent))}
-              </div>
+      {/* 项目列表 */}
+      <div className="space-y-1">
+        {sortedProjects.map((project) => (
+          <Link
+            href={`/projects/${project.id}`}
+            key={project.id}
+            className="flex items-center p-3 bg-white rounded-none border-b last:rounded-b-lg hover:bg-gray-50 transition-colors"
+          >
+            <Badge
+              className="w-6 h-4 mr-6"
+              style={{ backgroundColor: project.goalColor || '#808080' }}
+            />
+            <div className="w-24 font-mono text-sm">{project.code}</div>
+            <div className="w-32 text-sm">
+              <Badge variant="outline" className="font-normal">
+                {project.goalSummary || '无目标'}
+              </Badge>
             </div>
-          ))}
-        </div>
+            <div className="w-24 text-sm">
+              <Badge variant="secondary" className="font-normal">
+                {project.state}
+              </Badge>
+            </div>
+            <div className="flex-1 font-medium truncate">{project.summary}</div>
+            <div className="w-28 text-sm text-gray-500 px-1">
+              {project.startDate.toLocaleDateString()}
+            </div>
+            <div className="w-28 text-sm text-gray-500 px-1">
+              {project.dueDate.toLocaleDateString()}
+            </div>
+            <div className="w-24 text-sm text-gray-500 px-1">
+              {formatTimeEstimate(
+                minutesToTimeEstimate(project.originalEstimate)
+              )}
+            </div>
+            <div className="w-24 text-sm text-gray-500 px-1">
+              {formatTimeEstimate(minutesToTimeEstimate(project.timeSpent))}
+            </div>
+          </Link>
+        ))}
       </div>
     </main>
   )

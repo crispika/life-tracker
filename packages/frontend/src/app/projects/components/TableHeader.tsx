@@ -65,7 +65,7 @@ export default function TableHeader({
   }
 
   return (
-    <div className="flex items-center p-3 bg-gray-100 rounded-t-lg font-medium text-gray-700">
+    <div className="flex items-center p-3 bg-gray-100 rounded-t-lg font-medium text-gray-700 sticky top-16">
       <div className="w-6 h-4 mr-6 text-sm">#</div>
       <div className="w-24 text-sm">编号</div>
       <div className="w-32 text-sm" onClick={() => toggleSort('goal')}>
