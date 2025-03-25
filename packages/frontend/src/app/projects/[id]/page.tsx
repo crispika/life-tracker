@@ -1,8 +1,7 @@
-import { queries, mutations } from '@life-tracker/db'
-import { formatTimeEstimate } from '../projects.util'
-import { minutesToTimeEstimate } from '../projects.util'
 import { Button } from '@/components/ui/button'
+import { queries } from '@life-tracker/db'
 import { Plus } from 'lucide-react'
+import { formatTimeEstimate, minutesToTimeEstimate } from '../projects.util'
 import { ProjectStateDropdown } from './components/ProjectStateDropdown/ProjectStateDropdown'
 
 export default async function ProjectDetail({

@@ -52,7 +52,7 @@ RUN adduser --system --uid 1001 nextjs
 
 COPY --from=builder /app/packages/frontend/public ./packages/frontend/public
 COPY --from=builder /app/packages/frontend/.next/standalone/. ./
-COPY --from=builder /app/packages/frontend/.next/static ./packages/frontend/static
+COPY --from=builder /app/packages/frontend/.next/static ./packages/frontend/.next/static
 COPY --from=builder /app/packages/db/ ./packages/db/
 
 USER nextjs
@@ -64,5 +64,5 @@ ENV HOSTNAME="0.0.0.0"
 
 # server.js is created by next build from the standalone output
 # https://nextjs.org/docs/pages/api-reference/config/next-config-js/output
-# CMD ["node", "packages/frontend/server.js"]
-CMD ["sh", "-c", "npx prisma migrate deploy --schema=packages/db/prisma/schema.prisma && node packages/frontend/server.js"]
+CMD ["node", "packages/frontend/server.js"]
+# CMD ["sh", "-c", "npx prisma migrate deploy --schema=packages/db/prisma/schema.prisma && node packages/frontend/server.js"]

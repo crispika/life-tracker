@@ -51,7 +51,7 @@ export function sortProjects(
       case 'goal':
         return factor * (a.goalSummary || '').localeCompare(b.goalSummary || '')
       case 'state':
-        return factor * (a.state || '').localeCompare(b.state || '')
+        return factor * (a.state.name || '').localeCompare(b.state.name || '')
       case 'startDate':
         return factor * (a.startDate.getTime() - b.startDate.getTime())
       case 'dueDate':

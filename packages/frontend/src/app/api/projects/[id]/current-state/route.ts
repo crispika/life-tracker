@@ -3,9 +3,9 @@ import { queries, mutations } from '@life-tracker/db'
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const projectId = parseInt(params.id)
+  const projectId = Number((await params).id)
   try {
     const state = await queries.project.getProjectCurrentState(projectId)
     return NextResponse.json(state)
@@ -20,9 +20,9 @@ export async function GET(
 
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const projectId = parseInt(params.id)
+  const projectId = Number((await params).id)
   const { stateId } = await request.json()
 
   try {

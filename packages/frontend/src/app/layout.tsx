@@ -10,6 +10,8 @@ export const metadata = {
   description: 'Track your life goals and projects'
 }
 
+export const dynamic = 'force-dynamic'
+
 export default function RootLayout({
   children
 }: {
