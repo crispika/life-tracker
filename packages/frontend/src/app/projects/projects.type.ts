@@ -9,7 +9,7 @@ export type Project = {
   timeSpent: number
   goalSummary?: string
   goalColor?: string
-  state: string
+  state: ProjectState
 }
 
 // 时间估计类型（UI 显示用）
@@ -18,4 +18,10 @@ export type TimeEstimate = {
   days: number
   hours: number
   minutes: number
+}
+
+export interface ProjectState {
+  name: string
+  id: number
+  systemDefined: boolean
 }

@@ -8,6 +8,7 @@ import {
   sortProjects
 } from './projects.util'
 import Link from 'next/link'
+import { getProjectStateName } from './project.util'
 
 export default async function Projects({
   searchParams
@@ -54,7 +55,10 @@ export default async function Projects({
             </div>
             <div className="w-24 text-sm">
               <Badge variant="secondary" className="font-normal">
-                {project.state}
+                {getProjectStateName(
+                  project.state.systemDefined,
+                  project.state.name
+                )}
               </Badge>
             </div>
             <div className="flex-1 font-medium truncate">{project.summary}</div>

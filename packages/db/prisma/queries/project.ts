@@ -22,7 +22,9 @@ const getProjectsByUserId = async (userId: number) => {
       },
       UC_PROJECT_STATE: {
         select: {
-          name: true
+          name: true,
+          state_id: true,
+          system_defined: true
         }
       }
     }
@@ -39,7 +41,11 @@ const getProjectsByUserId = async (userId: number) => {
     timeSpent: p.time_spent_minutes,
     goalSummary: p.UC_GOAL?.summary,
     goalColor: p.UC_GOAL?.color,
-    state: p.UC_PROJECT_STATE.name
+    state: {
+      name: p.UC_PROJECT_STATE.name,
+      id: p.UC_PROJECT_STATE.state_id,
+      systemDefined: p.UC_PROJECT_STATE.system_defined
+    }
   }))
 }
 
@@ -59,7 +65,9 @@ const getProjectDetailById = async (projectId: number) => {
       time_spent_minutes: true,
       UC_PROJECT_STATE: {
         select: {
-          name: true
+          name: true,
+          state_id: true,
+          system_defined: true
         }
       }
     }
@@ -76,7 +84,11 @@ const getProjectDetailById = async (projectId: number) => {
     dueDate: project.due_date,
     originalEstimate: project.original_estimate_minutes,
     timeSpent: project.time_spent_minutes,
-    state: project.UC_PROJECT_STATE.name
+    state: {
+      name: project.UC_PROJECT_STATE.name,
+      id: project.UC_PROJECT_STATE.state_id,
+      systemDefined: project.UC_PROJECT_STATE.system_defined
+    }
   }
 }
 
@@ -98,8 +110,36 @@ const getProjectStatesByUserId = async (userId: number) => {
   }))
 }
 
+const getProjectCurrentState = async (projectId: number) => {
+  const currentState = await prisma.uC_PROJECT.findUnique({
+    where: {
+      project_id: projectId
+    },
+    select: {
+      UC_PROJECT_STATE: {
+        select: {
+          name: true,
+          state_id: true,
+          system_defined: true
+        }
+      }
+    }
+  })
+
+  if (!currentState) {
+    throw new Error('Project state not found')
+  }
+
+  return {
+    name: currentState.UC_PROJECT_STATE.name,
+    id: currentState.UC_PROJECT_STATE.state_id,
+    systemDefined: currentState.UC_PROJECT_STATE.system_defined
+  }
+}
+
 export default {
   getProjectsByUserId,
   getProjectDetailById,
-  getProjectStatesByUserId
+  getProjectStatesByUserId,
+  getProjectCurrentState
 }

@@ -3,7 +3,7 @@ import { formatTimeEstimate } from '../projects.util'
 import { minutesToTimeEstimate } from '../projects.util'
 import { Button } from '@/components/ui/button'
 import { Plus } from 'lucide-react'
-import { ProjectStateDropdown } from './components/ProjectStateDropdown'
+import { ProjectStateDropdown } from './components/ProjectStateDropdown/ProjectStateDropdown'
 
 export default async function ProjectDetail({
   params
@@ -18,16 +18,7 @@ export default async function ProjectDetail({
         <div className="flex flex-col gap-4 min-w-80">
           <div className="flex justify-between">
             <h1 className="text-xl font-bold">{project.code}</h1>
-            <ProjectStateDropdown
-              currentState={project.state}
-              onStateChange={async (newStateId) => {
-                'use server'
-                await mutations.project.updateProjectState(
-                  projectId,
-                  newStateId
-                )
-              }}
-            />
+            <ProjectStateDropdown projectId={projectId} />
           </div>
           <div className="flex gap-4">
             <Button variant="outline" size="sm">
