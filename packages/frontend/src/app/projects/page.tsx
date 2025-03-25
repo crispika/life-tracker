@@ -1,5 +1,5 @@
 import { Badge } from '@/components/ui/badge'
-import { projectQueries } from '@life-tracker/db'
+import { queries } from '@life-tracker/db'
 import TableHeader from './components/TableHeader'
 import { Project } from './projects.type'
 import {
@@ -15,8 +15,9 @@ export default async function Projects({
   searchParams: Promise<{ sort?: string; dir?: string }>
 }) {
   const { sort, dir } = await searchParams
+  const userId = 100000 // 硬编码的演示用户ID
 
-  const projects: Project[] = await projectQueries.getProjectsByUserId(100000)
+  const projects: Project[] = await queries.project.getProjectsByUserId(userId)
 
   // 处理日期字段
   const processedProjects: Project[] = projects.map((project) => ({

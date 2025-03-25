@@ -1,9 +1,9 @@
-import { projectQueries } from '@life-tracker/db'
+import { queries, mutations } from '@life-tracker/db'
 import { formatTimeEstimate } from '../projects.util'
 import { minutesToTimeEstimate } from '../projects.util'
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { CirclePlus, Plus } from 'lucide-react'
+import { Plus } from 'lucide-react'
+import { ProjectStateDropdown } from './components/ProjectStateDropdown'
 
 export default async function ProjectDetail({
   params
@@ -11,14 +11,23 @@ export default async function ProjectDetail({
   params: Promise<{ id: string }>
 }) {
   const projectId = Number((await params).id)
-  const project = await projectQueries.getProjectDetailById(projectId)
+  const project = await queries.project.getProjectDetailById(projectId)
   return (
     <main className="min-h-72 px-80 py-8 flex justify-between">
       <div className="flex-1 mr-16">
         <div className="flex flex-col gap-4 min-w-80">
           <div className="flex justify-between">
             <h1 className="text-xl font-bold">{project.code}</h1>
-            <Badge variant="secondary">{project.state}</Badge>
+            <ProjectStateDropdown
+              currentState={project.state}
+              onStateChange={async (newStateId) => {
+                'use server'
+                await mutations.project.updateProjectState(
+                  projectId,
+                  newStateId
+                )
+              }}
+            />
           </div>
           <div className="flex gap-4">
             <Button variant="outline" size="sm">

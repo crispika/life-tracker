@@ -1,12 +1,13 @@
 import '@/app/globals.css'
 import { Inter } from 'next/font/google'
 import { Header } from './Header'
+import { QueryProvider } from './QueryProvider'
 
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata = {
   title: 'Life Tracker',
-  description: 'Track your life'
+  description: 'Track your life goals and projects'
 }
 
 export default function RootLayout({
@@ -17,8 +18,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <Header />
-        {children}
+        <QueryProvider>
+          <Header />
+          {children}
+        </QueryProvider>
       </body>
     </html>
   )

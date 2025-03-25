@@ -5,7 +5,7 @@
   "type": "module",
   "main": "src/index.ts",
   "scripts": {
-    "client:generate": "npx prisma generate",
+    "generate": "npx prisma generate",
     "db:pull": "npx prisma db pull",
     "db:start": "bash ./mysql/scripts/start_local_db.sh"
   },

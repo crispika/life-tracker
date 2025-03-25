@@ -1,4 +1,4 @@
-import { prisma } from '../index'
+import { prisma } from '../../index'
 
 const getProjectsByUserId = async (userId: number) => {
   const projects = await prisma.uC_PROJECT.findMany({
@@ -80,4 +80,26 @@ const getProjectDetailById = async (projectId: number) => {
   }
 }
 
-export default { getProjectsByUserId, getProjectDetailById }
+const getProjectStatesByUserId = async (userId: number) => {
+  const states = await prisma.uC_PROJECT_STATE.findMany({
+    where: {
+      user_id: userId
+    },
+    select: {
+      name: true,
+      state_id: true,
+      system_defined: true
+    }
+  })
+  return states.map((state) => ({
+    name: state.name,
+    id: state.state_id,
+    systemDefined: state.system_defined
+  }))
+}
+
+export default {
+  getProjectsByUserId,
+  getProjectDetailById,
+  getProjectStatesByUserId
+}
