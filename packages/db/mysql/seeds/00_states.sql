@@ -16,11 +16,3 @@ INSERT INTO PROJECT_STATE_TEMPLATE (name) VALUES
 ('ON_HOLD'),
 ('ABORTED'),
 ('ARCHIVED');
-
--- 为示例用户插入默认项目状态
-INSERT INTO UC_PROJECT_STATE (user_id, name, is_default)
-SELECT 
-  (SELECT user_id FROM USER WHERE email = 'demo@example.com'),
-  name,
-  TRUE
-FROM PROJECT_STATE_TEMPLATE;
