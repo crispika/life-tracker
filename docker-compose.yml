@@ -3,8 +3,8 @@ services:
     image: mysql:8.0
     container_name: life_tracker_mysql
     restart: always
-    ports:
-      - '3306:3306'
+    expose:
+      - '3306'
     environment:
       MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
       MYSQL_DATABASE: life_tracker
@@ -49,8 +49,8 @@ services:
       target: runner
       args:
         - DATABASE_URL=mysql://root:${DB_ROOT_PASSWORD}@db:3306/life_tracker?connect_timeout=300
-    ports:
-      - '3000:3000'
+    expose:
+      - '3000'
     environment:
       - DEBUG=prisma:client,prisma:engine
       - DATABASE_URL=mysql://root:${DB_ROOT_PASSWORD}@db:3306/life_tracker?connect_timeout=300&charset=utf8mb4
@@ -59,6 +59,19 @@ services:
         condition: service_healthy
     env_file:
       - .env
+
+  nginx:
+    image: nginx:alpine
+    container_name: life_tracker_nginx
+    ports:
+      - '80:80'
+      - '443:443'
+    volumes:
+      - ./nginx/conf.d/${NGINX_CONF:-prod}.conf:/etc/nginx/conf.d/default.conf
+      - ./nginx/ssl:/etc/nginx/ssl
+    depends_on:
+      - web
+    restart: always
 
 volumes:
   mysql_data:
