@@ -9,25 +9,25 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { ChevronDown } from 'lucide-react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { fetchUserProjectStates, updateProjectState } from './projectState.api'
-import { fetchCurrentState } from './projectState.api'
-import { getProjectStateName } from '@/app/projects/project.util'
+import { fetchUserTaskStates, updateTaskState } from './taskState.api'
+import { fetchCurrentState } from './taskState.api'
+import { getTaskStateName } from '@/app/tasks/tasks.util'
 
-export interface ProjectStateDropdownProps {
-  projectId: number
+export interface TaskStateDropdownProps {
+  taskId: number
 }
 
-export function ProjectStateDropdown({ projectId }: ProjectStateDropdownProps) {
+export function TaskStateDropdown({ taskId }: TaskStateDropdownProps) {
   const queryClient = useQueryClient()
 
   const { data: currentState, isLoading: isLoadingCurrentState } = useQuery({
-    queryKey: ['projectCurrentState', projectId],
-    queryFn: () => fetchCurrentState(projectId)
+    queryKey: ['taskCurrentState', taskId],
+    queryFn: () => fetchCurrentState(taskId)
   })
 
   const { data: availableStates = [], isLoading: isLoadingStates } = useQuery({
-    queryKey: ['userProjectStates'],
-    queryFn: fetchUserProjectStates
+    queryKey: ['userTaskStates'],
+    queryFn: fetchUserTaskStates
   })
 
   const isLoading = isLoadingCurrentState || isLoadingStates
@@ -37,10 +37,10 @@ export function ProjectStateDropdown({ projectId }: ProjectStateDropdownProps) {
   }
 
   const handleStateChange = async (stateId: number) => {
-    await updateProjectState(projectId, stateId)
+    await updateTaskState(taskId, stateId)
     // 使缓存失效，触发重新获取
     queryClient.invalidateQueries({
-      queryKey: ['projectCurrentState', projectId]
+      queryKey: ['taskCurrentState', taskId]
     })
   }
 
@@ -51,7 +51,7 @@ export function ProjectStateDropdown({ projectId }: ProjectStateDropdownProps) {
           variant="secondary"
           className="cursor-pointer flex items-center gap-1"
         >
-          {getProjectStateName(currentState.systemDefined, currentState.name)}
+          {getTaskStateName(currentState.systemDefined, currentState.name)}
           <ChevronDown className="h-3 w-3" />
         </Badge>
       </DropdownMenuTrigger>
@@ -63,7 +63,7 @@ export function ProjectStateDropdown({ projectId }: ProjectStateDropdownProps) {
               key={state.id}
               onClick={() => handleStateChange(state.id)}
             >
-              {getProjectStateName(state.systemDefined, state.name)}
+              {getTaskStateName(state.systemDefined, state.name)}
             </DropdownMenuItem>
           ))}
       </DropdownMenuContent>

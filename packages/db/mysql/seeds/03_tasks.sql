@@ -23,16 +23,16 @@ SET @relax_travel_id = (SELECT goal_id FROM UC_GOAL WHERE user_id = @demo_user_i
 SET @family_act_id = (SELECT goal_id FROM UC_GOAL WHERE user_id = @demo_user_id AND summary = '家庭活动计划');
 SET @family_finance_id = (SELECT goal_id FROM UC_GOAL WHERE user_id = @demo_user_id AND summary = '家庭财务规划');
 
--- 获取项目状态ID
-SET @open_state_id = (SELECT state_id FROM UC_PROJECT_STATE WHERE user_id = @demo_user_id AND name = 'OPEN');
-SET @in_progress_state_id = (SELECT state_id FROM UC_PROJECT_STATE WHERE user_id = @demo_user_id AND name = 'IN_PROGRESS');
-SET @completed_state_id = (SELECT state_id FROM UC_PROJECT_STATE WHERE user_id = @demo_user_id AND name = 'COMPLETED');
-SET @on_hold_state_id = (SELECT state_id FROM UC_PROJECT_STATE WHERE user_id = @demo_user_id AND name = 'ON_HOLD');
-SET @aborted_state_id = (SELECT state_id FROM UC_PROJECT_STATE WHERE user_id = @demo_user_id AND name = 'ABORTED');
-SET @archived_state_id = (SELECT state_id FROM UC_PROJECT_STATE WHERE user_id = @demo_user_id AND name = 'ARCHIVED');
+-- 获取任务状态ID
+SET @open_state_id = (SELECT state_id FROM UC_TASK_STATE WHERE user_id = @demo_user_id AND name = 'OPEN');
+SET @in_progress_state_id = (SELECT state_id FROM UC_TASK_STATE WHERE user_id = @demo_user_id AND name = 'IN_PROGRESS');
+SET @completed_state_id = (SELECT state_id FROM UC_TASK_STATE WHERE user_id = @demo_user_id AND name = 'COMPLETED');
+SET @on_hold_state_id = (SELECT state_id FROM UC_TASK_STATE WHERE user_id = @demo_user_id AND name = 'ON_HOLD');
+SET @aborted_state_id = (SELECT state_id FROM UC_TASK_STATE WHERE user_id = @demo_user_id AND name = 'ABORTED');
+SET @archived_state_id = (SELECT state_id FROM UC_TASK_STATE WHERE user_id = @demo_user_id AND name = 'ARCHIVED');
 
--- 创建项目
-CALL create_project(
+-- 创建任务
+CALL create_task(
   @health_prefix_id,
   @demo_user_id,
   '#FF0000',
@@ -42,11 +42,11 @@ CALL create_project(
   DATE_ADD(NOW(3), INTERVAL 1 MONTH),
   180,
   @health_sport_id,
-  @health_sport_project_id,
-  @health_sport_project_code
+  @health_sport_task_id,
+  @health_sport_task_code
 );
 
-CALL create_project(
+CALL create_task(
   @health_prefix_id,
   @demo_user_id,
   '#FF69B4',
@@ -56,11 +56,11 @@ CALL create_project(
   DATE_ADD(NOW(3), INTERVAL 3 MONTH),
   120,
   @health_diet_id,
-  @health_diet_project_id,
-  @health_diet_project_code
+  @health_diet_task_id,
+  @health_diet_task_code
 );
 
-CALL create_project(
+CALL create_task(
   @health_prefix_id,
   @demo_user_id,
   '#00FF00',
@@ -70,11 +70,11 @@ CALL create_project(
   DATE_ADD(NOW(3), INTERVAL 2 MONTH),
   240,
   @health_sport_id,
-  @health_sleep_project_id,
-  @health_sleep_project_code
+  @health_sleep_task_id,
+  @health_sleep_task_code
 );
 
-CALL create_project(
+CALL create_task(
   @work_prefix_id,
   @demo_user_id,
   '#4B0082',
@@ -84,11 +84,11 @@ CALL create_project(
   DATE_ADD(NOW(3), INTERVAL 2 MONTH),
   480,
   @work_dev_id,
-  @work_refactor_project_id,
-  @work_refactor_project_code
+  @work_refactor_task_id,
+  @work_refactor_task_code
 );
 
-CALL create_project(
+CALL create_task(
   @work_prefix_id,
   @demo_user_id,
   '#00C7E6',
@@ -98,11 +98,11 @@ CALL create_project(
   DATE_ADD(NOW(3), INTERVAL 3 MONTH),
   360,
   @work_mgmt_id,
-  @work_mgmt_project_id,
-  @work_mgmt_project_code
+  @work_mgmt_task_id,
+  @work_mgmt_task_code
 );
 
-CALL create_project(
+CALL create_task(
   @work_prefix_id,
   @demo_user_id,
   '#FF8B00',
@@ -112,11 +112,11 @@ CALL create_project(
   DATE_ADD(NOW(3), INTERVAL 1 MONTH),
   180,
   @work_career_id,
-  @work_career_project_id,
-  @work_career_project_code
+  @work_career_task_id,
+  @work_career_task_code
 );
 
-CALL create_project(
+CALL create_task(
   @learning_prefix_id,
   @demo_user_id,
   '#8B4513',
@@ -126,11 +126,11 @@ CALL create_project(
   DATE_ADD(NOW(3), INTERVAL 1 MONTH),
   240,
   @learning_tech_id,
-  @learning_ts_project_id,
-  @learning_ts_project_code
+  @learning_ts_task_id,
+  @learning_ts_task_code
 );
 
-CALL create_project(
+CALL create_task(
   @learning_prefix_id,
   @demo_user_id,
   '#36B37E',
@@ -140,11 +140,11 @@ CALL create_project(
   DATE_ADD(NOW(3), INTERVAL 6 MONTH),
   720,
   @learning_lang_id,
-  @learning_english_project_id,
-  @learning_english_project_code
+  @learning_english_task_id,
+  @learning_english_task_code
 );
 
-CALL create_project(
+CALL create_task(
   @relax_prefix_id,
   @demo_user_id,
   '#FFC400',
@@ -154,11 +154,11 @@ CALL create_project(
   DATE_ADD(NOW(3), INTERVAL 6 MONTH),
   720,
   @relax_travel_id,
-  @relax_hiking_project_id,
-  @relax_hiking_project_code
+  @relax_hiking_task_id,
+  @relax_hiking_task_code
 );
 
-CALL create_project(
+CALL create_task(
   @relax_prefix_id,
   @demo_user_id,
   '#FF5630',
@@ -168,11 +168,11 @@ CALL create_project(
   DATE_ADD(NOW(3), INTERVAL 3 MONTH),
   180,
   @relax_read_id,
-  @relax_music_project_id,
-  @relax_music_project_code
+  @relax_music_task_id,
+  @relax_music_task_code
 );
 
-CALL create_project(
+CALL create_task(
   @relax_prefix_id,
   @demo_user_id,
   '#00B8D9',
@@ -182,11 +182,11 @@ CALL create_project(
   DATE_ADD(NOW(3), INTERVAL 6 MONTH),
   360,
   @relax_read_id,
-  @relax_movie_project_id,
-  @relax_movie_project_code
+  @relax_movie_task_id,
+  @relax_movie_task_code
 );
 
-CALL create_project(
+CALL create_task(
   @family_prefix_id,
   @demo_user_id,
   '#FF8B00',
@@ -196,11 +196,11 @@ CALL create_project(
   DATE_ADD(NOW(3), INTERVAL 3 MONTH),
   480,
   @family_act_id,
-  @family_travel_project_id,
-  @family_travel_project_code
+  @family_travel_task_id,
+  @family_travel_task_code
 );
 
-CALL create_project(
+CALL create_task(
   @family_prefix_id,
   @demo_user_id,
   '#00B8D9',
@@ -210,11 +210,11 @@ CALL create_project(
   DATE_ADD(NOW(3), INTERVAL 2 MONTH),
   240,
   @family_finance_id,
-  @family_finance_project_id,
-  @family_finance_project_code
+  @family_finance_task_id,
+  @family_finance_task_code
 );
 
-CALL create_project(
+CALL create_task(
   @family_prefix_id,
   @demo_user_id,
   '#FFC400',
@@ -224,12 +224,12 @@ CALL create_project(
   DATE_ADD(NOW(3), INTERVAL 6 MONTH),
   1440,
   @family_act_id,
-  @family_renovation_project_id,
-  @family_renovation_project_code
+  @family_renovation_task_id,
+  @family_renovation_task_code
 );
 
--- 创建历史项目
-CALL create_project(
+-- 创建历史任务
+CALL create_task(
   @work_prefix_id,
   @demo_user_id,
   '#6554C0',
@@ -239,11 +239,11 @@ CALL create_project(
   '2023-03-31 23:59:59',
   4800,
   @work_dev_id,
-  @react_project_id,
-  @react_project_code
+  @react_task_id,
+  @react_task_code
 );
 
-CALL create_project(
+CALL create_task(
   @work_prefix_id,
   @demo_user_id,
   '#6554C0',
@@ -253,11 +253,11 @@ CALL create_project(
   '2023-06-30 23:59:59',
   7200,
   @work_dev_id,
-  @nextjs_project_id,
-  @nextjs_project_code
+  @nextjs_task_id,
+  @nextjs_task_code
 );
 
-CALL create_project(
+CALL create_task(
   @work_prefix_id,
   @demo_user_id,
   '#6554C0',
@@ -267,11 +267,11 @@ CALL create_project(
   '2023-09-30 23:59:59',
   3600,
   @work_dev_id,
-  @ts_project_id,
-  @ts_project_code
+  @ts_task_id,
+  @ts_task_code
 );
 
-CALL create_project(
+CALL create_task(
   @work_prefix_id,
   @demo_user_id,
   '#00C7E6',
@@ -281,11 +281,11 @@ CALL create_project(
   '2023-05-31 23:59:59',
   6000,
   @work_mgmt_id,
-  @agile_project_id,
-  @agile_project_code
+  @agile_task_id,
+  @agile_task_code
 );
 
-CALL create_project(
+CALL create_task(
   @health_prefix_id,
   @demo_user_id,
   '#57D9A3',
@@ -295,11 +295,11 @@ CALL create_project(
   '2023-10-31 23:59:59',
   9000,
   @health_sport_id,
-  @marathon_project_id,
-  @marathon_project_code
+  @marathon_task_id,
+  @marathon_task_code
 );
 
-CALL create_project(
+CALL create_task(
   @relax_prefix_id,
   @demo_user_id,
   '#00B8D9',
@@ -309,11 +309,11 @@ CALL create_project(
   '2023-05-31 23:59:59',
   1800,
   @relax_read_id,
-  @three_body_project_id,
-  @three_body_project_code
+  @three_body_task_id,
+  @three_body_task_code
 );
 
-CALL create_project(
+CALL create_task(
   @relax_prefix_id,
   @demo_user_id,
   '#FFC400',
@@ -323,11 +323,11 @@ CALL create_project(
   '2023-07-31 23:59:59',
   1200,
   @relax_read_id,
-  @sapiens_project_id,
-  @sapiens_project_code
+  @sapiens_task_id,
+  @sapiens_task_code
 );
 
-CALL create_project(
+CALL create_task(
   @relax_prefix_id,
   @demo_user_id,
   '#FF5630',
@@ -337,11 +337,11 @@ CALL create_project(
   '2023-10-31 23:59:59',
   4800,
   @relax_travel_id,
-  @domestic_travel_project_id,
-  @domestic_travel_project_code
+  @domestic_travel_task_id,
+  @domestic_travel_task_code
 );
 
-CALL create_project(
+CALL create_task(
   @learning_prefix_id,
   @demo_user_id,
   '#36B37E',
@@ -351,11 +351,11 @@ CALL create_project(
   '2023-03-31 23:59:59',
   3600,
   @learning_tech_id,
-  @rust_project_id,
-  @rust_project_code
+  @rust_task_id,
+  @rust_task_code
 );
 
-CALL create_project(
+CALL create_task(
   @family_prefix_id,
   @demo_user_id,
   '#00B8D9',
@@ -365,11 +365,11 @@ CALL create_project(
   '2023-12-31 23:59:59',
   5200,
   @family_act_id,
-  @family_weekend_project_id,
-  @family_weekend_project_code
+  @family_weekend_task_id,
+  @family_weekend_task_code
 );
 
-CALL create_project(
+CALL create_task(
   @family_prefix_id,
   @demo_user_id,
   '#00B8D9',
@@ -379,6 +379,6 @@ CALL create_project(
   '2023-08-31 23:59:59',
   3600,
   @family_act_id,
-  @family_travel_history_project_id,
-  @family_travel_history_project_code
+  @family_travel_history_task_id,
+  @family_travel_history_task_code
 );

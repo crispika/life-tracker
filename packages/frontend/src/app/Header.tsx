@@ -11,8 +11,8 @@ export const Header = () => {
         <Link href="/" className={getClassName(pathname, '/')}>
           Dashboard
         </Link>
-        <Link href="/projects" className={getClassName(pathname, '/projects')}>
-          Projects
+        <Link href="/tasks" className={getClassName(pathname, '/tasks')}>
+          Tasks
         </Link>
       </nav>
     </header>
@@ -25,8 +25,8 @@ const getClassName = (pathname: string, href: string) => {
     case '/':
       selected = pathname === href
       break
-    case '/projects':
-      selected = pathname.includes('/projects')
+    case '/tasks':
+      selected = pathname.includes('/tasks')
       break
   }
   return selected

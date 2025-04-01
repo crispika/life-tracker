@@ -2,8 +2,8 @@ USE life_tracker;
 
 DELIMITER //
 
--- 为用户创建默认项目状态的存储过程
-CREATE PROCEDURE create_default_project_states_for_user(IN p_user_id INT UNSIGNED)
+-- 为用户创建默认任务状态的存储过程
+CREATE PROCEDURE create_default_task_states_for_user(IN p_user_id INT UNSIGNED)
 BEGIN
   DECLARE user_exists INT;
   DECLARE states_count INT;
@@ -16,23 +16,23 @@ BEGIN
     SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = '用户不存在';
   END IF;
   
-  -- 检查用户是否已有项目状态
-  SELECT COUNT(*) INTO states_count FROM UC_PROJECT_STATE WHERE user_id = p_user_id;
+  -- 检查用户是否已有任务状态
+  SELECT COUNT(*) INTO states_count FROM UC_TASK_STATE WHERE user_id = p_user_id;
   
   -- 只有当用户没有状态时才创建
   IF states_count = 0 THEN
     -- 从模板表中获取默认状态并插入到用户状态表
-    INSERT INTO UC_PROJECT_STATE (user_id, name, system_defined, created_at, updated_at)
+    INSERT INTO UC_TASK_STATE (user_id, name, system_defined, created_at, updated_at)
     SELECT p_user_id, name, TRUE, NOW(3), NOW(3)
-    FROM PROJECT_STATE_TEMPLATE;
+    FROM TASK_STATE_TEMPLATE;
     
     -- 获取OPEN状态的ID
     SELECT state_id INTO open_state_id
-    FROM UC_PROJECT_STATE
+    FROM UC_TASK_STATE
     WHERE user_id = p_user_id AND name = 'OPEN';
     
     -- 设置用户的默认初始化状态
-    INSERT INTO UC_PROJECT_INIT_STATE (user_id, state_id)
+    INSERT INTO UC_TASK_INIT_STATE (user_id, state_id)
     VALUES (p_user_id, open_state_id);
   END IF;
 END //
@@ -108,8 +108,8 @@ BEGIN
   SET p_goal_id = LAST_INSERT_ID();
 END //
 
--- 创建项目并生成项目编号的存储过程
-CREATE PROCEDURE create_project(
+-- 创建任务并生成任务编号的存储过程
+CREATE PROCEDURE create_task(
   IN p_prefix_id INT UNSIGNED,
   IN p_user_id INT UNSIGNED,
   IN p_color VARCHAR(7),
@@ -119,7 +119,7 @@ CREATE PROCEDURE create_project(
   IN p_due_date DATETIME(3),
   IN p_original_estimate_minutes INT,
   IN p_goal_id INT UNSIGNED,
-  OUT p_project_id INT UNSIGNED,
+  OUT p_task_id INT UNSIGNED,
   OUT p_code VARCHAR(30)
 )
 BEGIN
@@ -166,16 +166,16 @@ BEGIN
   
   -- 获取用户的默认初始化状态
   SELECT state_id INTO v_default_state_id
-  FROM UC_PROJECT_INIT_STATE
+  FROM UC_TASK_INIT_STATE
   WHERE user_id = p_user_id;
   
   -- 如果没有设置默认状态，报错
   IF v_default_state_id IS NULL THEN
-    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = '未找到默认项目状态，请先初始化项目状态';
+    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = '未找到默认任务状态，请先初始化任务状态';
   END IF;
   
-  -- 插入项目记录
-  INSERT INTO UC_PROJECT (
+  -- 插入任务记录
+  INSERT INTO UC_TASK (
     code, user_id, color, summary, description,
     start_date, due_date, original_estimate_minutes,
     state_id, goal_id
@@ -185,8 +185,8 @@ BEGIN
     v_default_state_id, p_goal_id
   );
   
-  -- 获取新插入的项目ID
-  SET p_project_id = LAST_INSERT_ID();
+  -- 获取新插入的任务ID
+  SET p_task_id = LAST_INSERT_ID();
   
   COMMIT;
 END //

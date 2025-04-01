@@ -21,30 +21,22 @@ model GOAL_STATE {
 }
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
-model PROJECT_STATE_TEMPLATE {
-  template_id Int      @id @default(autoincrement()) @db.UnsignedInt
-  name        String   @db.VarChar(50)
-  created_at  DateTime @default(now())
-  updated_at  DateTime @default(now())
-}
-
-/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model UC_GOAL {
-  goal_id       Int          @id @default(autoincrement()) @db.UnsignedInt
-  user_id       Int          @db.UnsignedInt
-  color         String       @db.VarChar(7)
-  summary       String       @db.VarChar(100)
-  description   String?      @db.Text
-  state_id      Int          @db.UnsignedInt
-  parent_id     Int?         @db.UnsignedInt
-  prefix_id     Int?         @db.UnsignedInt
-  created_at    DateTime     @default(now())
-  updated_at    DateTime     @default(now())
-  UC_GOAL       UC_GOAL?     @relation("UC_GOALToUC_GOAL", fields: [parent_id], references: [goal_id], onUpdate: NoAction, map: "fk_uc_goal_parent")
-  other_UC_GOAL UC_GOAL[]    @relation("UC_GOALToUC_GOAL")
-  GOAL_STATE    GOAL_STATE   @relation(fields: [state_id], references: [state_id], onUpdate: NoAction, map: "fk_uc_goal_state")
-  USER          USER         @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_uc_goal_user")
-  UC_PROJECT    UC_PROJECT[]
+  goal_id       Int        @id @default(autoincrement()) @db.UnsignedInt
+  user_id       Int        @db.UnsignedInt
+  color         String     @db.VarChar(7)
+  summary       String     @db.VarChar(100)
+  description   String?    @db.Text
+  state_id      Int        @db.UnsignedInt
+  parent_id     Int?       @db.UnsignedInt
+  prefix_id     Int?       @db.UnsignedInt
+  created_at    DateTime   @default(now())
+  updated_at    DateTime   @default(now())
+  UC_GOAL       UC_GOAL?   @relation("UC_GOALToUC_GOAL", fields: [parent_id], references: [goal_id], onUpdate: NoAction, map: "fk_uc_goal_parent")
+  other_UC_GOAL UC_GOAL[]  @relation("UC_GOALToUC_GOAL")
+  GOAL_STATE    GOAL_STATE @relation(fields: [state_id], references: [state_id], onUpdate: NoAction, map: "fk_uc_goal_state")
+  USER          USER       @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_uc_goal_user")
+  UC_TASK       UC_TASK[]
 
   @@unique([user_id, summary], map: "uk_uc_goal_summary")
   @@index([parent_id], map: "fk_uc_goal_parent")
@@ -56,65 +48,20 @@ model UC_GOAL {
 }
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
-model UC_PROJECT {
-  project_id                Int              @id @default(autoincrement()) @db.UnsignedInt
-  code                      String           @db.VarChar(30)
-  user_id                   Int              @db.UnsignedInt
-  color                     String           @db.VarChar(7)
-  summary                   String           @db.VarChar(100)
-  description               String?          @db.Text
-  start_date                DateTime
-  due_date                  DateTime
-  original_estimate_minutes Int
-  time_spent_minutes        Int              @default(0)
-  state_id                  Int              @db.UnsignedInt
-  goal_id                   Int?             @db.UnsignedInt
-  created_at                DateTime         @default(now())
-  updated_at                DateTime         @default(now())
-  UC_GOAL                   UC_GOAL?         @relation(fields: [goal_id], references: [goal_id], onUpdate: NoAction, map: "fk_uc_project_goal")
-  UC_PROJECT_STATE          UC_PROJECT_STATE @relation(fields: [state_id], references: [state_id], onUpdate: NoAction, map: "fk_uc_project_state")
-  USER                      USER             @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_uc_project_user")
-
-  @@unique([user_id, code], map: "uk_uc_project_code")
-  @@index([state_id], map: "fk_uc_project_state")
-  @@index([goal_id], map: "idx_uc_project_goal")
-  @@index([user_id], map: "idx_uc_project_user")
-  @@index([user_id, goal_id], map: "idx_uc_project_user_goal")
-  @@index([user_id, state_id], map: "idx_uc_project_user_state")
-}
-
-/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
-model UC_PROJECT_STATE {
-  state_id              Int                     @id @default(autoincrement()) @db.UnsignedInt
-  user_id               Int                     @db.UnsignedInt
-  name                  String                  @db.VarChar(50)
-  system_defined        Boolean                 @default(false)
-  created_at            DateTime                @default(now())
-  updated_at            DateTime                @default(now())
-  UC_PROJECT            UC_PROJECT[]
-  UC_PROJECT_INIT_STATE UC_PROJECT_INIT_STATE[]
-  USER                  USER                    @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_uc_project_state_user")
-
-  @@unique([user_id, name], map: "uk_uc_project_state_name")
-  @@index([name], map: "idx_uc_project_state_name")
-  @@index([user_id], map: "idx_uc_project_state_user")
-}
-
-/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model USER {
-  user_id               Int                    @id @default(autoincrement()) @db.UnsignedInt
-  email                 String                 @unique(map: "email") @db.VarChar(100)
-  password_hash         String                 @db.VarChar(255)
-  display_name          String?                @db.VarChar(100)
-  avatar_url            String?                @db.VarChar(255)
-  is_active             Boolean                @default(true)
-  created_at            DateTime               @default(now())
-  updated_at            DateTime               @default(now())
-  UC_GOAL               UC_GOAL[]
-  UC_GOAL_PREFIX        UC_GOAL_PREFIX[]
-  UC_PROJECT            UC_PROJECT[]
-  UC_PROJECT_INIT_STATE UC_PROJECT_INIT_STATE?
-  UC_PROJECT_STATE      UC_PROJECT_STATE[]
+  user_id            Int                 @id @default(autoincrement()) @db.UnsignedInt
+  email              String              @unique(map: "email") @db.VarChar(100)
+  password_hash      String              @db.VarChar(255)
+  display_name       String?             @db.VarChar(100)
+  avatar_url         String?             @db.VarChar(255)
+  is_active          Boolean             @default(true)
+  created_at         DateTime            @default(now())
+  updated_at         DateTime            @default(now())
+  UC_GOAL            UC_GOAL[]
+  UC_GOAL_PREFIX     UC_GOAL_PREFIX[]
+  UC_TASK            UC_TASK[]
+  UC_TASK_INIT_STATE UC_TASK_INIT_STATE?
+  UC_TASK_STATE      UC_TASK_STATE[]
 }
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
@@ -131,14 +78,67 @@ model UC_GOAL_PREFIX {
 }
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
-model UC_PROJECT_INIT_STATE {
-  init_state_id    Int              @id @default(autoincrement()) @db.UnsignedInt
-  user_id          Int              @unique(map: "uk_uc_project_init_state_user") @db.UnsignedInt
-  state_id         Int              @db.UnsignedInt
-  created_at       DateTime         @default(now())
-  updated_at       DateTime         @default(now())
-  UC_PROJECT_STATE UC_PROJECT_STATE @relation(fields: [state_id], references: [state_id], onUpdate: NoAction, map: "fk_uc_project_init_state_state")
-  USER             USER             @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_uc_project_init_state_user")
+model TASK_STATE_TEMPLATE {
+  template_id Int      @id @default(autoincrement()) @db.UnsignedInt
+  name        String   @db.VarChar(50)
+  created_at  DateTime @default(now())
+  updated_at  DateTime @default(now())
+}
 
-  @@index([state_id], map: "fk_uc_project_init_state_state")
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model UC_TASK {
+  task_id                   Int           @id @default(autoincrement()) @db.UnsignedInt
+  code                      String        @db.VarChar(30)
+  user_id                   Int           @db.UnsignedInt
+  color                     String        @db.VarChar(7)
+  summary                   String        @db.VarChar(100)
+  description               String?       @db.Text
+  start_date                DateTime
+  due_date                  DateTime
+  original_estimate_minutes Int
+  time_spent_minutes        Int           @default(0)
+  state_id                  Int           @db.UnsignedInt
+  goal_id                   Int?          @db.UnsignedInt
+  created_at                DateTime      @default(now())
+  updated_at                DateTime      @default(now())
+  UC_GOAL                   UC_GOAL?      @relation(fields: [goal_id], references: [goal_id], onUpdate: NoAction, map: "fk_uc_task_goal")
+  UC_TASK_STATE             UC_TASK_STATE @relation(fields: [state_id], references: [state_id], onUpdate: NoAction, map: "fk_uc_task_state")
+  USER                      USER          @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_uc_task_user")
+
+  @@unique([user_id, code], map: "uk_uc_task_code")
+  @@index([state_id], map: "fk_uc_task_state")
+  @@index([goal_id], map: "idx_uc_task_goal")
+  @@index([user_id], map: "idx_uc_task_user")
+  @@index([user_id, goal_id], map: "idx_uc_task_user_goal")
+  @@index([user_id, state_id], map: "idx_uc_task_user_state")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model UC_TASK_INIT_STATE {
+  init_state_id Int           @id @default(autoincrement()) @db.UnsignedInt
+  user_id       Int           @unique(map: "uk_uc_task_init_state_user") @db.UnsignedInt
+  state_id      Int           @db.UnsignedInt
+  created_at    DateTime      @default(now())
+  updated_at    DateTime      @default(now())
+  UC_TASK_STATE UC_TASK_STATE @relation(fields: [state_id], references: [state_id], onUpdate: NoAction, map: "fk_uc_task_init_state_state")
+  USER          USER          @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_uc_task_init_state_user")
+
+  @@index([state_id], map: "fk_uc_task_init_state_state")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model UC_TASK_STATE {
+  state_id           Int                  @id @default(autoincrement()) @db.UnsignedInt
+  user_id            Int                  @db.UnsignedInt
+  name               String               @db.VarChar(50)
+  system_defined     Boolean              @default(false)
+  created_at         DateTime             @default(now())
+  updated_at         DateTime             @default(now())
+  UC_TASK            UC_TASK[]
+  UC_TASK_INIT_STATE UC_TASK_INIT_STATE[]
+  USER               USER                 @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_uc_task_state_user")
+
+  @@unique([user_id, name], map: "uk_uc_task_state_name")
+  @@index([name], map: "idx_uc_task_state_name")
+  @@index([user_id], map: "idx_uc_task_state_user")
 }

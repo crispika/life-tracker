@@ -1,6 +1,6 @@
 import { PrismaClient } from '@prisma/client'
-import projectQueries from './prisma/queries/project'
-import projectMutations from './prisma/mutations/project'
+import taskQueries from './prisma/queries/task'
+import taskMutations from './prisma/mutations/task'
 
 //Prevent hot reloading from creating new instances of PrismaClient
 //each instance of PrismaClient manages a connection pool, which means that a large number of clients can exhaust the database connection limit.
@@ -12,11 +12,11 @@ const prisma = globalForPrisma.prisma || new PrismaClient()
 if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma
 
 const queries = {
-  project: projectQueries
+  task: taskQueries
 }
 
 const mutations = {
-  project: projectMutations
+  task: taskMutations
 }
 
 export { prisma, queries, mutations }

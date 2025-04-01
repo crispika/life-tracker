@@ -7,7 +7,7 @@ const inter = Inter({ subsets: ['latin'] })
 
 export const metadata = {
   title: 'Life Tracker',
-  description: 'Track your life goals and projects'
+  description: 'Track your life goals and tasks'
 }
 
 export const dynamic = 'force-dynamic'

@@ -1,4 +1,10 @@
-export type Project = {
+export interface TaskState {
+  id: number
+  name: string
+  systemDefined: boolean
+}
+
+export interface Task {
   id: number
   code: string
   summary: string
@@ -9,7 +15,7 @@ export type Project = {
   timeSpent: number
   goalSummary?: string
   goalColor?: string
-  state: ProjectState
+  state: TaskState
 }
 
 // 时间估计类型（UI 显示用）
@@ -20,7 +26,7 @@ export type TimeEstimate = {
   minutes: number
 }
 
-export interface ProjectState {
+export interface TaskState {
   name: string
   id: number
   systemDefined: boolean

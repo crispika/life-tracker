@@ -132,7 +132,7 @@ log_info "开始导入种子数据"
 execute_sql "./seeds/00_states.sql" "导入状态数据" || log_error "导入状态数据失败，但继续执行"
 execute_sql "./seeds/01_users.sql" "导入用户数据" || log_error "导入用户数据失败，但继续执行"
 execute_sql "./seeds/02_goals.sql" "导入目标数据" || log_error "导入目标数据失败，但继续执行"
-execute_sql "./seeds/03_projects.sql" "导入项目数据" || log_error "导入项目数据失败，但继续执行"
+execute_sql "./seeds/03_tasks.sql" "导入任务数据" || log_error "导入任务数据失败，但继续执行"
 
 # 验证数据库结构
 log_info "验证数据库结构"
@@ -152,6 +152,6 @@ mysql -u root -p$MYSQL_ROOT_PASSWORD -e "USE life_tracker; SHOW PROCEDURE STATUS
 # 验证种子数据
 log_info "验证种子数据"
 echo "表数据统计:"
-mysql -u root -p$MYSQL_ROOT_PASSWORD -e "USE life_tracker; SELECT 'USER' as Table_Name, COUNT(*) as Row_Count FROM USER UNION SELECT 'GOAL_STATE', COUNT(*) FROM GOAL_STATE UNION SELECT 'UC_GOAL', COUNT(*) FROM UC_GOAL UNION SELECT 'UC_PROJECT', COUNT(*) FROM UC_PROJECT;"
+mysql -u root -p$MYSQL_ROOT_PASSWORD -e "USE life_tracker; SELECT 'USER' as Table_Name, COUNT(*) as Row_Count FROM USER UNION SELECT 'GOAL_STATE', COUNT(*) FROM GOAL_STATE UNION SELECT 'UC_GOAL', COUNT(*) FROM UC_GOAL UNION SELECT 'UC_TASK', COUNT(*) FROM UC_TASK;"
 
 log_info "===== 数据库初始化完成！ =====" 
