@@ -1,5 +1,3 @@
-import * as React from 'react'
-import { ChevronRight } from 'lucide-react'
 import {
   Collapsible,
   CollapsibleContent,
@@ -12,15 +10,15 @@ import {
   SidebarGroupContent,
   SidebarGroupLabel,
   SidebarHeader,
-  SidebarMenu,
   SidebarMenuButton,
-  SidebarMenuItem,
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
   SidebarRail
 } from '@/components/ui/sidebar'
+import { ChevronRight } from 'lucide-react'
 import Link from 'next/link'
+import * as React from 'react'
 
 const data = {
   navMain: [
@@ -124,7 +122,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         {data.navMain.map((item) => {
           if (item.items.length === 0) {
             return (
-              <SidebarGroup>
+              <SidebarGroup key={item.title}>
                 <SidebarGroupLabel
                   asChild
                   className="group/label text-sm text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
@@ -145,7 +143,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               defaultOpen
               className="group/collapsible"
             >
-              <SidebarGroup>
+              <SidebarGroup key={item.title}>
                 <SidebarGroupLabel
                   asChild
                   className="group/label text-sm text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"

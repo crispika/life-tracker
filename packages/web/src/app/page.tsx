@@ -1,15 +1,12 @@
 import { SidebarTrigger } from '@/components/ui/sidebar'
 
 import {
+  Breadcrumb,
   BreadcrumbItem,
   BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator
+  BreadcrumbList
 } from '@/components/ui/breadcrumb'
-import { Breadcrumb } from '@/components/ui/breadcrumb'
 import { Separator } from '@/components/ui/separator'
-import { SidebarInset } from '@/components/ui/sidebar'
 
 export default async function Home() {
   return (

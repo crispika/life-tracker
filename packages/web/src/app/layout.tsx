@@ -1,21 +1,8 @@
 import '@/app/globals.css'
+import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar'
 import { Inter } from 'next/font/google'
-import { QueryProvider } from './components/QueryProvider'
 import { AppSidebar } from './components/AppSidebar'
-import {
-  SidebarInset,
-  SidebarProvider,
-  SidebarTrigger
-} from '@/components/ui/sidebar'
-import { Separator } from '@/components/ui/separator'
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator
-} from '@/components/ui/breadcrumb'
+import { QueryProvider } from './components/QueryProvider'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata = {

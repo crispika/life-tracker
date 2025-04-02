@@ -1,6 +1,4 @@
-import { Project } from 'next/dist/build/swc/types'
-import { TimeEstimate } from './tasks.type'
-import { Task } from './tasks.type'
+import { Task, TimeEstimate } from './tasks.type'
 
 const DEFAULT_TASK_STATE = {
   OPEN: '未开始',
