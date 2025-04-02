@@ -1,5 +1,5 @@
 {
-  "name": "@life-tracker/frontend",
+  "name": "@life-tracker/web",
   "version": "0.1.0",
   "private": true,
   "scripts": {
