@@ -44,8 +44,8 @@ async function getUserGoalTree(userId: number) {
         description: g.description,
         parentId: g.parent_id,
         prefix: {
-          id: g.UC_GOAL_PREFIX?.prefix_id,
-          name: g.UC_GOAL_PREFIX?.prefix
+          id: g.UC_GOAL_PREFIX.prefix_id,
+          name: g.UC_GOAL_PREFIX.prefix
         },
         state: {
           id: g.GOAL_STATE.state_id,

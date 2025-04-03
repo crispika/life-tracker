@@ -22,21 +22,21 @@ model GOAL_STATE {
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model UC_GOAL {
-  goal_id        Int             @id @default(autoincrement()) @db.UnsignedInt
-  user_id        Int             @db.UnsignedInt
-  color          String          @db.VarChar(7)
-  summary        String          @db.VarChar(100)
-  description    String?         @db.Text
-  state_id       Int             @db.UnsignedInt
-  parent_id      Int?            @db.UnsignedInt
-  prefix_id      Int?            @db.UnsignedInt
-  created_at     DateTime        @default(now())
-  updated_at     DateTime        @default(now())
-  UC_GOAL        UC_GOAL?        @relation("UC_GOALToUC_GOAL", fields: [parent_id], references: [goal_id], onUpdate: NoAction, map: "fk_uc_goal_parent")
-  other_UC_GOAL  UC_GOAL[]       @relation("UC_GOALToUC_GOAL")
-  UC_GOAL_PREFIX UC_GOAL_PREFIX? @relation(fields: [prefix_id], references: [prefix_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_uc_goal_prefix")
-  GOAL_STATE     GOAL_STATE      @relation(fields: [state_id], references: [state_id], onUpdate: NoAction, map: "fk_uc_goal_state")
-  USER           USER            @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_uc_goal_user")
+  goal_id        Int            @id @default(autoincrement()) @db.UnsignedInt
+  user_id        Int            @db.UnsignedInt
+  color          String         @db.VarChar(7)
+  summary        String         @db.VarChar(100)
+  description    String?        @db.Text
+  state_id       Int            @db.UnsignedInt
+  parent_id      Int?           @db.UnsignedInt
+  prefix_id      Int            @db.UnsignedInt
+  created_at     DateTime       @default(now())
+  updated_at     DateTime       @default(now())
+  UC_GOAL        UC_GOAL?       @relation("UC_GOALToUC_GOAL", fields: [parent_id], references: [goal_id], onUpdate: NoAction, map: "fk_uc_goal_parent")
+  other_UC_GOAL  UC_GOAL[]      @relation("UC_GOALToUC_GOAL")
+  UC_GOAL_PREFIX UC_GOAL_PREFIX @relation(fields: [prefix_id], references: [prefix_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_uc_goal_prefix")
+  GOAL_STATE     GOAL_STATE     @relation(fields: [state_id], references: [state_id], onUpdate: NoAction, map: "fk_uc_goal_state")
+  USER           USER           @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_uc_goal_user")
   UC_TASK        UC_TASK[]
 
   @@unique([user_id, summary], map: "uk_uc_goal_summary")
