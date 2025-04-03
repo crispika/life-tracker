@@ -22,14 +22,23 @@ export function SetLifeGoalDialog() {
   const [open, setOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const { toast } = useToast()
+  const [errors, setErrors] = useState<{
+    summary?: string
+  }>({})
+
+  const validateForm = () => {
+    const newErrors: typeof errors = {}
+
+    if (!summary.trim()) {
+      newErrors.summary = '目标概述不能为空'
+    }
+
+    setErrors(newErrors)
+    return Object.keys(newErrors).length === 0
+  }
 
   const handleSubmit = async () => {
-    if (!summary) {
-      toast({
-        title: '错误',
-        description: '目标概述不能为空',
-        variant: 'destructive'
-      })
+    if (!validateForm()) {
       return
     }
 
@@ -79,13 +88,22 @@ export function SetLifeGoalDialog() {
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <div className="grid gap-2">
-            <Label htmlFor="summary">目标概述</Label>
+            <Label htmlFor="summary" className="flex items-center">
+              人生目标概述
+              <span className="text-red-500 ml-1">*</span>
+            </Label>
             <Input
               id="summary"
               value={summary}
               onChange={(e) => setSummary(e.target.value)}
               placeholder="用一句话描述你的人生目标"
+              autoComplete="off"
             />
+            {errors.summary && (
+              <p className="text-xs text-red-500 ml-2 -mt-1">
+                {errors.summary}
+              </p>
+            )}
           </div>
           <div className="grid gap-2">
             <Label htmlFor="sidenote">补充说明</Label>

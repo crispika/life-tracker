@@ -13,7 +13,6 @@ import { GoalsTree } from './components/GoalTree'
 export default async function Goals() {
   const lifeGoal = await queries.goal.getUserUltimateGoal(100000)
   const goals = await queries.goal.getUserGoalTree(100000)
-  console.log(lifeGoal)
   return (
     <>
       <header className="flex sticky top-0 bg-background h-16 shrink-0 items-center gap-2 border-b px-4">

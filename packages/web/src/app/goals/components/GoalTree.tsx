@@ -13,6 +13,7 @@ import ReactFlow, {
 } from 'reactflow'
 import 'reactflow/dist/style.css'
 import { Goal, LifeGoal } from '../goals.type'
+import { LifeGoalNode } from './LifeGoalNode'
 
 const nodeWidth = 200
 const nodeHeight = 40
@@ -26,11 +27,8 @@ const nodeStyle = {
   background: '#fff'
 }
 
-// 根节点样式
-const rootNodeStyle = {
-  ...nodeStyle,
-  background: '#e6f3ff',
-  borderColor: '#1890ff'
+const nodeTypes = {
+  root: LifeGoalNode
 }
 
 const getLayoutedElements = (
@@ -70,28 +68,21 @@ const getLayoutedElements = (
   return { nodes: layoutedNodes, edges }
 }
 
-function processGoals(goals: Goal[]): { nodes: Node[]; edges: Edge[] } {
+function processGoals(
+  rootGoal: LifeGoal,
+  goals: Goal[]
+): { nodes: Node[]; edges: Edge[] } {
   const nodes: Node[] = []
   const edges: Edge[] = []
 
-  // 添加根节点
-  const rootId = 'root'
+  // 添加根节点（用户的人生目标）
   nodes.push({
-    id: rootId,
-    data: {
-      label: '人生目标',
-      description: '总体目标'
-    },
+    id: 'root',
+    data: rootGoal,
     position: { x: 0, y: 0 },
-    type: 'input',
+    type: 'root',
     targetPosition: Position.Left,
-    sourcePosition: Position.Right,
-    style: {
-      ...rootNodeStyle,
-      background: '#1890ff',
-      color: 'white',
-      borderColor: '#096dd9'
-    }
+    sourcePosition: Position.Right
   })
 
   const processNode = (goal: Goal, parentId: string) => {
@@ -124,7 +115,7 @@ function processGoals(goals: Goal[]): { nodes: Node[]; edges: Edge[] } {
   }
 
   // 处理所有顶层目标，将它们连接到根节点
-  goals.forEach((goal) => processNode(goal, rootId))
+  goals.forEach((goal) => processNode(goal, 'root'))
 
   return getLayoutedElements(nodes, edges)
 }
@@ -136,15 +127,17 @@ export function GoalsTree({
   lifeGoal: LifeGoal
   goals: Goal[]
 }) {
-  console.log(lifeGoal)
   const [nodes, setNodes, onNodesChange] = useNodesState([])
   const [edges, setEdges, onEdgesChange] = useEdgesState([])
 
   const onLayout = useCallback(() => {
-    const { nodes: layoutedNodes, edges: layoutedEdges } = processGoals(goals)
+    const { nodes: layoutedNodes, edges: layoutedEdges } = processGoals(
+      lifeGoal,
+      goals
+    )
     setNodes(layoutedNodes)
     setEdges(layoutedEdges)
-  }, [goals, setNodes, setEdges])
+  }, [lifeGoal, goals, setNodes, setEdges])
 
   // 初始化布局
   useEffect(() => {
@@ -164,6 +157,7 @@ export function GoalsTree({
           defaultEdgeOptions={{
             type: 'smoothstep'
           }}
+          nodeTypes={nodeTypes}
         >
           <Background />
           <Controls />
