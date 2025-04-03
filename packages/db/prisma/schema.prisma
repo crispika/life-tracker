@@ -64,6 +64,7 @@ model USER {
   UC_TASK            UC_TASK[]
   UC_TASK_INIT_STATE UC_TASK_INIT_STATE?
   UC_TASK_STATE      UC_TASK_STATE[]
+  UC_ULTIMATE_GOAL   UC_ULTIMATE_GOAL?
 }
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
@@ -144,4 +145,15 @@ model UC_TASK_STATE {
   @@unique([user_id, name], map: "uk_uc_task_state_name")
   @@index([name], map: "idx_uc_task_state_name")
   @@index([user_id], map: "idx_uc_task_state_user")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model UC_ULTIMATE_GOAL {
+  goal_id    Int      @id @default(autoincrement()) @db.UnsignedInt
+  user_id    Int      @unique(map: "uk_uc_ultimate_goal_user") @db.UnsignedInt
+  summary    String   @db.VarChar(100)
+  sidenote   String?  @db.Text
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now())
+  USER       USER     @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_uc_ultimate_goal_user")
 }

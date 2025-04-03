@@ -93,4 +93,36 @@ async function getGoalWithChildren(goalId: number) {
   }
 }
 
-export const goalQueries = { getUserGoalTree, getGoalWithChildren }
+// 获取用户的终极目标
+async function getUserUltimateGoal(userId: number) {
+  try {
+    const lifeGoal = await prisma.uC_ULTIMATE_GOAL.findUnique({
+      where: {
+        user_id: userId
+      },
+      select: {
+        goal_id: true,
+        summary: true,
+        sidenote: true
+      }
+    })
+    return lifeGoal
+      ? {
+          id: lifeGoal.goal_id,
+          summary: lifeGoal.summary,
+          sidenote: lifeGoal.sidenote
+        }
+      : null
+  } catch (error) {
+    throw new Error(
+      '获取终极目标失败: ' +
+        (error instanceof Error ? error.message : String(error))
+    )
+  }
+}
+
+export const goalQueries = {
+  getUserGoalTree,
+  getGoalWithChildren,
+  getUserUltimateGoal
+}

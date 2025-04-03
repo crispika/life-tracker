@@ -13,3 +13,9 @@ export type Goal = {
   }
   children: Goal[]
 }
+
+export type LifeGoal = {
+  id: number
+  summary: string
+  sidenote: string | null
+}

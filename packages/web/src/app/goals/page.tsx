@@ -1,5 +1,4 @@
 import { queries } from '@life-tracker/db'
-import { GoalsTree } from './GoalTree'
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -8,10 +7,13 @@ import {
 } from '@/components/ui/breadcrumb'
 import { Separator } from '@/components/ui/separator'
 import { SidebarTrigger } from '@/components/ui/sidebar'
+import { SetLifeGoalDialog } from './components/SetLifeGoalDialog'
+import { GoalsTree } from './components/GoalTree'
 
 export default async function Goals() {
+  const lifeGoal = await queries.goal.getUserUltimateGoal(100000)
   const goals = await queries.goal.getUserGoalTree(100000)
-  console.log(goals)
+  console.log(lifeGoal)
   return (
     <>
       <header className="flex sticky top-0 bg-background h-16 shrink-0 items-center gap-2 border-b px-4">
@@ -25,8 +27,18 @@ export default async function Goals() {
           </BreadcrumbList>
         </Breadcrumb>
       </header>
-      <div className="flex flex-col items-center justify-center h-screen">
-        <GoalsTree goals={goals} />
+      <div className="flex flex-col items-center justify-center h-[calc(100vh-4rem)]">
+        {lifeGoal ? (
+          <GoalsTree lifeGoal={lifeGoal} goals={goals} />
+        ) : (
+          <div className="flex flex-col items-center gap-4">
+            <h2 className="text-2xl font-semibold">你还没有设置人生目标</h2>
+            <p className="text-muted-foreground">
+              请先设置你的人生目标，然后才能开始规划具体的子目标
+            </p>
+            <SetLifeGoalDialog />
+          </div>
+        )}
       </div>
     </>
   )

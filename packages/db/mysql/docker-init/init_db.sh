@@ -122,7 +122,7 @@ mysql -u root -p$MYSQL_ROOT_PASSWORD -e "USE life_tracker;" || {
 }
 
 # 执行schema脚本
-execute_sql "./schema/01_init.sql" "创建表结构" || log_error "创建表结构失败，但继续执行"
+execute_sql "./schema/01_tables.sql" "创建表结构" || log_error "创建表结构失败，但继续执行"
 execute_sql "./schema/04_stored_procedures.sql" "创建存储过程" || log_error "创建存储过程失败，但继续执行"
 execute_sql "./schema/03_add_triggers.sql" "创建触发器" || log_error "创建触发器失败，但继续执行"
 execute_sql "./schema/02_add_indexes.sql" "创建索引" || log_error "创建索引失败，但继续执行"
