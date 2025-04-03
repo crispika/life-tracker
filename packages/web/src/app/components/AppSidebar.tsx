@@ -24,36 +24,19 @@ const data = {
   navMain: [
     {
       title: 'Dashboard',
-      url: '#',
+      url: '/',
       items: []
     },
     {
       title: 'Goals',
-      url: '#',
-      items: [
-        {
-          title: 'Installation',
-          url: '#'
-        },
-        {
-          title: 'Project Structure',
-          url: '#'
-        }
-      ]
+      url: '/goals',
+      items: []
     },
     {
       title: 'Tasks',
-      url: '#',
-      items: [
-        {
-          title: 'Installation',
-          url: '#'
-        },
-        {
-          title: 'Project Structure',
-          url: '#'
-        }
-      ]
+      url: '/tasks',
+      isActive: true,
+      items: []
     },
     {
       title: 'Documentation',
@@ -65,8 +48,7 @@ const data = {
         },
         {
           title: 'Data Fetching',
-          url: '#',
-          isActive: true
+          url: '#'
         },
         {
           title: 'Rendering',
@@ -116,7 +98,7 @@ const data = {
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar {...props}>
-      <SidebarHeader>header</SidebarHeader>
+      <SidebarHeader> Todo-header</SidebarHeader>
       <SidebarContent className="gap-0">
         {/* We create a collapsible SidebarGroup for each parent. */}
         {data.navMain.map((item) => {
@@ -127,7 +109,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   asChild
                   className="group/label text-sm text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
                 >
-                  <SidebarMenuButton>
+                  <SidebarMenuButton isActive={item.isActive}>
                     <Link href={item.url} className="font-medium">
                       {item.title}
                     </Link>
@@ -158,10 +140,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                     <SidebarMenuSub>
                       {item.items.map((item) => (
                         <SidebarMenuSubItem key={item.title}>
-                          <SidebarMenuSubButton
-                            asChild
-                            isActive={item.isActive}
-                          >
+                          <SidebarMenuSubButton asChild>
                             <Link href={item.url}>{item.title}</Link>
                           </SidebarMenuSubButton>
                         </SidebarMenuSubItem>
