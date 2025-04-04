@@ -28,11 +28,11 @@ const COLORS = [
   { name: '黑', value: '#000000' }
 ]
 
-interface AddGoalDialogProps {
-  parentId?: number
-}
-
-export function AddGoalDialog({ parentId }: AddGoalDialogProps) {
+export function AddFirstLevelGoalDialog({
+  setParentIsHovered
+}: {
+  setParentIsHovered: (isHovered: boolean) => void
+}) {
   const [open, setOpen] = useState(false)
   const [summary, setSummary] = useState('')
   const [description, setDescription] = useState('')
@@ -79,8 +79,9 @@ export function AddGoalDialog({ parentId }: AddGoalDialogProps) {
           color,
           summary,
           description,
-          parentId,
-          prefix
+          parentId: null,
+          prefix,
+          isFirstLevel: true
         })
       })
       if (!response.ok) {
@@ -95,7 +96,6 @@ export function AddGoalDialog({ parentId }: AddGoalDialogProps) {
         title: '创建成功',
         description: '目标已成功创建'
       })
-      setOpen(false)
       router.push('/goals')
       router.refresh()
     } catch (error) {
@@ -103,8 +103,15 @@ export function AddGoalDialog({ parentId }: AddGoalDialogProps) {
     }
   }
 
+  const handleOpenChange = (open: boolean) => {
+    if (!open) {
+      setParentIsHovered(false)
+    }
+    setOpen(open)
+  }
+
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         <Button
           size="sm"
@@ -116,10 +123,10 @@ export function AddGoalDialog({ parentId }: AddGoalDialogProps) {
       <DialogContent className="bg-white/95 backdrop-blur-sm">
         <DialogHeader className="space-y-2">
           <DialogTitle className="text-xl font-semibold">
-            添加新目标
+            添加新的一级目标
           </DialogTitle>
           <p className="text-sm text-gray-500">
-            为目标设置名称、前缀和颜色，以便于识别和管理
+            为一级目标设置名称、前缀和颜色，以便于识别和管理后续的所有子目标与任务
           </p>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -190,7 +197,7 @@ export function AddGoalDialog({ parentId }: AddGoalDialogProps) {
                 id="description"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                placeholder="请输入目标描述（可选，详细描述您的目标和期望）"
+                placeholder="请输入目标描述。可以记录您设置这个目标的动机，也可以运用SMART详细原则描述目标。"
                 className="min-h-[100px]"
               />
             </div>
@@ -199,7 +206,7 @@ export function AddGoalDialog({ parentId }: AddGoalDialogProps) {
             <Button
               type="button"
               variant="outline"
-              onClick={() => setOpen(false)}
+              onClick={() => handleOpenChange(false)}
               className="px-6"
             >
               取消

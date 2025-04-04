@@ -45,6 +45,7 @@ CREATE PROCEDURE create_goal(
   IN p_description TEXT,
   IN p_parent_id INT UNSIGNED,
   IN p_prefix VARCHAR(15),
+  IN p_is_first_level BOOLEAN,
   OUT p_goal_id INT UNSIGNED,
   OUT p_prefix_id INT UNSIGNED
 )
@@ -60,8 +61,30 @@ BEGIN
   -- 获取ACTIVE状态ID
   SELECT state_id INTO v_active_state_id FROM GOAL_STATE WHERE name = 'ACTIVE';
   
-  -- 如果有父目标，检查父目标是否存在并获取其前缀ID
-  IF p_parent_id IS NOT NULL THEN
+  -- 如果是一级目标，必须指定前缀
+  IF p_is_first_level THEN
+    IF p_prefix IS NULL THEN
+      SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = '一级目标必须指定前缀';
+    END IF;
+    
+    -- 检查前缀是否已存在
+    IF EXISTS (SELECT 1 FROM UC_GOAL_PREFIX WHERE user_id = p_user_id AND prefix = p_prefix) THEN
+      SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = '该前缀已被使用';
+    END IF;
+    
+    -- 插入前缀记录
+    INSERT INTO UC_GOAL_PREFIX (user_id, prefix, next_seq_number)
+    VALUES (p_user_id, p_prefix, 1);
+    
+    -- 获取新创建的前缀ID
+    SET p_prefix_id = LAST_INSERT_ID();
+  ELSE
+    -- 如果不是一级目标，必须有父目标
+    IF p_parent_id IS NULL THEN
+      SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = '非一级目标必须指定父目标';
+    END IF;
+    
+    -- 检查父目标是否存在
     IF NOT EXISTS (SELECT 1 FROM UC_GOAL WHERE goal_id = p_parent_id AND user_id = p_user_id) THEN
       SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = '父目标不存在';
     END IF;
@@ -76,32 +99,15 @@ BEGIN
     
     -- 使用父目标的前缀ID
     SET p_prefix_id = v_parent_prefix_id;
-  ELSE
-    -- 顶级目标必须指定前缀
-    IF p_prefix IS NULL THEN
-      SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = '顶级目标必须指定前缀';
-    END IF;
-    
-    -- 检查前缀是否已存在
-    IF EXISTS (SELECT 1 FROM UC_GOAL_PREFIX WHERE user_id = p_user_id AND prefix = p_prefix) THEN
-      SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = '该前缀已被使用';
-    END IF;
-    
-    -- 插入前缀记录
-    INSERT INTO UC_GOAL_PREFIX (user_id, prefix, next_seq_number)
-    VALUES (p_user_id, p_prefix, 1);
-    
-    -- 获取新创建的前缀ID
-    SET p_prefix_id = LAST_INSERT_ID();
   END IF;
   
   -- 插入目标记录
   INSERT INTO UC_GOAL (
     user_id, color, summary, description,
-    state_id, parent_id, prefix_id
+    state_id, parent_id, prefix_id, is_first_level
   ) VALUES (
     p_user_id, p_color, p_summary, p_description,
-    v_active_state_id, p_parent_id, p_prefix_id
+    v_active_state_id, p_parent_id, p_prefix_id, p_is_first_level
   );
   
   -- 获取新创建的目标ID

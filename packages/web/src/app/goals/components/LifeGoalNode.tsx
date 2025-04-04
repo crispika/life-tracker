@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Handle, Position } from 'reactflow'
 import { LifeGoal } from '../goals.type'
-import { AddGoalDialog } from './AddGoalDialog'
+import { AddFirstLevelGoalDialog } from './AddFirstLevelGoalDialog'
 
 export const LifeGoalNode = ({ data }: { data: LifeGoal }) => {
   const [isHovered, setIsHovered] = useState(false)
@@ -23,7 +23,7 @@ export const LifeGoalNode = ({ data }: { data: LifeGoal }) => {
       />
       {isHovered && (
         <div className="absolute -bottom-4 left-1/2 transform -translate-x-1/2">
-          <AddGoalDialog />
+          <AddFirstLevelGoalDialog setParentIsHovered={setIsHovered} />
         </div>
       )}
     </div>

@@ -3,6 +3,8 @@ export type Goal = {
   summary: string
   description: string
   parentId: number | null
+  color: string
+  isFirstLevel: boolean
   prefix: {
     id: number
     name: string

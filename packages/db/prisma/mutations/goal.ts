@@ -38,6 +38,7 @@ async function createGoal(
     description?: string | null
     parentId?: number | null
     prefix: string
+    isFirstLevel: boolean
   }
 ) {
   try {
@@ -49,6 +50,7 @@ async function createGoal(
         ${data.description},
         ${data.parentId},
         ${data.prefix},
+        ${data.isFirstLevel},
         @goal_id,
         @prefix_id
       )

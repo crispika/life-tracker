@@ -30,6 +30,7 @@ model UC_GOAL {
   state_id       Int            @db.UnsignedInt
   parent_id      Int?           @db.UnsignedInt
   prefix_id      Int            @db.UnsignedInt
+  is_first_level Boolean        @default(false)
   created_at     DateTime       @default(now())
   updated_at     DateTime       @default(now())
   UC_GOAL        UC_GOAL?       @relation("UC_GOALToUC_GOAL", fields: [parent_id], references: [goal_id], onUpdate: NoAction, map: "fk_uc_goal_parent")

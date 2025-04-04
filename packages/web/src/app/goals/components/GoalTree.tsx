@@ -14,21 +14,14 @@ import ReactFlow, {
 import 'reactflow/dist/style.css'
 import { Goal, LifeGoal } from '../goals.type'
 import { LifeGoalNode } from './LifeGoalNode'
+import { GoalNode } from './GoalNode'
 
 const nodeWidth = 200
 const nodeHeight = 40
 
-// 基础节点样式
-const nodeStyle = {
-  border: '1px solid #ccc',
-  borderRadius: '8px',
-  padding: '10px',
-  fontSize: '14px',
-  background: '#fff'
-}
-
 const nodeTypes = {
-  root: LifeGoalNode
+  root: LifeGoalNode,
+  goal: GoalNode
 }
 
 const getLayoutedElements = (
@@ -88,16 +81,11 @@ function processGoals(
   const processNode = (goal: Goal, parentId: string) => {
     nodes.push({
       id: goal.id.toString(),
-      data: {
-        label: goal.summary,
-        description: goal.description
-      },
+      data: goal,
       position: { x: 0, y: 0 },
-      type: 'default',
+      type: 'goal',
       targetPosition: Position.Left,
-      sourcePosition: Position.Right,
-      style: nodeStyle,
-      className: 'goal-node'
+      sourcePosition: Position.Right
     })
 
     // 创建与父节点的连接

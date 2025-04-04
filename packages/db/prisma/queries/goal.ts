@@ -22,6 +22,8 @@ async function getUserGoalTree(userId: number) {
         summary: true,
         description: true,
         parent_id: true,
+        color: true,
+        is_first_level: true,
         GOAL_STATE: {
           select: {
             name: true,
@@ -43,6 +45,8 @@ async function getUserGoalTree(userId: number) {
         summary: g.summary,
         description: g.description,
         parentId: g.parent_id,
+        color: g.color,
+        isFirstLevel: !!g.is_first_level,
         prefix: {
           id: g.UC_GOAL_PREFIX.prefix_id,
           name: g.UC_GOAL_PREFIX.prefix
