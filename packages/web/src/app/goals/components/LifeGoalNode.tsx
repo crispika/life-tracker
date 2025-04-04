@@ -1,15 +1,10 @@
 import { useState } from 'react'
 import { Handle, Position } from 'reactflow'
-import { Goal, LifeGoal } from '../goals.type'
+import { LifeGoal } from '../goals.type'
 import { AddGoalDialog } from './AddGoalDialog'
 
 export const LifeGoalNode = ({ data }: { data: LifeGoal }) => {
   const [isHovered, setIsHovered] = useState(false)
-
-  const handleAddGoal = (goal: Omit<Goal, 'id' | 'children'>) => {
-    // TODO: 调用 API 添加目标
-    console.log('添加目标', goal)
-  }
 
   return (
     <div
@@ -28,7 +23,7 @@ export const LifeGoalNode = ({ data }: { data: LifeGoal }) => {
       />
       {isHovered && (
         <div className="absolute -bottom-4 left-1/2 transform -translate-x-1/2">
-          <AddGoalDialog parentId={data.id} onAddGoal={handleAddGoal} />
+          <AddGoalDialog />
         </div>
       )}
     </div>

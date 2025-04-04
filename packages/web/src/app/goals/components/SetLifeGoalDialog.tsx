@@ -44,7 +44,7 @@ export function SetLifeGoalDialog() {
 
     setIsLoading(true)
     try {
-      const response = await fetch('/api/goals', {
+      const response = await fetch('/api/life-goal', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

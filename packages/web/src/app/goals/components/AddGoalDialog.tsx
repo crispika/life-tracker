@@ -1,3 +1,5 @@
+import { GoalErrorCode } from '@/app/api/goals/error.types'
+import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogContent,
@@ -5,12 +7,13 @@ import {
   DialogTitle,
   DialogTrigger
 } from '@/components/ui/dialog'
-import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
+import { useToast } from '@/hooks/use-toast'
+import { useRouter } from 'next/navigation'
 import { useState } from 'react'
-import { Goal } from '../goals.type'
+import { AlertCircle } from 'lucide-react'
 
 const COLORS = [
   { name: '红', value: '#ff4d4f' },
@@ -26,11 +29,10 @@ const COLORS = [
 ]
 
 interface AddGoalDialogProps {
-  parentId: number
-  onAddGoal: (goal: Omit<Goal, 'id' | 'children'>) => void
+  parentId?: number
 }
 
-export function AddGoalDialog({ parentId, onAddGoal }: AddGoalDialogProps) {
+export function AddGoalDialog({ parentId }: AddGoalDialogProps) {
   const [open, setOpen] = useState(false)
   const [summary, setSummary] = useState('')
   const [description, setDescription] = useState('')
@@ -40,6 +42,8 @@ export function AddGoalDialog({ parentId, onAddGoal }: AddGoalDialogProps) {
     summary?: string
     prefix?: string
   }>({})
+  const { toast } = useToast()
+  const router = useRouter()
 
   const validateForm = () => {
     const newErrors: typeof errors = {}
@@ -58,33 +62,45 @@ export function AddGoalDialog({ parentId, onAddGoal }: AddGoalDialogProps) {
     return Object.keys(newErrors).length === 0
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
     if (!validateForm()) {
       return
     }
 
-    onAddGoal({
-      summary,
-      description,
-      parentId,
-      prefix: {
-        id: 0, // 这个值会在后端生成
-        name: prefix
-      },
-      state: {
-        id: 1, // 默认状态：进行中
-        name: '进行中'
+    try {
+      const response = await fetch('/api/goals', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          color,
+          summary,
+          description,
+          parentId,
+          prefix
+        })
+      })
+      if (!response.ok) {
+        const error = await response.json()
+        if (error.code === GoalErrorCode.PREFIX_EXISTS) {
+          setErrors((prev) => ({ ...prev, prefix: '该前缀已被其他目标使用' }))
+          return
+        }
+        throw new Error(error.error || '创建目标失败')
       }
-    })
-    setOpen(false)
-    // 重置表单
-    setSummary('')
-    setDescription('')
-    setPrefix('')
-    setColor(COLORS[0].value)
-    setErrors({})
+      toast({
+        title: '创建成功',
+        description: '目标已成功创建'
+      })
+      setOpen(false)
+      router.push('/goals')
+      router.refresh()
+    } catch (error) {
+      console.error('创建目标失败:', error)
+    }
   }
 
   return (
@@ -122,7 +138,8 @@ export function AddGoalDialog({ parentId, onAddGoal }: AddGoalDialogProps) {
                 className="h-10"
               />
               {errors.summary && (
-                <p className="text-xs text-red-500 ml-2 -mt-1">
+                <p className="text-xs text-red-500 -mt-1 flex items-center">
+                  <AlertCircle className="h-4 w-4 fill-red-500 stroke-white" />
                   {errors.summary}
                 </p>
               )}
@@ -142,7 +159,8 @@ export function AddGoalDialog({ parentId, onAddGoal }: AddGoalDialogProps) {
                 className="h-10"
               />
               {errors.prefix && (
-                <p className="text-xs text-red-500 ml-2 -mt-1">
+                <p className="text-xs text-red-500 -mt-1 flex items-center">
+                  <AlertCircle className="h-4 w-4 fill-red-500 stroke-white" />
                   {errors.prefix}
                 </p>
               )}

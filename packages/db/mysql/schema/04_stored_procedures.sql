@@ -191,4 +191,48 @@ BEGIN
   COMMIT;
 END //
 
+-- 删除目标的存储过程
+CREATE PROCEDURE delete_goal(
+  IN p_user_id INT UNSIGNED,
+  IN p_goal_id INT UNSIGNED
+)
+BEGIN
+  DECLARE v_prefix_id INT UNSIGNED;
+  DECLARE v_parent_id INT UNSIGNED;
+  DECLARE v_goal_id INT UNSIGNED;
+  DECLARE done INT DEFAULT FALSE;
+  DECLARE cur CURSOR FOR 
+    SELECT goal_id FROM UC_GOAL WHERE parent_id = p_goal_id;
+  DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+  
+  -- 检查目标是否存在且属于该用户
+  IF NOT EXISTS (SELECT 1 FROM UC_GOAL WHERE goal_id = p_goal_id AND user_id = p_user_id) THEN
+    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = '目标不存在';
+  END IF;
+  
+  -- 获取目标的前缀ID和父ID
+  SELECT prefix_id, parent_id INTO v_prefix_id, v_parent_id
+  FROM UC_GOAL
+  WHERE goal_id = p_goal_id;
+  
+  -- 递归删除所有子目标
+  OPEN cur;
+  read_loop: LOOP
+    FETCH cur INTO v_goal_id;
+    IF done THEN
+      LEAVE read_loop;
+    END IF;
+    CALL delete_goal(p_user_id, v_goal_id);
+  END LOOP;
+  CLOSE cur;
+  
+  -- 删除目标记录
+  DELETE FROM UC_GOAL WHERE goal_id = p_goal_id;
+  
+  -- 如果是顶级目标，删除对应的前缀记录
+  IF v_parent_id IS NULL AND v_prefix_id IS NOT NULL THEN
+    DELETE FROM UC_GOAL_PREFIX WHERE prefix_id = v_prefix_id;
+  END IF;
+END //
+
 DELIMITER ; 
