@@ -23,6 +23,7 @@ export const LifeGoalNode = ({ data }: { data: LifeGoal }) => {
       />
       {isHovered && (
         <div className="absolute -bottom-4 left-1/2 transform -translate-x-1/2">
+          {/* TODO: 这里简单修复了modal关闭时，hover状态没有消失的问题，有时间了看如何更好改善 */}
           <AddFirstLevelGoalDialog setParentIsHovered={setIsHovered} />
         </div>
       )}

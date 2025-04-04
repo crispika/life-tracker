@@ -15,6 +15,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { useToast } from '@/hooks/use-toast'
+import { AlertCircle } from 'lucide-react'
 
 export function SetLifeGoalDialog() {
   const [summary, setSummary] = useState('')
@@ -100,7 +101,8 @@ export function SetLifeGoalDialog() {
               autoComplete="off"
             />
             {errors.summary && (
-              <p className="text-xs text-red-500 ml-2 -mt-1">
+              <p className="text-xs text-red-500 -mt-1 flex items-center">
+                <AlertCircle className="h-4 w-4 fill-red-500 stroke-white" />
                 {errors.summary}
               </p>
             )}

@@ -125,8 +125,47 @@ async function getUserUltimateGoal(userId: number) {
   }
 }
 
+async function getGoalById(goalId: number) {
+  try {
+    const goal = await prisma.uC_GOAL.findUnique({
+      where: {
+        goal_id: goalId
+      },
+      include: {
+        GOAL_STATE: true,
+        UC_GOAL_PREFIX: true
+      }
+    })
+
+    if (!goal) {
+      return null
+    }
+
+    return {
+      id: goal.goal_id,
+      summary: goal.summary,
+      description: goal.description,
+      parentId: goal.parent_id,
+      color: goal.color,
+      isFirstLevel: goal.is_first_level,
+      prefix: {
+        id: goal.UC_GOAL_PREFIX.prefix_id,
+        name: goal.UC_GOAL_PREFIX.prefix
+      },
+      state: {
+        id: goal.GOAL_STATE.state_id,
+        name: goal.GOAL_STATE.name
+      }
+    }
+  } catch (error) {
+    console.error('Error fetching goal:', error)
+    throw error
+  }
+}
+
 export const goalQueries = {
   getUserGoalTree,
   getGoalWithChildren,
-  getUserUltimateGoal
+  getUserUltimateGoal,
+  getGoalById
 }

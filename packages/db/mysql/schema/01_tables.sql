@@ -47,8 +47,7 @@ CREATE TABLE IF NOT EXISTS UC_GOAL (
   CONSTRAINT fk_uc_goal_user FOREIGN KEY (user_id) REFERENCES USER(user_id) ON DELETE CASCADE,
   CONSTRAINT fk_uc_goal_state FOREIGN KEY (state_id) REFERENCES GOAL_STATE(state_id) ON DELETE RESTRICT,
   CONSTRAINT fk_uc_goal_parent FOREIGN KEY (parent_id) REFERENCES UC_GOAL(goal_id) ON DELETE SET NULL,
-  CONSTRAINT fk_uc_goal_prefix FOREIGN KEY (prefix_id) REFERENCES UC_GOAL_PREFIX(prefix_id),
-  CONSTRAINT uk_uc_goal_summary UNIQUE (user_id, summary)
+  CONSTRAINT fk_uc_goal_prefix FOREIGN KEY (prefix_id) REFERENCES UC_GOAL_PREFIX(prefix_id)
 ) AUTO_INCREMENT=100000 COMMENT='用户GOAL表，支持树形结构';
 
 CREATE TABLE IF NOT EXISTS UC_TASK_STATE (

@@ -7,7 +7,9 @@
   "packageManager": "pnpm@9.15.1",
   "scripts": {
     "format": "prettier --write \"packages/**/*.{ts,tsx,js,jsx,json,css,md}\"",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "dev:db-down": "docker-compose down db -v",
+    "dev:db-up": "bash ./packages/db/mysql/scripts/start_local_db.sh"
   },
   "devDependencies": {
     "eslint-config-prettier": "^9.1.0",

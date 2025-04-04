@@ -70,7 +70,7 @@ export function AddFirstLevelGoalDialog({
     }
 
     try {
-      const response = await fetch('/api/goals', {
+      const response = await fetch('/api/goals/first-level-goals', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -96,7 +96,6 @@ export function AddFirstLevelGoalDialog({
         title: '创建成功',
         description: '目标已成功创建'
       })
-      router.push('/goals')
       router.refresh()
     } catch (error) {
       console.error('创建目标失败:', error)
@@ -197,7 +196,7 @@ export function AddFirstLevelGoalDialog({
                 id="description"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                placeholder="请输入目标描述。可以记录您设置这个目标的动机，也可以运用SMART详细原则描述目标。"
+                placeholder="请输入目标描述。可以记录您设置这个目标的动机，也可以运用SMART原则具体描述目标。"
                 className="min-h-[100px]"
               />
             </div>

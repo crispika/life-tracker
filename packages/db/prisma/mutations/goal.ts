@@ -37,7 +37,7 @@ async function createGoal(
     summary: string
     description?: string | null
     parentId?: number | null
-    prefix: string
+    prefix?: string
     isFirstLevel: boolean
   }
 ) {
