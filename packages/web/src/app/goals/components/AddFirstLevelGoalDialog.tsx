@@ -45,11 +45,21 @@ export function AddFirstLevelGoalDialog({
   const { toast } = useToast()
   const router = useRouter()
 
+  const resetState = () => {
+    setSummary('')
+    setDescription('')
+    setPrefix('')
+    setColor(COLORS[0].value)
+    setErrors({})
+  }
+
   const validateForm = () => {
     const newErrors: typeof errors = {}
 
     if (!summary.trim()) {
       newErrors.summary = '目标名称不能为空'
+    } else if (summary.length > 100) {
+      newErrors.summary = '目标名称不能超过100个字符'
     }
 
     if (!prefix.trim()) {
@@ -96,6 +106,8 @@ export function AddFirstLevelGoalDialog({
         title: '创建成功',
         description: '目标已成功创建'
       })
+      setOpen(false)
+      resetState()
       router.refresh()
     } catch (error) {
       console.error('创建目标失败:', error)
@@ -105,6 +117,7 @@ export function AddFirstLevelGoalDialog({
   const handleOpenChange = (open: boolean) => {
     if (!open) {
       setParentIsHovered(false)
+      resetState()
     }
     setOpen(open)
   }
@@ -142,6 +155,7 @@ export function AddFirstLevelGoalDialog({
                 placeholder="请输入目标概述"
                 autoComplete="off"
                 className="h-10"
+                maxLength={100}
               />
               {errors.summary && (
                 <p className="text-xs text-red-500 -mt-1 flex items-center">

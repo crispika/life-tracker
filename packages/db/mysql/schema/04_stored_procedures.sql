@@ -41,7 +41,7 @@ END //
 CREATE PROCEDURE create_goal(
   IN p_user_id INT UNSIGNED,
   IN p_color VARCHAR(7),
-  IN p_summary VARCHAR(100),
+  IN p_summary VARCHAR(300),
   IN p_description TEXT,
   IN p_parent_id INT UNSIGNED,
   IN p_prefix VARCHAR(15),
@@ -119,7 +119,7 @@ CREATE PROCEDURE create_task(
   IN p_prefix_id INT UNSIGNED,
   IN p_user_id INT UNSIGNED,
   IN p_color VARCHAR(7),
-  IN p_summary VARCHAR(100),
+  IN p_summary VARCHAR(300),
   IN p_description TEXT,
   IN p_start_date DATETIME(3),
   IN p_due_date DATETIME(3),
@@ -239,6 +239,47 @@ BEGIN
   IF v_parent_id IS NULL AND v_prefix_id IS NOT NULL THEN
     DELETE FROM UC_GOAL_PREFIX WHERE prefix_id = v_prefix_id;
   END IF;
+END //
+
+-- 更新目标的存储过程
+CREATE PROCEDURE update_goal(
+  IN p_code VARCHAR(50),
+  IN p_user_id BIGINT,
+  IN p_color VARCHAR(7),
+  IN p_summary VARCHAR(300),
+  IN p_description TEXT,
+  IN p_parent_id BIGINT,
+  IN p_prefix VARCHAR(15),
+  IN p_is_first_level BOOLEAN
+)
+BEGIN
+  DECLARE v_goal_id INT UNSIGNED;
+  DECLARE v_prefix_id INT UNSIGNED;
+  
+  -- 检查用户是否存在
+  IF NOT EXISTS (SELECT 1 FROM USER WHERE user_id = p_user_id) THEN
+    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = '用户不存在';
+  END IF;
+  
+  -- 检查目标是否存在
+  IF NOT EXISTS (SELECT 1 FROM UC_GOAL WHERE code = p_code AND user_id = p_user_id) THEN
+    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = '目标不存在';
+  END IF;
+  
+  -- 获取目标的ID和前缀ID
+  SELECT goal_id, prefix_id INTO v_goal_id, v_prefix_id
+  FROM UC_GOAL
+  WHERE code = p_code AND user_id = p_user_id;
+  
+  -- 更新目标记录
+  UPDATE UC_GOAL
+  SET color = p_color,
+      summary = p_summary,
+      description = p_description,
+      parent_id = p_parent_id,
+      prefix_id = v_prefix_id,
+      is_first_level = p_is_first_level
+  WHERE goal_id = v_goal_id;
 END //
 
 DELIMITER ; 

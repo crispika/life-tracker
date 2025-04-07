@@ -16,8 +16,8 @@ import { Goal, LifeGoal } from '../goals.type'
 import { LifeGoalNode } from './LifeGoalNode'
 import { GoalNode } from './GoalNode'
 
-const nodeWidth = 200
-const nodeHeight = 40
+const nodeWidth = 300
+const nodeHeight = 100
 
 const nodeTypes = {
   root: LifeGoalNode,
@@ -146,6 +146,8 @@ export function GoalsTree({
             type: 'smoothstep'
           }}
           nodeTypes={nodeTypes}
+          nodesDraggable={false}
+          nodesConnectable={false}
         >
           <Background />
           <Controls />

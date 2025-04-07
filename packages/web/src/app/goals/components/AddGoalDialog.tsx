@@ -32,11 +32,19 @@ export function AddGoalDialog({
   const { toast } = useToast()
   const router = useRouter()
 
+  const resetState = () => {
+    setSummary('')
+    setDescription('')
+    setErrors({})
+  }
+
   const validateForm = () => {
     const newErrors: typeof errors = {}
 
     if (!summary.trim()) {
       newErrors.summary = '目标名称不能为空'
+    } else if (summary.length > 100) {
+      newErrors.summary = '目标名称不能超过100个字符'
     }
 
     setErrors(newErrors)
@@ -72,6 +80,7 @@ export function AddGoalDialog({
         title: '创建成功',
         description: '目标已成功创建'
       })
+      resetState()
       onOpenChange(false)
       router.refresh()
     } catch (error) {
@@ -80,7 +89,15 @@ export function AddGoalDialog({
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog
+      open={open}
+      onOpenChange={(open) => {
+        if (!open) {
+          resetState()
+        }
+        onOpenChange(open)
+      }}
+    >
       <DialogContent className="bg-white/95 backdrop-blur-sm">
         <DialogHeader className="space-y-2">
           <DialogTitle className="text-xl font-semibold">
@@ -102,6 +119,7 @@ export function AddGoalDialog({
                 placeholder="请输入目标名称"
                 autoComplete="off"
                 className="h-10"
+                maxLength={100}
               />
               {errors.summary && (
                 <p className="text-xs text-red-500 -mt-1 flex items-center">
