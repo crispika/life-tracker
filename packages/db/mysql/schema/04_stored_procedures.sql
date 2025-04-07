@@ -1,4 +1,5 @@
 USE life_tracker;
+-- TODO check transaction management for all procedures
 
 DELIMITER //
 
@@ -198,47 +199,81 @@ BEGIN
 END //
 
 -- 删除目标的存储过程
-CREATE PROCEDURE delete_goal(
+CREATE PROCEDURE delete_goal_with_all_children(
   IN p_user_id INT UNSIGNED,
   IN p_goal_id INT UNSIGNED
 )
 BEGIN
+  DECLARE v_goal_exists INT;
+  DECLARE v_is_first_level BOOLEAN;
   DECLARE v_prefix_id INT UNSIGNED;
-  DECLARE v_parent_id INT UNSIGNED;
-  DECLARE v_goal_id INT UNSIGNED;
-  DECLARE done INT DEFAULT FALSE;
-  DECLARE cur CURSOR FOR 
-    SELECT goal_id FROM UC_GOAL WHERE parent_id = p_goal_id;
-  DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+  
+  -- 检查用户是否存在
+  IF NOT EXISTS (SELECT 1 FROM USER WHERE user_id = p_user_id) THEN
+    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = '用户不存在';
+  END IF;
   
   -- 检查目标是否存在且属于该用户
-  IF NOT EXISTS (SELECT 1 FROM UC_GOAL WHERE goal_id = p_goal_id AND user_id = p_user_id) THEN
-    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = '目标不存在';
+  SELECT COUNT(*) INTO v_goal_exists FROM UC_GOAL 
+  WHERE goal_id = p_goal_id AND user_id = p_user_id;
+  
+  IF v_goal_exists = 0 THEN
+    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = '目标不存在或不属于该用户';
   END IF;
   
-  -- 获取目标的前缀ID和父ID
-  SELECT prefix_id, parent_id INTO v_prefix_id, v_parent_id
+  -- 获取目标是否是一级目标及其前缀ID
+  SELECT is_first_level, prefix_id INTO v_is_first_level, v_prefix_id
   FROM UC_GOAL
-  WHERE goal_id = p_goal_id;
+  WHERE goal_id = p_goal_id AND user_id = p_user_id;
   
-  -- 递归删除所有子目标
-  OPEN cur;
-  read_loop: LOOP
-    FETCH cur INTO v_goal_id;
-    IF done THEN
-      LEAVE read_loop;
-    END IF;
-    CALL delete_goal(p_user_id, v_goal_id);
-  END LOOP;
-  CLOSE cur;
+  START TRANSACTION;
   
-  -- 删除目标记录
-  DELETE FROM UC_GOAL WHERE goal_id = p_goal_id;
+  -- 使用递归CTE查找所有子目标ID（包括当前目标）
+  WITH RECURSIVE goal_tree AS (
+    -- 基本情况：当前目标
+    SELECT goal_id FROM UC_GOAL WHERE goal_id = p_goal_id AND user_id = p_user_id
+    
+    UNION ALL
+    
+    -- 递归情况：所有子目标
+    SELECT c.goal_id
+    FROM UC_GOAL c
+    JOIN goal_tree p ON c.parent_id = p.goal_id
+    WHERE c.user_id = p_user_id
+  )
   
-  -- 如果是顶级目标，删除对应的前缀记录
-  IF v_parent_id IS NULL AND v_prefix_id IS NOT NULL THEN
-    DELETE FROM UC_GOAL_PREFIX WHERE prefix_id = v_prefix_id;
+  -- 首先删除所有关联的任务
+  DELETE FROM UC_TASK 
+  WHERE goal_id IN (SELECT goal_id FROM goal_tree) 
+  AND user_id = p_user_id;
+  
+  -- 然后从叶子节点开始删除目标（先删除没有子目标的目标）
+  DELETE FROM UC_GOAL
+  WHERE goal_id IN (
+    WITH RECURSIVE goal_tree AS (
+      -- 基本情况：当前目标
+      SELECT goal_id FROM UC_GOAL WHERE goal_id = p_goal_id AND user_id = p_user_id
+      
+      UNION ALL
+      
+      -- 递归情况：所有子目标
+      SELECT c.goal_id
+      FROM UC_GOAL c
+      JOIN goal_tree p ON c.parent_id = p.goal_id
+      WHERE c.user_id = p_user_id
+    )
+    SELECT goal_id FROM goal_tree
+  )
+  AND user_id = p_user_id;
+  
+  -- 如果是一级目标，删除对应的前缀
+  IF v_is_first_level THEN
+    DELETE FROM UC_GOAL_PREFIX
+    WHERE prefix_id = v_prefix_id
+    AND user_id = p_user_id;
   END IF;
+  
+  COMMIT;
 END //
 
 -- 更新目标的存储过程

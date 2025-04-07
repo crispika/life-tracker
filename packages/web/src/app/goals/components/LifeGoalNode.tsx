@@ -8,7 +8,7 @@ export const LifeGoalNode = ({ data }: { data: LifeGoal }) => {
 
   return (
     <div
-      className="relative p-4 rounded-lg shadow-lg bg-gradient-to-r from-blue-500 to-blue-600 text-white"
+      className="relative p-4 min-w-[150px] rounded-lg shadow-lg bg-gradient-to-r from-blue-500 to-blue-600 text-white"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >

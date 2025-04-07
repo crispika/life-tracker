@@ -5,22 +5,25 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
-import { MoreHorizontalIcon, Plus } from 'lucide-react'
+import { MoreHorizontalIcon, Plus, Trash2 } from 'lucide-react'
 import { useState } from 'react'
 import { Handle, Position, NodeToolbar } from 'reactflow'
 import { Goal } from '../goals.type'
 import { AddGoalDialog } from './AddGoalDialog'
 import { AddTaskDialog } from './AddTaskDialog'
+import { DeleteGoalDialog } from './DeleteGoalDialog'
 
 interface GoalNodeProps {
   data: Goal
 }
 
 export function GoalNode({ data }: GoalNodeProps) {
-  const { summary, description, color, prefix, isFirstLevel, children } = data
+  const { id, summary, description, color, prefix, isFirstLevel, children } =
+    data
   const [isHovered, setIsHovered] = useState(false)
   const [isAddGoalOpen, setIsAddGoalOpen] = useState(false)
   const [isAddTaskOpen, setIsAddTaskOpen] = useState(false)
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
 
   return (
     <>
@@ -103,6 +106,15 @@ export function GoalNode({ data }: GoalNodeProps) {
                   <Plus className="h-4 w-4 mr-2" />
                   添加任务
                 </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    setIsDeleteDialogOpen(true)
+                  }}
+                >
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  删除目标
+                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
@@ -130,6 +142,14 @@ export function GoalNode({ data }: GoalNodeProps) {
         goalId={data.id}
         open={isAddTaskOpen}
         onOpenChange={setIsAddTaskOpen}
+      />
+
+      <DeleteGoalDialog
+        goalId={id}
+        goalSummary={summary}
+        open={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+        isFirstLevel={isFirstLevel}
       />
     </>
   )
