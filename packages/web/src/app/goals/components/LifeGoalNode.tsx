@@ -1,32 +1,62 @@
-import { useState } from 'react'
-import { Handle, Position } from 'reactflow'
-import { LifeGoal } from '../goals.type'
+import { Handle, NodeToolbar, Position } from 'reactflow'
+import { Button } from '@/components/ui/button'
+import { Pencil, Target } from 'lucide-react'
+import { SetLifeGoalDialog } from './SetLifeGoalDialog'
 import { AddFirstLevelGoalDialog } from './AddFirstLevelGoalDialog'
+import { useState } from 'react'
+import { LifeGoal } from '../goals.type'
 
 export const LifeGoalNode = ({ data }: { data: LifeGoal }) => {
-  const [isHovered, setIsHovered] = useState(false)
-
+  const [lifeGoal, setLifeGoal] = useState<LifeGoal>(data)
+  const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false)
+  const [isAddGoalDialogOpen, setIsAddGoalDialogOpen] = useState(false)
   return (
-    <div
-      className="relative p-4 min-w-[150px] rounded-lg shadow-lg bg-gradient-to-r from-blue-500 to-blue-600 text-white"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
-      <div className="text-lg font-semibold mb-2">{data.summary}</div>
-      {data.sidenote && (
-        <div className="text-sm opacity-80">{data.sidenote}</div>
-      )}
-      <Handle
-        type="source"
-        position={Position.Right}
-        style={{ background: '#fff', width: '8px', height: '8px' }}
-      />
-      {isHovered && (
-        <div className="absolute -bottom-4 left-1/2 transform -translate-x-1/2">
-          {/* TODO: 这里简单修复了modal关闭时，hover状态没有消失的问题，有时间了看如何更好改善 */}
-          <AddFirstLevelGoalDialog setParentIsHovered={setIsHovered} />
+    <>
+      <NodeToolbar position={Position.Top} offset={6} align={'start'}>
+        <div className="flex space-x-1 bg-white p-1 rounded-lg shadow-lg border border-gray-200">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setIsUpdateDialogOpen(true)}
+            className="h-8 w-8"
+          >
+            <Pencil className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setIsAddGoalDialogOpen(true)}
+            className="h-8 w-8"
+          >
+            <Target className="h-4 w-4" />
+          </Button>
         </div>
-      )}
-    </div>
+      </NodeToolbar>
+
+      <div className="p-4 min-w-[150px] min-h-[100px] max-w-[300px] rounded-lg shadow-lg bg-gradient-to-r from-blue-500 to-blue-600 text-white">
+        <div className="text-lg font-semibold mb-2">{lifeGoal.summary}</div>
+        {lifeGoal.sidenote && (
+          <div className="text-sm opacity-80">{lifeGoal.sidenote}</div>
+        )}
+        <Handle
+          type="source"
+          position={Position.Right}
+          style={{ background: '#fff', width: '8px', height: '8px' }}
+        />
+      </div>
+
+      <SetLifeGoalDialog
+        mode="edit"
+        initialData={lifeGoal}
+        setLifeGoal={setLifeGoal}
+        open={isUpdateDialogOpen}
+        onOpenChange={setIsUpdateDialogOpen}
+      />
+
+      <AddFirstLevelGoalDialog
+        open={isAddGoalDialogOpen}
+        onOpenChange={setIsAddGoalDialogOpen}
+      />
+    </>
   )
 }

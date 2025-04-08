@@ -9,8 +9,6 @@ export async function PUT(
   const goalId = Number((await params).id)
   const userId = Number(request.headers.get('x-user-id') || '100000')
 
-  console.log('userId1111111', userId)
-
   const { state } = await request.json()
 
   if (!state) {

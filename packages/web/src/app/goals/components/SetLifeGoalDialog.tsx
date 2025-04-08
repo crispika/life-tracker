@@ -1,6 +1,5 @@
 'use client'
-
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -16,16 +15,43 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { useToast } from '@/hooks/use-toast'
 import { AlertCircle } from 'lucide-react'
+import { LifeGoal } from '../goals.type'
 
-export function SetLifeGoalDialog() {
-  const [summary, setSummary] = useState('')
-  const [sidenote, setSidenote] = useState('')
-  const [open, setOpen] = useState(false)
+interface SetLifeGoalDialogProps {
+  mode?: 'create' | 'edit'
+  initialData?: LifeGoal
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
+  setLifeGoal?: React.Dispatch<React.SetStateAction<LifeGoal>>
+}
+
+export function SetLifeGoalDialog({
+  mode = 'create',
+  initialData,
+  open: controlledOpen,
+  onOpenChange,
+  setLifeGoal
+}: SetLifeGoalDialogProps) {
+  const [summary, setSummary] = useState(initialData?.summary || '')
+  const [sidenote, setSidenote] = useState(initialData?.sidenote || '')
+  const [internalOpen, setInternalOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const { toast } = useToast()
   const [errors, setErrors] = useState<{
     summary?: string
   }>({})
+
+  // 使用受控或非受控的open状态
+  const open = controlledOpen !== undefined ? controlledOpen : internalOpen
+  const setOpen = onOpenChange || setInternalOpen
+
+  // 当initialData变化时更新表单
+  useEffect(() => {
+    if (initialData) {
+      setSummary(initialData.summary || '')
+      setSidenote(initialData.sidenote || '')
+    }
+  }, [initialData])
 
   const validateForm = () => {
     const newErrors: typeof errors = {}
@@ -46,7 +72,7 @@ export function SetLifeGoalDialog() {
     setIsLoading(true)
     try {
       const response = await fetch('/api/life-goal', {
-        method: 'POST',
+        method: mode === 'create' ? 'POST' : 'PUT',
         headers: {
           'Content-Type': 'application/json',
           'x-user-id': '100000'
@@ -56,18 +82,30 @@ export function SetLifeGoalDialog() {
 
       if (!response.ok) {
         const error = await response.json()
-        throw new Error(error.error || '设置人生目标失败')
+        throw new Error(
+          error.error || `${mode === 'create' ? '设置' : '更新'}人生目标失败`
+        )
       }
 
       setOpen(false)
-      // 刷新页面以显示新的目标
-      window.location.reload()
+      toast({
+        title: '成功',
+        description: `人生目标已${mode === 'create' ? '设置' : '更新'}`
+      })
+      if (mode === 'edit' && setLifeGoal) {
+        setLifeGoal((prev) => ({ ...prev, summary, sidenote }))
+      }
     } catch (error) {
-      console.error('设置人生目标失败:', error)
+      console.error(
+        `${mode === 'create' ? '设置' : '更新'}人生目标失败:`,
+        error
+      )
       toast({
         title: '错误',
         description:
-          error instanceof Error ? error.message : '设置人生目标失败',
+          error instanceof Error
+            ? error.message
+            : `${mode === 'create' ? '设置' : '更新'}人生目标失败`,
         variant: 'destructive'
       })
     } finally {
@@ -77,14 +115,20 @@ export function SetLifeGoalDialog() {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button>设置人生目标</Button>
-      </DialogTrigger>
+      {mode === 'create' && (
+        <DialogTrigger asChild>
+          <Button>设置人生目标</Button>
+        </DialogTrigger>
+      )}
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>设置你的人生目标</DialogTitle>
+          <DialogTitle>
+            {mode === 'create' ? '设置你的人生目标' : '编辑你的人生目标'}
+          </DialogTitle>
           <DialogDescription>
-            请描述你的人生目标，这将作为你所有子目标的指导方向。
+            {mode === 'create'
+              ? '请描述你的人生目标，这将作为你所有子目标的指导方向。'
+              : '修改你的人生目标，这将影响你所有子目标的指导方向。'}
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">

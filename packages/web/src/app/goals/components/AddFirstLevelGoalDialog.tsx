@@ -4,16 +4,15 @@ import {
   Dialog,
   DialogContent,
   DialogHeader,
-  DialogTitle,
-  DialogTrigger
+  DialogTitle
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { useToast } from '@/hooks/use-toast'
+import { AlertCircle } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
-import { AlertCircle } from 'lucide-react'
 
 const COLORS = [
   { name: '红', value: '#ff4d4f' },
@@ -28,12 +27,15 @@ const COLORS = [
   { name: '黑', value: '#000000' }
 ]
 
+interface AddFirstLevelGoalDialogProps {
+  open: boolean
+  onOpenChange: (open: boolean) => void
+}
+
 export function AddFirstLevelGoalDialog({
-  setParentIsHovered
-}: {
-  setParentIsHovered: (isHovered: boolean) => void
-}) {
-  const [open, setOpen] = useState(false)
+  open,
+  onOpenChange
+}: AddFirstLevelGoalDialogProps) {
   const [summary, setSummary] = useState('')
   const [description, setDescription] = useState('')
   const [prefix, setPrefix] = useState('')
@@ -106,8 +108,7 @@ export function AddFirstLevelGoalDialog({
         title: '创建成功',
         description: '目标已成功创建'
       })
-      setOpen(false)
-      resetState()
+      handleOpenChange(false)
       router.refresh()
     } catch (error) {
       console.error('创建目标失败:', error)
@@ -116,22 +117,13 @@ export function AddFirstLevelGoalDialog({
 
   const handleOpenChange = (open: boolean) => {
     if (!open) {
-      setParentIsHovered(false)
       resetState()
     }
-    setOpen(open)
+    onOpenChange(open)
   }
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogTrigger asChild>
-        <Button
-          size="sm"
-          className="bg-white text-black hover:bg-slate-50 shadow-md"
-        >
-          添加目标
-        </Button>
-      </DialogTrigger>
       <DialogContent className="bg-white/95 backdrop-blur-sm">
         <DialogHeader className="space-y-2">
           <DialogTitle className="text-xl font-semibold">
