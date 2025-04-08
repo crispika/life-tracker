@@ -317,4 +317,45 @@ BEGIN
   WHERE goal_id = v_goal_id;
 END //
 
+-- 更新目标状态的存储过程
+CREATE PROCEDURE update_goal_state(
+  IN p_goal_id INT UNSIGNED,
+  IN p_user_id INT UNSIGNED,
+  IN p_state_name VARCHAR(50)
+)
+BEGIN
+  DECLARE v_goal_exists INT;
+  DECLARE v_state_id INT UNSIGNED;
+  DECLARE v_error_message VARCHAR(100);
+  
+  -- 检查用户是否存在
+  IF NOT EXISTS (SELECT 1 FROM USER WHERE user_id = p_user_id) THEN
+    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = '用户不存在';
+  END IF;
+  
+  -- 检查目标是否存在且属于该用户
+  SELECT COUNT(*) INTO v_goal_exists FROM UC_GOAL 
+  WHERE goal_id = p_goal_id AND user_id = p_user_id;
+  
+  IF v_goal_exists = 0 THEN
+    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = '目标不存在或不属于该用户';
+  END IF;
+  
+  -- 获取状态ID
+  SELECT state_id INTO v_state_id 
+  FROM GOAL_STATE 
+  WHERE name = p_state_name;
+  
+  IF v_state_id IS NULL THEN
+    SET v_error_message = CONCAT('无效的状态名称: ', p_state_name);
+    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = v_error_message;
+  END IF;
+  
+  -- 更新目标状态
+  UPDATE UC_GOAL
+  SET state_id = v_state_id,
+      updated_at = NOW(3)
+  WHERE goal_id = p_goal_id AND user_id = p_user_id;
+END //
+
 DELIMITER ; 

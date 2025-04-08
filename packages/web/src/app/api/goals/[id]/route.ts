@@ -4,10 +4,10 @@ import { GoalErrorCode } from '../error.types'
 
 export async function DELETE(
   request: Request,
-  { params }: { params: Promise<{ goalId: string }> }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const goalId = Number((await params).goalId)
+    const goalId = Number((await params).id)
     const userId = Number(request.headers.get('x-user-id') || '100000')
 
     if (isNaN(goalId)) {

@@ -25,6 +25,7 @@ const data = {
     {
       title: 'Dashboard',
       url: '/',
+      isActive: true,
       items: []
     },
     {
@@ -35,7 +36,6 @@ const data = {
     {
       title: 'Tasks',
       url: '/tasks',
-      isActive: true,
       items: []
     },
     {

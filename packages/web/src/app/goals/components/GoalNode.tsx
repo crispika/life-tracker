@@ -1,26 +1,23 @@
 import { Button } from '@/components/ui/button'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger
-} from '@/components/ui/dropdown-menu'
-import { MoreHorizontalIcon, Plus, Trash2 } from 'lucide-react'
+import { ListTodo, Target, Trash2 } from 'lucide-react'
 import { useState } from 'react'
-import { Handle, Position, NodeToolbar } from 'reactflow'
-import { Goal } from '../goals.type'
+import { Handle, NodeProps, NodeToolbar, Position } from 'reactflow'
 import { AddGoalDialog } from './AddGoalDialog'
 import { AddTaskDialog } from './AddTaskDialog'
 import { DeleteGoalDialog } from './DeleteGoalDialog'
+import { GoalStateDropdown } from './GoalStateDropdown'
 
-interface GoalNodeProps {
-  data: Goal
-}
-
-export function GoalNode({ data }: GoalNodeProps) {
-  const { id, summary, description, color, prefix, isFirstLevel, children } =
-    data
-  const [isHovered, setIsHovered] = useState(false)
+export function GoalNode({ data, selected }: NodeProps) {
+  const {
+    id,
+    summary,
+    description,
+    color,
+    prefix,
+    isFirstLevel,
+    children,
+    state
+  } = data
   const [isAddGoalOpen, setIsAddGoalOpen] = useState(false)
   const [isAddTaskOpen, setIsAddTaskOpen] = useState(false)
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
@@ -28,10 +25,10 @@ export function GoalNode({ data }: GoalNodeProps) {
   return (
     <>
       <div
-        className="relative min-w-[200px] max-w-[300px] rounded-lg border border-gray-200 bg-white p-3 shadow-sm"
+        className={`relative min-w-[200px] max-w-[300px] rounded-lg border bg-white p-3 shadow-sm ${
+          selected ? 'border-gray-300  ring-1 ring-gray-300' : 'border-gray-200'
+        }`}
         style={{ borderLeftColor: color, borderLeftWidth: '4px' }}
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
       >
         {/* 左侧连接点 */}
         <Handle
@@ -71,56 +68,57 @@ export function GoalNode({ data }: GoalNodeProps) {
           )}
         </div>
 
-        {isHovered && (
+        {/* 右上角状态下拉菜单 */}
+        {state && (
           <div className="absolute top-2 right-2 z-10">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-8 w-8 bg-gray-100 hover:bg-gray-200"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <MoreHorizontalIcon className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent
-                align="end"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <DropdownMenuItem
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    setIsAddGoalOpen(true)
-                  }}
-                >
-                  <Plus className="h-4 w-4 mr-2" />
-                  添加子目标
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    setIsAddTaskOpen(true)
-                  }}
-                >
-                  <Plus className="h-4 w-4 mr-2" />
-                  添加任务
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    setIsDeleteDialogOpen(true)
-                  }}
-                >
-                  <Trash2 className="h-4 w-4 mr-2" />
-                  删除目标
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <GoalStateDropdown goalId={id} currentState={state} />
           </div>
         )}
+
         <NodeToolbar position={Position.Top} offset={6} align={'start'}>
-          <div className="bg-white p-3 rounded-lg shadow-lg border border-gray-200 max-w-sm">
+          <div className="flex space-x-1 bg-white p-1 rounded-lg shadow-lg border border-gray-200">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 text-gray-500 hover:text-gray-700 hover:bg-gray-100"
+              onClick={(e) => {
+                e.stopPropagation()
+                setIsAddGoalOpen(true)
+              }}
+              title="添加子目标"
+            >
+              <Target className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 text-gray-500 hover:text-gray-700 hover:bg-gray-100"
+              onClick={(e) => {
+                e.stopPropagation()
+                setIsAddTaskOpen(true)
+              }}
+              title="添加任务"
+            >
+              <ListTodo className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 text-gray-500 hover:text-red-500 hover:bg-gray-100"
+              onClick={(e) => {
+                e.stopPropagation()
+                setIsDeleteDialogOpen(true)
+              }}
+              title="删除目标"
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          </div>
+        </NodeToolbar>
+
+        {/* 节点详情工具栏 */}
+        <NodeToolbar position={Position.Bottom} offset={6} align={'start'}>
+          <div className="bg-white p-3 rounded-lg shadow-lg border border-gray-200 max-w-xs">
             <p className="text-sm text-gray-700 whitespace-pre-wrap break-words">
               {summary}
             </p>

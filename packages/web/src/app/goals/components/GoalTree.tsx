@@ -13,8 +13,8 @@ import ReactFlow, {
 } from 'reactflow'
 import 'reactflow/dist/style.css'
 import { Goal, LifeGoal } from '../goals.type'
-import { LifeGoalNode } from './LifeGoalNode'
 import { GoalNode } from './GoalNode'
+import { LifeGoalNode } from './LifeGoalNode'
 
 const nodeWidth = 300
 const nodeHeight = 100

@@ -9,11 +9,13 @@ export type Goal = {
     id: number
     name: string
   }
-  state: {
-    id: number
-    name: string
-  }
+  state: GoalState
   children: Goal[]
+}
+
+export type GoalState = {
+  id: number
+  name: string
 }
 
 export type LifeGoal = {
