@@ -24,32 +24,34 @@ export interface GoalStateDropdownProps {
   currentState: GoalState
 }
 
-export function GoalStateDropdown({
+export function UpdateGoalStateDropdown({
   goalId,
   currentState
 }: GoalStateDropdownProps) {
   const [_goalState, setGoalState] = useState(currentState.name)
 
-  const handleGoalStateChange = (newState: string) => {
-    fetch(`/api/goals/${goalId}/state`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-user-id': '100000'
-      },
-      body: JSON.stringify({ state: newState })
-    })
-      .then((res) => res.json())
-      .then(() => {
-        setGoalState(newState)
-        toast({
-          title: '状态更新成功',
-          description: '目标状态已更新'
-        })
+  const handleGoalStateChange = async (newState: string) => {
+    try {
+      const response = await fetch(`/api/goals/${goalId}/state`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-user-id': '100000'
+        },
+        body: JSON.stringify({ state: newState })
       })
-      .catch((err) => {
-        console.error(err)
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.error || '更新目标状态失败')
+      }
+      toast({
+        title: '状态更新成功',
+        description: '目标状态已更新'
       })
+      setGoalState(newState)
+    } catch (error) {
+      console.error(error)
+    }
   }
 
   return (

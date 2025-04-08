@@ -84,11 +84,45 @@ async function deleteGoalWithAllChildren(userId: number, goalId: number) {
   }
 }
 
-async function updateGoalState(userId: number, goalId: number, state: string) {
+async function updateGoalStateByStateName(
+  userId: number,
+  goalId: number,
+  stateName: string
+) {
   try {
-    await prisma.$queryRawUnsafe(`
-      CALL update_goal_state(${userId}, ${goalId}, ${state})
-    `)
+    // 首先检查目标是否存在且属于该用户
+    const goal = await prisma.uC_GOAL.findFirst({
+      where: {
+        goal_id: goalId,
+        user_id: userId
+      }
+    })
+
+    if (!goal) {
+      throw new Error('目标不存在或不属于当前用户')
+    }
+
+    // 获取状态ID
+    const state = await prisma.gOAL_STATE.findFirst({
+      where: {
+        name: stateName
+      }
+    })
+
+    if (!state) {
+      throw new Error(`无效的状态名称: ${stateName}`)
+    }
+
+    // 使用Prisma更新目标状态
+    await prisma.uC_GOAL.update({
+      where: {
+        goal_id: goalId
+      },
+      data: {
+        state_id: state.state_id,
+        updated_at: new Date()
+      }
+    })
   } catch (error) {
     console.error('更新目标状态失败:', error)
     throw new Error(
@@ -98,9 +132,49 @@ async function updateGoalState(userId: number, goalId: number, state: string) {
   }
 }
 
+async function updateGoalBasicInfo(
+  userId: number,
+  goalId: number,
+  summary: string,
+  description: string
+) {
+  try {
+    // 首先检查目标是否存在且属于该用户
+    const goal = await prisma.uC_GOAL.findFirst({
+      where: {
+        goal_id: goalId,
+        user_id: userId
+      }
+    })
+
+    if (!goal) {
+      throw new Error('目标不存在或不属于当前用户')
+    }
+
+    // 使用Prisma更新目标
+    await prisma.uC_GOAL.update({
+      where: {
+        goal_id: goalId
+      },
+      data: {
+        summary,
+        description,
+        updated_at: new Date()
+      }
+    })
+  } catch (error) {
+    console.error('更新目标失败:', error)
+    throw new Error(
+      '更新目标失败: ' +
+        (error instanceof Error ? error.message : String(error))
+    )
+  }
+}
+
 export const goalMutations = {
   upsertUltimateGoal,
   createGoal,
   deleteGoalWithAllChildren,
-  updateGoalState
+  updateGoalStateByStateName,
+  updateGoalBasicInfo
 }

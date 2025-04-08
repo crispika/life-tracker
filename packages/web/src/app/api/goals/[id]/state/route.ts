@@ -9,6 +9,8 @@ export async function PUT(
   const goalId = Number((await params).id)
   const userId = Number(request.headers.get('x-user-id') || '100000')
 
+  console.log('userId1111111', userId)
+
   const { state } = await request.json()
 
   if (!state) {
@@ -18,7 +20,7 @@ export async function PUT(
     )
   }
   try {
-    await mutations.goal.updateGoalState(userId, goalId, state)
+    await mutations.goal.updateGoalStateByStateName(userId, goalId, state)
     return NextResponse.json({ success: true })
   } catch (error) {
     console.error('更新目标状态失败:', error)
