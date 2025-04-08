@@ -3,6 +3,18 @@ USE life_tracker;
 -- 获取用户ID
 SET @demo_user_id = (SELECT user_id FROM USER WHERE email = 'demo@example.com');
 
+-- 定义颜色变量
+SET @color_red = '#ff4d4f';
+SET @color_orange = '#fa8c16';
+SET @color_yellow = '#fadb14';
+SET @color_green = '#52c41a';
+SET @color_cyan = '#13c2c2';
+SET @color_blue = '#1890ff';
+SET @color_purple = '#722ed1';
+SET @color_brown = '#8B4513';
+SET @color_gray = '#8c8c8c';
+SET @color_black = '#000000';
+
 -- 获取目标状态ID
 SET @active_state_id = (SELECT state_id FROM GOAL_STATE WHERE name = 'ACTIVE');
 SET @on_hold_state_id = (SELECT state_id FROM GOAL_STATE WHERE name = 'ON_HOLD');
@@ -13,7 +25,7 @@ SET @archived_state_id = (SELECT state_id FROM GOAL_STATE WHERE name = 'ARCHIVED
 -- 创建一级目标
 CALL create_goal(
   @demo_user_id,
-  '#FF0000',
+  @color_blue,
   '健康管理',
   '保持身体健康',
   NULL,
@@ -25,7 +37,7 @@ CALL create_goal(
 
 CALL create_goal(
   @demo_user_id,
-  '#00FF00',
+  @color_red,
   '职业发展',
   '职业发展相关目标',
   NULL,
@@ -35,21 +47,10 @@ CALL create_goal(
   @work_prefix_id
 );
 
-CALL create_goal(
-  @demo_user_id,
-  '#0000FF',
-  '知识学习',
-  '持续学习新知识',
-  NULL,
-  'LX',
-  TRUE,
-  @learning_goal_id,
-  @learning_prefix_id
-);
 
 CALL create_goal(
   @demo_user_id,
-  '#FFC400',
+  @color_green,
   '休闲娱乐',
   '休闲娱乐相关目标',
   NULL,
@@ -59,22 +60,11 @@ CALL create_goal(
   @relax_prefix_id
 );
 
-CALL create_goal(
-  @demo_user_id,
-  '#00B8D9',
-  '家庭生活',
-  '家庭生活相关目标',
-  NULL,
-  'FM',
-  TRUE,
-  @family_goal_id,
-  @family_prefix_id
-);
 
 -- 创建子目标
 CALL create_goal(
   @demo_user_id,
-  '#FFA500',
+  @color_blue,
   '运动健身',
   '保持运动习惯',
   @health_goal_id,
@@ -86,7 +76,7 @@ CALL create_goal(
 
 CALL create_goal(
   @demo_user_id,
-  '#FF69B4',
+  @color_blue,
   '健康饮食',
   '健康饮食计划',
   @health_goal_id,
@@ -98,7 +88,7 @@ CALL create_goal(
 
 CALL create_goal(
   @demo_user_id,
-  '#4B0082',
+  @color_red,
   '项目开发',
   '项目开发相关目标',
   @work_goal_id,
@@ -108,22 +98,10 @@ CALL create_goal(
   @work_dev_prefix_id
 );
 
-CALL create_goal(
-  @demo_user_id,
-  '#8B4513',
-  '技术学习',
-  '学习新技术',
-  @learning_goal_id,
-  NULL,
-  FALSE,
-  @learning_tech_goal_id,
-  @learning_tech_prefix_id
-);
-
 -- 创建更多子目标
 CALL create_goal(
   @demo_user_id,
-  '#6554C0',
+  @color_red,
   '技术开发能力',
   '提升技术能力',
   @work_goal_id,
@@ -135,7 +113,7 @@ CALL create_goal(
 
 CALL create_goal(
   @demo_user_id,
-  '#00C7E6',
+  @color_red,
   '项目管理能力',
   '提升项目管理能力',
   @work_goal_id,
@@ -147,7 +125,7 @@ CALL create_goal(
 
 CALL create_goal(
   @demo_user_id,
-  '#FF8B00',
+  @color_red,
   '职业发展规划',
   '长期职业发展规划',
   @work_goal_id,
@@ -159,7 +137,7 @@ CALL create_goal(
 
 CALL create_goal(
   @demo_user_id,
-  '#57D9A3',
+  @color_blue,
   '日常锻炼',
   '保持身体健康的锻炼',
   @health_goal_id,
@@ -171,7 +149,7 @@ CALL create_goal(
 
 CALL create_goal(
   @demo_user_id,
-  '#FF5630',
+  @color_blue,
   '睡眠管理',
   '改善睡眠质量',
   @health_goal_id,
@@ -183,7 +161,7 @@ CALL create_goal(
 
 CALL create_goal(
   @demo_user_id,
-  '#FFC400',
+  @color_green,
   '阅读计划',
   '阅读各类书籍',
   @relax_goal_id,
@@ -195,7 +173,7 @@ CALL create_goal(
 
 CALL create_goal(
   @demo_user_id,
-  '#FF5630',
+  @color_green,
   '旅行计划',
   '探索新地方',
   @relax_goal_id,
@@ -207,7 +185,7 @@ CALL create_goal(
 
 CALL create_goal(
   @demo_user_id,
-  '#4A6FDC',
+  @color_green,
   '摄影技能',
   '提高摄影技巧',
   @relax_goal_id,
@@ -215,52 +193,4 @@ CALL create_goal(
   FALSE,
   @relax_photo_goal_id,
   @relax_photo_prefix_id
-);
-
-CALL create_goal(
-  @demo_user_id,
-  '#36B37E',
-  '编程语言学习',
-  '学习新的编程语言',
-  @learning_goal_id,
-  NULL,
-  FALSE,
-  @learning_prog_goal_id,
-  @learning_prog_prefix_id
-);
-
-CALL create_goal(
-  @demo_user_id,
-  '#FF8B00',
-  '外语学习计划',
-  '提高外语水平',
-  @learning_goal_id,
-  NULL,
-  FALSE,
-  @learning_lang_goal_id,
-  @learning_lang_prefix_id
-);
-
-CALL create_goal(
-  @demo_user_id,
-  '#00B8D9',
-  '家庭活动计划',
-  '增加家庭共处时间',
-  @family_goal_id,
-  NULL,
-  FALSE,
-  @family_act_goal_id,
-  @family_act_prefix_id
-);
-
-CALL create_goal(
-  @demo_user_id,
-  '#FFC400',
-  '家庭财务规划',
-  '家庭财务规划',
-  @family_goal_id,
-  NULL,
-  FALSE,
-  @family_finance_goal_id,
-  @family_finance_prefix_id
 );

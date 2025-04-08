@@ -146,7 +146,6 @@ END //
 
 -- 创建任务并生成任务编号的存储过程
 CREATE PROCEDURE create_task(
-  IN p_prefix_id INT UNSIGNED,
   IN p_user_id INT UNSIGNED,
   IN p_color VARCHAR(7),
   IN p_summary VARCHAR(300),
@@ -156,12 +155,12 @@ CREATE PROCEDURE create_task(
   IN p_original_estimate_minutes INT,
   IN p_goal_id INT UNSIGNED,
   OUT p_task_id INT UNSIGNED,
-  OUT p_code VARCHAR(30)
+  OUT p_code INT UNSIGNED
 )
 BEGIN
-  DECLARE v_prefix VARCHAR(15);
   DECLARE v_next_seq INT UNSIGNED;
   DECLARE v_default_state_id INT UNSIGNED;
+  DECLARE v_prefix_id INT UNSIGNED;
   
   START TRANSACTION;
   
@@ -170,35 +169,29 @@ BEGIN
     SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = '用户不存在';
   END IF;
   
-  -- 检查前缀是否存在
-  IF NOT EXISTS (SELECT 1 FROM UC_GOAL_PREFIX WHERE prefix_id = p_prefix_id AND user_id = p_user_id) THEN
-    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = '前缀不存在';
-  END IF;
+  -- 检查目标是否存在并获取其前缀ID
+  SELECT prefix_id INTO v_prefix_id
+  FROM UC_GOAL
+  WHERE goal_id = p_goal_id AND user_id = p_user_id;
   
-  -- 检查目标ID是否为空
-  IF p_goal_id IS NULL THEN
-    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'goal_id不能为空';
-  END IF;
-
-  -- 检查目标是否存在
-  IF NOT EXISTS (SELECT 1 FROM UC_GOAL WHERE goal_id = p_goal_id AND user_id = p_user_id) THEN
-    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'goal不存在';
+  IF v_prefix_id IS NULL THEN
+    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = '与该task相关的goal不存在';
   END IF;
   
   -- 获取并锁定前缀记录
-  SELECT prefix, next_seq_number 
-  INTO v_prefix, v_next_seq
+  SELECT next_seq_number 
+  INTO v_next_seq
   FROM UC_GOAL_PREFIX 
-  WHERE prefix_id = p_prefix_id
+  WHERE prefix_id = v_prefix_id
   FOR UPDATE;
   
   -- 更新下一个序号
   UPDATE UC_GOAL_PREFIX 
   SET next_seq_number = next_seq_number + 1 
-  WHERE prefix_id = p_prefix_id;
+  WHERE prefix_id = v_prefix_id;
   
-  -- 生成代码
-  SET p_code = CONCAT(v_prefix, '-', v_next_seq);
+  -- 设置代码
+  SET p_code = v_next_seq;
   
   -- 获取用户的默认初始化状态
   SELECT state_id INTO v_default_state_id
