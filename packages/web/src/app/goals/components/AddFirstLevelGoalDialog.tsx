@@ -166,14 +166,14 @@ export function AddFirstLevelGoalDialog({
             </div>
             <div className="space-y-2">
               <Label htmlFor="prefix" className="flex items-center">
-                任务序列前缀
+                序列前缀
                 <span className="text-red-500 ml-1">*</span>
               </Label>
               <Input
                 id="prefix"
                 value={prefix}
                 onChange={(e) => setPrefix(e.target.value)}
-                placeholder="请输入简短的目标前缀（如wk），后续任务将以此编号（如wk-001）"
+                placeholder="请输入简短的目标前缀（如wk），后续所有子目标或任务将以此编号（如wk-001）"
                 maxLength={5}
                 autoComplete="off"
                 className="h-10"

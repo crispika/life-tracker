@@ -5,6 +5,7 @@ export type Goal = {
   parentId: number | null
   color: string
   isFirstLevel: boolean
+  code: number | null
   prefix: {
     id: number
     name: string

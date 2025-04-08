@@ -17,7 +17,8 @@ export function GoalNode({ data, selected }: NodeProps) {
     prefix,
     isFirstLevel,
     children,
-    state
+    state,
+    code
   } = data
   const [isAddGoalOpen, setIsAddGoalOpen] = useState(false)
   const [isAddTaskOpen, setIsAddTaskOpen] = useState(false)
@@ -51,13 +52,11 @@ export function GoalNode({ data, selected }: NodeProps) {
         {/* 节点内容 */}
         <div className="space-y-2">
           {/* Prefix Section */}
-          {prefix && isFirstLevel && (
-            <div className="flex items-center">
-              <span className="rounded bg-gray-100 px-2 py-0.5 text-xs text-gray-600">
-                {prefix.name}
-              </span>
-            </div>
-          )}
+          <div className="flex items-center">
+            <span className="rounded bg-gray-100 px-2 py-0.5 text-xs text-gray-600">
+              {isFirstLevel ? prefix.name : `${prefix.name}-${code}`}
+            </span>
+          </div>
 
           {/* Summary Section */}
           <div className="truncate">

@@ -53,9 +53,15 @@ CREATE PROCEDURE create_goal(
 BEGIN
   DECLARE v_parent_prefix_id INT UNSIGNED;
   DECLARE v_active_state_id INT UNSIGNED;
+  DECLARE v_next_seq INT UNSIGNED;
+  DECLARE v_code INT UNSIGNED;
+  
+  -- 开始事务
+  START TRANSACTION;
   
   -- 检查用户是否存在
   IF NOT EXISTS (SELECT 1 FROM USER WHERE user_id = p_user_id) THEN
+    ROLLBACK;
     SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = '用户不存在';
   END IF;
   
@@ -65,11 +71,13 @@ BEGIN
   -- 如果是一级目标，必须指定前缀
   IF p_is_first_level THEN
     IF p_prefix IS NULL THEN
+      ROLLBACK;
       SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = '一级目标必须指定前缀';
     END IF;
     
     -- 检查前缀是否已存在
     IF EXISTS (SELECT 1 FROM UC_GOAL_PREFIX WHERE user_id = p_user_id AND prefix = p_prefix) THEN
+      ROLLBACK;
       SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = '该前缀已被使用';
     END IF;
     
@@ -79,14 +87,17 @@ BEGIN
     
     -- 获取新创建的前缀ID
     SET p_prefix_id = LAST_INSERT_ID();
+    SET v_code = NULL;  -- 一级目标没有code
   ELSE
     -- 如果不是一级目标，必须有父目标
     IF p_parent_id IS NULL THEN
+      ROLLBACK;
       SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = '非一级目标必须指定父目标';
     END IF;
     
     -- 检查父目标是否存在
     IF NOT EXISTS (SELECT 1 FROM UC_GOAL WHERE goal_id = p_parent_id AND user_id = p_user_id) THEN
+      ROLLBACK;
       SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = '父目标不存在';
     END IF;
     
@@ -95,24 +106,42 @@ BEGIN
     
     -- 子目标必须使用父目标的前缀ID
     IF p_prefix IS NOT NULL THEN
+      ROLLBACK;
       SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = '子目标不能指定新的前缀，必须继承父目标的前缀';
     END IF;
     
     -- 使用父目标的前缀ID
     SET p_prefix_id = v_parent_prefix_id;
+    
+    -- 获取并更新下一个序号
+    SELECT next_seq_number INTO v_next_seq
+    FROM UC_GOAL_PREFIX
+    WHERE prefix_id = v_parent_prefix_id
+    FOR UPDATE;
+    
+    -- 更新序号
+    UPDATE UC_GOAL_PREFIX
+    SET next_seq_number = next_seq_number + 1
+    WHERE prefix_id = v_parent_prefix_id;
+    
+    -- 设置子目标的code
+    SET v_code = v_next_seq;
   END IF;
   
   -- 插入目标记录
   INSERT INTO UC_GOAL (
     user_id, color, summary, description,
-    state_id, parent_id, prefix_id, is_first_level
+    state_id, parent_id, prefix_id, code, is_first_level
   ) VALUES (
     p_user_id, p_color, p_summary, p_description,
-    v_active_state_id, p_parent_id, p_prefix_id, p_is_first_level
+    v_active_state_id, p_parent_id, p_prefix_id, v_code, p_is_first_level
   );
   
   -- 获取新创建的目标ID
   SET p_goal_id = LAST_INSERT_ID();
+  
+  -- 提交事务
+  COMMIT;
 END //
 
 -- 创建任务并生成任务编号的存储过程

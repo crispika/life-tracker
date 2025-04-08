@@ -24,6 +24,7 @@ async function getUserGoalTree(userId: number) {
         parent_id: true,
         color: true,
         is_first_level: true,
+        code: true,
         GOAL_STATE: {
           select: {
             name: true,
@@ -47,6 +48,7 @@ async function getUserGoalTree(userId: number) {
         parentId: g.parent_id,
         color: g.color,
         isFirstLevel: !!g.is_first_level,
+        code: g.code,
         prefix: {
           id: g.UC_GOAL_PREFIX.prefix_id,
           name: g.UC_GOAL_PREFIX.prefix
@@ -59,40 +61,6 @@ async function getUserGoalTree(userId: number) {
     )
   } catch (error) {
     console.error('Error fetching goal tree:', error)
-    throw error
-  }
-}
-
-// 获取单个目标及其子目标
-async function getGoalWithChildren(goalId: number) {
-  try {
-    const goal = await prisma.uC_GOAL.findUnique({
-      where: {
-        goal_id: goalId
-      },
-      include: {
-        GOAL_STATE: true,
-        other_UC_GOAL: {
-          include: {
-            GOAL_STATE: true
-          }
-        }
-      }
-    })
-
-    if (!goal) {
-      return null
-    }
-
-    // 构建树形结构
-    const goalTree = {
-      ...goal,
-      children: goal.other_UC_GOAL
-    }
-
-    return goalTree
-  } catch (error) {
-    console.error('Error fetching goal with children:', error)
     throw error
   }
 }
@@ -165,7 +133,6 @@ async function getGoalById(goalId: number) {
 
 export const goalQueries = {
   getUserGoalTree,
-  getGoalWithChildren,
   getUserUltimateGoal,
   getGoalById
 }
