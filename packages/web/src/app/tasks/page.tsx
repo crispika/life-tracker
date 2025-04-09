@@ -68,7 +68,7 @@ export default async function Tasks({
                 className="w-6 h-4 mr-6"
                 style={{ backgroundColor: task.goalColor || '#808080' }}
               />
-              <div className="w-24 font-mono text-sm">{task.code}</div>
+              <div className="w-24 font-mono text-sm">{`${task.prefix}-${task.code}`}</div>
               <div className="w-32 text-sm">
                 <Badge variant="outline" className="font-normal">
                   {task.goalSummary || '无目标'}

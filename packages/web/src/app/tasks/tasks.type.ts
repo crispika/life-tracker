@@ -6,15 +6,16 @@ export interface TaskState {
 
 export interface Task {
   id: number
-  code: string
+  code: number
   summary: string
   description: string | null
   startDate: Date
   dueDate: Date
   originalEstimate: number
   timeSpent: number
-  goalSummary?: string
-  goalColor?: string
+  goalSummary: string
+  goalColor: string
+  prefix: string
   state: TaskState
 }
 

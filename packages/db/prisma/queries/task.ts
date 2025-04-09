@@ -17,7 +17,12 @@ const getTasksByUserId = async (userId: number) => {
       UC_GOAL: {
         select: {
           summary: true,
-          color: true
+          color: true,
+          UC_GOAL_PREFIX: {
+            select: {
+              prefix: true
+            }
+          }
         }
       },
       UC_TASK_STATE: {
@@ -41,6 +46,7 @@ const getTasksByUserId = async (userId: number) => {
     timeSpent: t.time_spent_minutes,
     goalSummary: t.UC_GOAL?.summary,
     goalColor: t.UC_GOAL?.color,
+    prefix: t.UC_GOAL?.UC_GOAL_PREFIX?.prefix,
     state: {
       name: t.UC_TASK_STATE.name,
       id: t.UC_TASK_STATE.state_id,
@@ -69,6 +75,17 @@ const getTaskDetailById = async (taskId: number) => {
           state_id: true,
           system_defined: true
         }
+      },
+      UC_GOAL: {
+        select: {
+          summary: true,
+          color: true,
+          UC_GOAL_PREFIX: {
+            select: {
+              prefix: true
+            }
+          }
+        }
       }
     }
   })
@@ -88,7 +105,10 @@ const getTaskDetailById = async (taskId: number) => {
       name: task.UC_TASK_STATE.name,
       id: task.UC_TASK_STATE.state_id,
       systemDefined: task.UC_TASK_STATE.system_defined
-    }
+    },
+    prefix: task.UC_GOAL?.UC_GOAL_PREFIX.prefix,
+    goalSummary: task.UC_GOAL?.summary,
+    goalColor: task.UC_GOAL?.color
   }
 }
 

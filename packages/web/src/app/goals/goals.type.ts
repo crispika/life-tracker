@@ -6,15 +6,17 @@ export type Goal = {
   color: string
   isFirstLevel: boolean
   code: number | null
-  prefix: {
-    id: number
-    name: string
-  }
+  prefix: GoalPrefix
   state: GoalState
   children: Goal[]
 }
 
 export type GoalState = {
+  id: number
+  name: string
+}
+
+export type GoalPrefix = {
   id: number
   name: string
 }

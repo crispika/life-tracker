@@ -33,7 +33,7 @@ export default async function ProjectDetail({
         <div className="flex-1 mr-16">
           <div className="flex flex-col gap-4 min-w-80">
             <div className="flex justify-between">
-              <h1 className="text-xl font-bold">{task.code}</h1>
+              <h1 className="text-xl font-bold">{`${task.prefix}-${task.code}`}</h1>
               <TaskStateDropdown taskId={taskId} />
             </div>
             <div className="flex gap-4">

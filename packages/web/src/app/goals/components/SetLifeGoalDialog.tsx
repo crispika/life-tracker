@@ -16,6 +16,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { useToast } from '@/hooks/use-toast'
 import { AlertCircle } from 'lucide-react'
 import { LifeGoal } from '../goals.type'
+import { useRouter } from 'next/navigation'
 
 interface SetLifeGoalDialogProps {
   mode?: 'create' | 'edit'
@@ -40,7 +41,7 @@ export function SetLifeGoalDialog({
   const [errors, setErrors] = useState<{
     summary?: string
   }>({})
-
+  const router = useRouter()
   // 使用受控或非受控的open状态
   const open = controlledOpen !== undefined ? controlledOpen : internalOpen
   const setOpen = onOpenChange || setInternalOpen
@@ -94,6 +95,9 @@ export function SetLifeGoalDialog({
       })
       if (mode === 'edit' && setLifeGoal) {
         setLifeGoal((prev) => ({ ...prev, summary, sidenote }))
+      }
+      if (mode === 'create') {
+        router.refresh()
       }
     } catch (error) {
       console.error(

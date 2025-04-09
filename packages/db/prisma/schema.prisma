@@ -93,7 +93,7 @@ model UC_GOAL {
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model UC_TASK {
   task_id                   Int           @id @default(autoincrement()) @db.UnsignedInt
-  code                      String        @db.VarChar(30)
+  code                      Int           @db.UnsignedInt
   user_id                   Int           @db.UnsignedInt
   color                     String        @db.VarChar(7)
   summary                   String        @db.VarChar(300)
@@ -103,14 +103,14 @@ model UC_TASK {
   original_estimate_minutes Int
   time_spent_minutes        Int           @default(0)
   state_id                  Int           @db.UnsignedInt
-  goal_id                   Int?          @db.UnsignedInt
+  goal_id                   Int           @db.UnsignedInt
   created_at                DateTime      @default(now())
   updated_at                DateTime      @default(now())
-  UC_GOAL                   UC_GOAL?      @relation(fields: [goal_id], references: [goal_id], onUpdate: NoAction, map: "fk_uc_task_goal")
+  UC_GOAL                   UC_GOAL       @relation(fields: [goal_id], references: [goal_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_uc_task_goal")
   UC_TASK_STATE             UC_TASK_STATE @relation(fields: [state_id], references: [state_id], onUpdate: NoAction, map: "fk_uc_task_state")
   USER                      USER          @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_uc_task_user")
 
-  @@unique([user_id, code], map: "uk_uc_task_code")
+  @@unique([user_id, goal_id, code], map: "uk_uc_task_code")
   @@index([state_id], map: "fk_uc_task_state")
   @@index([goal_id], map: "idx_uc_task_goal")
   @@index([user_id], map: "idx_uc_task_user")
