@@ -15,13 +15,16 @@ import 'reactflow/dist/style.css'
 import { Goal, LifeGoal } from '../goals.type'
 import { GoalNode } from './GoalNode'
 import { LifeGoalNode } from './LifeGoalNode'
+import { Task } from '@/app/tasks/tasks.type'
+import { TaskNode } from './TaskNode'
 
 const nodeWidth = 300
 const nodeHeight = 100
 
 const nodeTypes = {
   root: LifeGoalNode,
-  goal: GoalNode
+  goal: GoalNode,
+  task: TaskNode
 }
 
 const getLayoutedElements = (
@@ -31,7 +34,13 @@ const getLayoutedElements = (
 ) => {
   const dagreGraph = new dagre.graphlib.Graph()
   dagreGraph.setDefaultEdgeLabel(() => ({}))
-  dagreGraph.setGraph({ rankdir: direction })
+
+  // 设置图的方向和节点间距
+  dagreGraph.setGraph({
+    rankdir: direction,
+    nodesep: 100 // 水平间距
+    // ranksep: 150 // 垂直间距
+  })
 
   // 添加节点
   nodes.forEach((node) => {
@@ -63,7 +72,8 @@ const getLayoutedElements = (
 
 function processGoals(
   rootGoal: LifeGoal,
-  goals: Goal[]
+  goals: Goal[],
+  tasks: Task[]
 ): { nodes: Node[]; edges: Edge[] } {
   const nodes: Node[] = []
   const edges: Edge[] = []
@@ -78,10 +88,13 @@ function processGoals(
     sourcePosition: Position.Right
   })
 
-  const processNode = (goal: Goal, parentId: string) => {
+  const processNode = (goal: Goal, parentId: string, tasks: Task[]) => {
+    const goalNodeId = `goal_${goal.id}`
+    const subTasks = tasks.filter((task) => task.goalId === goal.id)
+
     nodes.push({
-      id: goal.id.toString(),
-      data: goal,
+      id: goalNodeId,
+      data: { ...goal, hasSubTasks: subTasks.length > 0 },
       position: { x: 0, y: 0 },
       type: 'goal',
       targetPosition: Position.Left,
@@ -90,30 +103,51 @@ function processGoals(
 
     // 创建与父节点的连接
     edges.push({
-      id: `e${parentId}-${goal.id}`,
+      id: `e${parentId}-${goalNodeId}`,
       source: parentId,
-      target: goal.id.toString(),
-      style: { stroke: '#999' }
+      target: goalNodeId
+    })
+
+    // 先创建所有任务节点
+    subTasks.forEach((task) => {
+      const taskNodeId = `task_${task.id}`
+      nodes.push({
+        id: taskNodeId,
+        data: task,
+        position: { x: 0, y: 0 },
+        type: 'task',
+        targetPosition: Position.Left,
+        sourcePosition: Position.Right
+      })
+
+      // 立即为每个任务创建与目标的连接
+      edges.push({
+        id: `e${goalNodeId}-${taskNodeId}`,
+        source: goalNodeId,
+        target: taskNodeId
+      })
     })
 
     // 处理子节点
     if (goal.children) {
-      goal.children.forEach((child) => processNode(child, goal.id.toString()))
+      goal.children.forEach((child) => processNode(child, goalNodeId, tasks))
     }
   }
 
   // 处理所有顶层目标，将它们连接到根节点
-  goals.forEach((goal) => processNode(goal, 'root'))
+  goals.forEach((goal) => processNode(goal, 'root', tasks))
 
   return getLayoutedElements(nodes, edges)
 }
 
 export function GoalsTree({
   lifeGoal,
-  goals
+  goals,
+  tasks
 }: {
   lifeGoal: LifeGoal
   goals: Goal[]
+  tasks: Task[]
 }) {
   const [nodes, setNodes, onNodesChange] = useNodesState([])
   const [edges, setEdges, onEdgesChange] = useEdgesState([])
@@ -121,11 +155,12 @@ export function GoalsTree({
   const onLayout = useCallback(() => {
     const { nodes: layoutedNodes, edges: layoutedEdges } = processGoals(
       lifeGoal,
-      goals
+      goals,
+      tasks
     )
     setNodes(layoutedNodes)
     setEdges(layoutedEdges)
-  }, [lifeGoal, goals, setNodes, setEdges])
+  }, [lifeGoal, goals, tasks, setNodes, setEdges])
 
   // 初始化布局
   useEffect(() => {
@@ -148,6 +183,7 @@ export function GoalsTree({
           nodeTypes={nodeTypes}
           nodesDraggable={false}
           nodesConnectable={false}
+          elementsSelectable={true}
         >
           <Background />
           <Controls />

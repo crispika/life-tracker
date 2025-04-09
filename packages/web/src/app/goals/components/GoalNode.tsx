@@ -18,17 +18,20 @@ export function GoalNode({ data, selected }: NodeProps) {
     isFirstLevel,
     children,
     state,
-    code
+    code,
+    hasSubTasks
   } = data
   const [isAddGoalOpen, setIsAddGoalOpen] = useState(false)
   const [isAddTaskOpen, setIsAddTaskOpen] = useState(false)
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false)
 
+  const hasChildren = hasSubTasks || (children && children.length > 0)
+
   return (
     <>
       <div
-        className={`relative min-w-[200px] max-w-[300px] rounded-lg border bg-white p-3 shadow-sm ${
+        className={`relative min-w-[300px] max-w-[300px] rounded-lg border bg-white p-3 shadow-sm ${
           selected ? 'border-gray-300  ring-1 ring-gray-300' : 'border-gray-200'
         }`}
         style={{ borderLeftColor: color, borderLeftWidth: '4px' }}
@@ -41,7 +44,7 @@ export function GoalNode({ data, selected }: NodeProps) {
         />
 
         {/* 右侧连接点 - 只在有子节点时显示 */}
-        {children && children.length > 0 && (
+        {hasChildren && (
           <Handle
             type="source"
             position={Position.Right}
@@ -52,7 +55,8 @@ export function GoalNode({ data, selected }: NodeProps) {
         {/* 节点内容 */}
         <div className="space-y-2">
           {/* Prefix Section */}
-          <div className="flex items-center">
+          <div className="flex items-center gap-2">
+            <Target className="h-4 w-4 text-gray-500" />
             <span className="rounded bg-gray-100 px-2 py-0.5 text-xs text-gray-600">
               {isFirstLevel ? prefix.name : `${prefix.name}-${code}`}
             </span>

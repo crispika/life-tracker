@@ -16,6 +16,7 @@ export interface Task {
   goalSummary: string
   goalColor: string
   prefix: string
+  goalId: number
   state: TaskState
 }
 

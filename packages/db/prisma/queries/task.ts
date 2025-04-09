@@ -16,6 +16,7 @@ const getTasksByUserId = async (userId: number) => {
       time_spent_minutes: true,
       UC_GOAL: {
         select: {
+          goal_id: true,
           summary: true,
           color: true,
           UC_GOAL_PREFIX: {
@@ -32,6 +33,11 @@ const getTasksByUserId = async (userId: number) => {
           system_defined: true
         }
       }
+    },
+    orderBy: {
+      UC_GOAL: {
+        goal_id: 'asc'
+      }
     }
   })
 
@@ -47,6 +53,7 @@ const getTasksByUserId = async (userId: number) => {
     goalSummary: t.UC_GOAL?.summary,
     goalColor: t.UC_GOAL?.color,
     prefix: t.UC_GOAL?.UC_GOAL_PREFIX?.prefix,
+    goalId: t.UC_GOAL?.goal_id,
     state: {
       name: t.UC_TASK_STATE.name,
       id: t.UC_TASK_STATE.state_id,
