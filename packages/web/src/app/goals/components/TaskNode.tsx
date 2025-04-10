@@ -16,18 +16,26 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 import { Handle, NodeProps, NodeToolbar, Position } from 'reactflow'
+import { useState } from 'react'
+import { AddTaskDialog } from './AddTaskDialog'
 
 export function TaskNode({ data, selected }: NodeProps) {
-  const task = data as Task
+  const {
+    id: taskId,
+    goalColor,
+    state,
+    code,
+    prefix,
+    summary,
+    description,
+    startDate,
+    dueDate,
+    originalEstimate,
+    timeSpent,
+    goalId
+  } = data as Task
 
-  // 添加调试日志
-  console.log('Task data:', {
-    timeSpent: task.timeSpent,
-    originalEstimate: task.originalEstimate,
-    progress: task.originalEstimate
-      ? (task.timeSpent / task.originalEstimate) * 100
-      : 0
-  })
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
 
   return (
     <>
@@ -38,33 +46,9 @@ export function TaskNode({ data, selected }: NodeProps) {
             : 'border-transparent shadow-sm hover:shadow-md'
         }`}
         style={{
-          backgroundColor: `${task.goalColor}05`
+          backgroundColor: `${goalColor}05`
         }}
       >
-        {/* 顶部工具栏 */}
-        <NodeToolbar position={Position.Top} offset={6} align={'start'}>
-          <div className="flex space-x-1 bg-white p-1 rounded-lg shadow-lg border border-gray-200">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8 text-gray-500 hover:text-gray-700 hover:bg-gray-100"
-              title="编辑任务"
-            >
-              <Pencil className="h-4 w-4" />
-            </Button>
-            <Link href={`/tasks/${task.id}`} target="_blank">
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8 text-gray-500 hover:text-gray-700 hover:bg-gray-100"
-                title="查看任务详情"
-              >
-                <ExternalLink className="h-4 w-4" />
-              </Button>
-            </Link>
-          </div>
-        </NodeToolbar>
-
         {/* 左侧连接点 */}
         <Handle
           type="target"
@@ -82,44 +66,69 @@ export function TaskNode({ data, selected }: NodeProps) {
               </div>
               <div className="flex items-center gap-2">
                 <span className="rounded bg-white/80 px-2 py-0.5 text-xs font-medium text-gray-600 shadow-sm ring-1 ring-gray-100">
-                  {task.prefix}-{task.code}
+                  {prefix}-{code}
                 </span>
                 <TimeProgressBar
-                  timeSpent={task.timeSpent}
-                  originalEstimate={task.originalEstimate}
+                  timeSpent={timeSpent}
+                  originalEstimate={originalEstimate}
                   className="w-20"
                 />
               </div>
             </div>
             <span className="flex items-center gap-1.5 rounded-full bg-white/80 px-2 py-0.5 text-xs font-medium text-gray-600 shadow-sm ring-1 ring-gray-100">
               <CheckCircle2 className="h-3.5 w-3.5" />
-              {task.state.name}
+              {state.name}
             </span>
           </div>
 
           {/* 任务摘要 */}
           <div className="truncate px-1">
-            <span className="font-medium text-gray-700">{task.summary}</span>
+            <span className="font-medium text-gray-700">{summary}</span>
           </div>
 
           {/* 任务描述 */}
-          {task.description && (
+          {description && (
             <p className="px-1 text-sm text-gray-500 line-clamp-2 break-words">
-              {task.description}
+              {description}
             </p>
           )}
         </div>
       </div>
 
+      {/* 顶部工具栏 */}
+      <NodeToolbar position={Position.Top} offset={6} align={'start'}>
+        <div className="flex space-x-1 bg-white p-1 rounded-lg shadow-lg border border-gray-200">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 text-gray-500 hover:text-gray-700 hover:bg-gray-100"
+            title="编辑任务"
+            onClick={() => setIsEditDialogOpen(true)}
+          >
+            <Pencil className="h-4 w-4" />
+          </Button>
+          <Link href={`/tasks/${taskId}`} target="_blank">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 text-gray-500 hover:text-gray-700 hover:bg-gray-100"
+              title="查看任务详情"
+            >
+              <ExternalLink className="h-4 w-4" />
+            </Button>
+          </Link>
+        </div>
+      </NodeToolbar>
+
       <NodeToolbar position={Position.Bottom} offset={6} align={'start'}>
         <div className="bg-white/95 backdrop-blur-sm p-4 rounded-lg shadow-lg border border-gray-200 max-w-md transform transition-all duration-200 hover:shadow-xl">
           <div className=" space-y-3 ">
             <p className="text-sm font-medium text-gray-900 whitespace-pre-wrap break-words mb-1">
-              {task.summary}
+              {summary}
             </p>
-            {task.description && (
+            {description && (
               <p className="text-xs text-gray-500 whitespace-pre-wrap break-words border-t border-gray-100 pt-2 mt-2">
-                {task.description}
+                {description}
               </p>
             )}
           </div>
@@ -140,14 +149,14 @@ export function TaskNode({ data, selected }: NodeProps) {
                     <div className="w-1.5 h-1.5 rounded-full bg-gray-400"></div>
                     <span className="text-gray-500 min-w-[36px]">开始:</span>
                     <span className="font-medium text-gray-700 ml-auto">
-                      {task.startDate ? formatDate(task.startDate) : '未设置'}
+                      {startDate ? formatDate(startDate) : ' - '}
                     </span>
                   </div>
                   <div className="flex items-center gap-2 text-xs">
                     <div className="w-1.5 h-1.5 rounded-full bg-gray-600"></div>
                     <span className="text-gray-500 min-w-[36px]">截止:</span>
                     <span className="font-medium text-gray-700 ml-auto">
-                      {task.dueDate ? formatDate(task.dueDate) : '未设置'}
+                      {dueDate ? formatDate(dueDate) : ' - '}
                     </span>
                   </div>
                 </div>
@@ -166,20 +175,18 @@ export function TaskNode({ data, selected }: NodeProps) {
                     <div className="w-1.5 h-1.5 rounded-full bg-gray-400"></div>
                     <span className="text-gray-500 min-w-[36px]">预估:</span>
                     <span className="font-medium text-gray-700 ml-auto">
-                      {task.originalEstimate
+                      {originalEstimate
                         ? formatTimeEstimate(
-                            minutesToTimeEstimate(task.originalEstimate)
+                            minutesToTimeEstimate(originalEstimate)
                           )
-                        : '未设置'}
+                        : ' - '}
                     </span>
                   </div>
                   <div className="flex items-center gap-2 text-xs">
                     <div className="w-1.5 h-1.5 rounded-full bg-gray-600"></div>
                     <span className="text-gray-500 min-w-[36px]">已用:</span>
                     <span className={'font-medium ml-auto text-gray-700'}>
-                      {formatTimeEstimate(
-                        minutesToTimeEstimate(task.timeSpent)
-                      )}
+                      {formatTimeEstimate(minutesToTimeEstimate(timeSpent))}
                     </span>
                   </div>
                 </div>
@@ -188,6 +195,16 @@ export function TaskNode({ data, selected }: NodeProps) {
           </div>
         </div>
       </NodeToolbar>
+
+      {/* 编辑任务对话框 */}
+      <AddTaskDialog
+        mode="edit"
+        goalId={goalId}
+        open={isEditDialogOpen}
+        onOpenChange={setIsEditDialogOpen}
+        taskId={taskId}
+        task={data as Task}
+      />
     </>
   )
 }

@@ -51,7 +51,45 @@ const updateTaskState = async (taskId: number, newStateId: number) => {
   })
 }
 
+const updateTask = async (
+  taskId: number,
+  userId: number,
+  {
+    summary,
+    description,
+    startDate,
+    dueDate,
+    originalEstimateMinutes
+  }: {
+    summary: string
+    description: string
+    startDate: string | null
+    dueDate: string | null
+    originalEstimateMinutes: number | null
+  }
+) => {
+  const task = await prisma.uC_TASK.findUnique({
+    where: { task_id: taskId, user_id: userId }
+  })
+
+  if (!task) {
+    throw new Error('Task not found')
+  }
+
+  await prisma.uC_TASK.update({
+    where: { task_id: taskId, user_id: userId },
+    data: {
+      summary,
+      description,
+      start_date: startDate,
+      due_date: dueDate,
+      original_estimate_minutes: originalEstimateMinutes
+    }
+  })
+}
+
 export default {
   createTask,
-  updateTaskState
+  updateTaskState,
+  updateTask
 }
