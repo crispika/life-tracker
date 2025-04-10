@@ -8,7 +8,6 @@ import { TimeProgressBar } from '@/components/ui/progress-bar'
 import { formatDate } from '@/lib/utils'
 import {
   Calendar,
-  CheckCircle2,
   ExternalLink,
   ListTodo,
   Pencil,
@@ -20,6 +19,7 @@ import { useState } from 'react'
 import { Handle, NodeProps, NodeToolbar, Position } from 'reactflow'
 import { AddTaskDialog } from './AddTaskDialog'
 import { DeleteTaskDialog } from './DeleteTaskDialog'
+import { UpdateTaskStateDropdown } from './UpdateTaskStateDropdown'
 
 export function TaskNode({ data, selected }: NodeProps) {
   const {
@@ -78,10 +78,7 @@ export function TaskNode({ data, selected }: NodeProps) {
                 />
               </div>
             </div>
-            <span className="flex items-center gap-1.5 rounded-full bg-white/80 px-2 py-0.5 text-xs font-medium text-gray-600 shadow-sm ring-1 ring-gray-100">
-              <CheckCircle2 className="h-3.5 w-3.5" />
-              {state.name}
-            </span>
+            <UpdateTaskStateDropdown taskId={taskId} currentState={state} />
           </div>
 
           {/* 任务摘要 */}

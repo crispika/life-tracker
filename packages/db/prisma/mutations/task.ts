@@ -32,7 +32,7 @@ export const createTask = async (
   }
 }
 
-const updateTaskState = async (taskId: number, newStateId: number) => {
+const updateTaskStateByStateId = async (taskId: number, newStateId: number) => {
   const task = await prisma.uC_TASK.findUnique({
     where: { task_id: taskId },
     select: { user_id: true }
@@ -47,6 +47,42 @@ const updateTaskState = async (taskId: number, newStateId: number) => {
       user_id: task.user_id,
       state_id: newStateId
     }
+  })
+
+  if (!state) {
+    throw new Error('State not found')
+  }
+
+  try {
+    await prisma.uC_TASK.update({
+      where: { task_id: taskId },
+      data: { state_id: state.state_id }
+    })
+  } catch (error) {
+    console.error('更新任务状态失败:', error)
+    throw new Error(
+      '更新任务状态失败: ' +
+        (error instanceof Error ? error.message : String(error))
+    )
+  }
+}
+
+const updateTaskStateByName = async (taskId: number, newStateName: string) => {
+  const task = await prisma.uC_TASK.findUnique({
+    where: { task_id: taskId },
+    select: { user_id: true }
+  })
+
+  if (!task) {
+    throw new Error('Task not found')
+  }
+
+  const state = await prisma.uC_TASK_STATE.findFirst({
+    where: {
+      user_id: task.user_id,
+      name: newStateName
+    },
+    select: { state_id: true }
   })
 
   if (!state) {
@@ -139,7 +175,8 @@ const deleteTask = async (taskId: number, userId: number) => {
 
 export default {
   createTask,
-  updateTaskState,
+  updateTaskStateByStateId,
+  updateTaskStateByName,
   updateTask,
   deleteTask
 }

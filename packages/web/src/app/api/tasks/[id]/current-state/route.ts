@@ -24,8 +24,12 @@ export async function PUT(
 ) {
   try {
     const taskId = Number((await params).id)
-    const { stateId } = await request.json()
-    await mutations.task.updateTaskState(taskId, stateId)
+    const { stateId, stateName } = await request.json()
+    if (stateId) {
+      await mutations.task.updateTaskStateByStateId(taskId, stateId)
+    } else if (stateName) {
+      await mutations.task.updateTaskStateByName(taskId, stateName)
+    }
     return NextResponse.json({ success: true })
   } catch (error) {
     console.error('Error updating task state:', error)

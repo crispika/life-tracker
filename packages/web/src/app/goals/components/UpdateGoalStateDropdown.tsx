@@ -11,12 +11,12 @@ import { useState } from 'react'
 
 //TODO hardcode now, use api to fetch all available states in the future
 
-const stateMap: Record<string, { name: string; className: string }> = {
-  ACTIVE: { name: '进行中', className: 'bg-blue-100 text-blue-800' },
-  ON_HOLD: { name: '暂停', className: 'bg-yellow-100 text-yellow-800' },
-  COMPLETED: { name: '已完成', className: 'bg-green-100 text-green-800' },
-  ABORTED: { name: '已中止', className: 'bg-red-100 text-red-800' },
-  ARCHIVED: { name: '已归档', className: 'bg-gray-100 text-gray-800' }
+const stateMap: Record<string, string> = {
+  ACTIVE: '进行中',
+  ON_HOLD: '暂停',
+  COMPLETED: '已完成',
+  ABORTED: '已中止',
+  ARCHIVED: '已归档'
 }
 
 export interface GoalStateDropdownProps {
@@ -61,7 +61,7 @@ export function UpdateGoalStateDropdown({
           variant="secondary"
           className="cursor-pointer flex items-center gap-1"
         >
-          {stateMap[_goalState].name}
+          {stateMap[_goalState]}
         </Badge>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start" side="bottom">
@@ -72,7 +72,7 @@ export function UpdateGoalStateDropdown({
               key={stateKey}
               onClick={() => handleGoalStateChange(stateKey)}
             >
-              {stateName.name}
+              {stateName}
             </DropdownMenuItem>
           ))}
       </DropdownMenuContent>
