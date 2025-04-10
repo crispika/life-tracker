@@ -9,19 +9,27 @@ export const createTask = async (
   dueDate: string | null,
   originalEstimateMinutes: number | null
 ) => {
-  // 格式化日期为MySQL可接受的格式
+  // 由于调用存储过程，需要格式化日期为MySQL可接受的格式
   const formatDate = (dateStr: string | null) => {
     if (!dateStr) return 'NULL'
     const date = new Date(dateStr)
     return `'${date.toISOString().slice(0, 19).replace('T', ' ')}'`
   }
 
-  const [result] = await prisma.$queryRawUnsafe<
-    [{ task_id: number; code: number }]
-  >(
-    `CALL create_task(${userId}, '${summary}', '${description}', ${formatDate(startDate)}, ${formatDate(dueDate)}, ${originalEstimateMinutes ?? 'NULL'}, ${goalId})`
-  )
-  return result.task_id
+  try {
+    const [result] = await prisma.$queryRawUnsafe<
+      [{ task_id: number; code: number }]
+    >(
+      `CALL create_task(${userId}, '${summary}', '${description}', ${formatDate(startDate)}, ${formatDate(dueDate)}, ${originalEstimateMinutes ?? 'NULL'}, ${goalId})`
+    )
+    return result.task_id
+  } catch (error) {
+    console.error('创建任务失败:', error)
+    throw new Error(
+      '创建任务失败: ' +
+        (error instanceof Error ? error.message : String(error))
+    )
+  }
 }
 
 const updateTaskState = async (taskId: number, newStateId: number) => {
@@ -45,10 +53,18 @@ const updateTaskState = async (taskId: number, newStateId: number) => {
     throw new Error('State not found')
   }
 
-  await prisma.uC_TASK.update({
-    where: { task_id: taskId },
-    data: { state_id: state.state_id }
-  })
+  try {
+    await prisma.uC_TASK.update({
+      where: { task_id: taskId },
+      data: { state_id: state.state_id }
+    })
+  } catch (error) {
+    console.error('更新任务状态失败:', error)
+    throw new Error(
+      '更新任务状态失败: ' +
+        (error instanceof Error ? error.message : String(error))
+    )
+  }
 }
 
 const updateTask = async (
@@ -93,14 +109,37 @@ const updateTask = async (
     data.original_estimate_minutes = updateData.originalEstimateMinutes
   }
 
-  await prisma.uC_TASK.update({
-    where: { task_id: taskId, user_id: userId },
-    data
-  })
+  try {
+    await prisma.uC_TASK.update({
+      where: { task_id: taskId, user_id: userId },
+      data
+    })
+  } catch (error) {
+    console.error('更新任务失败:', error)
+    throw new Error(
+      '更新任务失败: ' +
+        (error instanceof Error ? error.message : String(error))
+    )
+  }
+}
+
+const deleteTask = async (taskId: number, userId: number) => {
+  try {
+    await prisma.uC_TASK.delete({
+      where: { task_id: taskId, user_id: userId }
+    })
+  } catch (error) {
+    console.error('删除任务失败:', error)
+    throw new Error(
+      '删除任务失败: ' +
+        (error instanceof Error ? error.message : String(error))
+    )
+  }
 }
 
 export default {
   createTask,
   updateTaskState,
-  updateTask
+  updateTask,
+  deleteTask
 }

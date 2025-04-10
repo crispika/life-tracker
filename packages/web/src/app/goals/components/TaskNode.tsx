@@ -12,12 +12,14 @@ import {
   ExternalLink,
   ListTodo,
   Pencil,
-  Timer
+  Timer,
+  Trash2
 } from 'lucide-react'
 import Link from 'next/link'
-import { Handle, NodeProps, NodeToolbar, Position } from 'reactflow'
 import { useState } from 'react'
+import { Handle, NodeProps, NodeToolbar, Position } from 'reactflow'
 import { AddTaskDialog } from './AddTaskDialog'
+import { DeleteTaskDialog } from './DeleteTaskDialog'
 
 export function TaskNode({ data, selected }: NodeProps) {
   const {
@@ -36,6 +38,7 @@ export function TaskNode({ data, selected }: NodeProps) {
   } = data as Task
 
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
 
   return (
     <>
@@ -116,6 +119,15 @@ export function TaskNode({ data, selected }: NodeProps) {
             onClick={() => setIsEditDialogOpen(true)}
           >
             <Pencil className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 text-gray-500 hover:text-red-500 hover:bg-gray-100"
+            title="删除任务"
+            onClick={() => setIsDeleteDialogOpen(true)}
+          >
+            <Trash2 className="h-4 w-4" />
           </Button>
         </div>
       </NodeToolbar>
@@ -205,6 +217,14 @@ export function TaskNode({ data, selected }: NodeProps) {
         onOpenChange={setIsEditDialogOpen}
         taskId={taskId}
         task={data as Task}
+      />
+
+      {/* 删除任务对话框 */}
+      <DeleteTaskDialog
+        taskId={taskId}
+        taskSummary={summary}
+        open={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
       />
     </>
   )
