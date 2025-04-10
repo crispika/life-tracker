@@ -98,15 +98,6 @@ export function TaskNode({ data, selected }: NodeProps) {
       {/* 顶部工具栏 */}
       <NodeToolbar position={Position.Top} offset={6} align={'start'}>
         <div className="flex space-x-1 bg-white p-1 rounded-lg shadow-lg border border-gray-200">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 text-gray-500 hover:text-gray-700 hover:bg-gray-100"
-            title="编辑任务"
-            onClick={() => setIsEditDialogOpen(true)}
-          >
-            <Pencil className="h-4 w-4" />
-          </Button>
           <Link href={`/tasks/${taskId}`} target="_blank">
             <Button
               variant="ghost"
@@ -117,9 +108,19 @@ export function TaskNode({ data, selected }: NodeProps) {
               <ExternalLink className="h-4 w-4" />
             </Button>
           </Link>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 text-gray-500 hover:text-gray-700 hover:bg-gray-100"
+            title="编辑任务"
+            onClick={() => setIsEditDialogOpen(true)}
+          >
+            <Pencil className="h-4 w-4" />
+          </Button>
         </div>
       </NodeToolbar>
 
+      {/* 底部详情tooltip */}
       <NodeToolbar position={Position.Bottom} offset={6} align={'start'}>
         <div className="bg-white/95 backdrop-blur-sm p-4 rounded-lg shadow-lg border border-gray-200 max-w-md transform transition-all duration-200 hover:shadow-xl">
           <div className=" space-y-3 ">

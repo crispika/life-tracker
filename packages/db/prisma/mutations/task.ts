@@ -54,19 +54,13 @@ const updateTaskState = async (taskId: number, newStateId: number) => {
 const updateTask = async (
   taskId: number,
   userId: number,
-  {
-    summary,
-    description,
-    startDate,
-    dueDate,
-    originalEstimateMinutes
-  }: {
+  updateData: Partial<{
     summary: string
     description: string
     startDate: string | null
     dueDate: string | null
     originalEstimateMinutes: number | null
-  }
+  }>
 ) => {
   const task = await prisma.uC_TASK.findUnique({
     where: { task_id: taskId, user_id: userId }
@@ -76,15 +70,32 @@ const updateTask = async (
     throw new Error('Task not found')
   }
 
+  // 构建更新数据对象，只包含传入的字段
+  const data: Record<string, any> = {}
+
+  if (updateData.summary !== undefined) {
+    data.summary = updateData.summary
+  }
+  if (updateData.description !== undefined) {
+    data.description = updateData.description
+  }
+  if (updateData.startDate !== undefined) {
+    // 对于Prisma，我们需要传入Date对象或ISO字符串
+    data.start_date = updateData.startDate
+      ? new Date(updateData.startDate)
+      : null
+  }
+  if (updateData.dueDate !== undefined) {
+    // 对于Prisma，我们需要传入Date对象或ISO字符串
+    data.due_date = updateData.dueDate ? new Date(updateData.dueDate) : null
+  }
+  if (updateData.originalEstimateMinutes !== undefined) {
+    data.original_estimate_minutes = updateData.originalEstimateMinutes
+  }
+
   await prisma.uC_TASK.update({
     where: { task_id: taskId, user_id: userId },
-    data: {
-      summary,
-      description,
-      start_date: startDate,
-      due_date: dueDate,
-      original_estimate_minutes: originalEstimateMinutes
-    }
+    data
   })
 }
 

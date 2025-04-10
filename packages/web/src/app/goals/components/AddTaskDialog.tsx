@@ -23,6 +23,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { useToast } from '@/hooks/use-toast'
+import { formatDate } from '@/lib/utils'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
@@ -248,6 +249,7 @@ export function AddTaskDialog({
                 )}
               />
 
+              {/* TODO optimize: use shadcn/ui datepicker */}
               <div className="grid grid-cols-2 gap-4">
                 <FormField
                   control={form.control}
@@ -315,11 +317,4 @@ export function AddTaskDialog({
       </DialogContent>
     </Dialog>
   )
-}
-
-// 辅助函数：格式化日期为YYYY-MM-DD格式
-function formatDate(date: Date): string {
-  if (!date) return ''
-  const dateObj = date instanceof Date ? date : new Date(date)
-  return dateObj.toISOString().split('T')[0]
 }
