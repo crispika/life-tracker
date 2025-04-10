@@ -1,0 +1,4 @@
+export enum TaskErrorCode {
+  INTERNAL_ERROR = 'INTERNAL_ERROR',
+  INVALID_INPUT = 'INVALID_INPUT'
+}

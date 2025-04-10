@@ -147,35 +147,57 @@ END //
 -- 创建任务并生成任务编号的存储过程
 CREATE PROCEDURE create_task(
   IN p_user_id INT UNSIGNED,
-  IN p_color VARCHAR(7),
   IN p_summary VARCHAR(300),
   IN p_description TEXT,
   IN p_start_date DATETIME(3),
   IN p_due_date DATETIME(3),
   IN p_original_estimate_minutes INT,
-  IN p_goal_id INT UNSIGNED,
-  OUT p_task_id INT UNSIGNED,
-  OUT p_code INT UNSIGNED
+  IN p_goal_id INT UNSIGNED
 )
 BEGIN
   DECLARE v_next_seq INT UNSIGNED;
   DECLARE v_default_state_id INT UNSIGNED;
   DECLARE v_prefix_id INT UNSIGNED;
+  DECLARE v_task_id INT UNSIGNED;
   
   START TRANSACTION;
   
-  -- 检查用户是否存在
+  -- 参数校验
+  -- 1. 检查必填字段
+  IF p_user_id IS NULL THEN
+    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = '用户ID不能为空';
+  END IF;
+  
+  IF p_summary IS NULL OR TRIM(p_summary) = '' THEN
+    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = '任务名称不能为空';
+  END IF;
+  
+  IF p_goal_id IS NULL THEN
+    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = '目标ID不能为空';
+  END IF;
+  
+  -- 2. 检查日期有效性（只有当两个日期都不为空时才检查）
+  IF p_start_date IS NOT NULL AND p_due_date IS NOT NULL AND p_start_date > p_due_date THEN
+    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = '开始日期不能晚于截止日期';
+  END IF;
+  
+  -- 3. 检查预估时间合理性
+  IF p_original_estimate_minutes IS NOT NULL AND p_original_estimate_minutes < 0 THEN
+    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = '预估时间不能为负数';
+  END IF;
+  
+  -- 4. 检查用户是否存在
   IF NOT EXISTS (SELECT 1 FROM USER WHERE user_id = p_user_id) THEN
     SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = '用户不存在';
   END IF;
   
-  -- 检查目标是否存在并获取其前缀ID
+  -- 5. 检查目标是否存在并获取其前缀ID
   SELECT prefix_id INTO v_prefix_id
   FROM UC_GOAL
   WHERE goal_id = p_goal_id AND user_id = p_user_id;
   
   IF v_prefix_id IS NULL THEN
-    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = '与该task相关的goal不存在';
+    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = '目标不存在或不属于该用户';
   END IF;
   
   -- 获取并锁定前缀记录
@@ -190,9 +212,6 @@ BEGIN
   SET next_seq_number = next_seq_number + 1 
   WHERE prefix_id = v_prefix_id;
   
-  -- 设置代码
-  SET p_code = v_next_seq;
-  
   -- 获取用户的默认初始化状态
   SELECT state_id INTO v_default_state_id
   FROM UC_TASK_INIT_STATE
@@ -205,17 +224,20 @@ BEGIN
   
   -- 插入任务记录
   INSERT INTO UC_TASK (
-    code, user_id, color, summary, description,
+    code, user_id, summary, description,
     start_date, due_date, original_estimate_minutes,
     state_id, goal_id
   ) VALUES (
-    p_code, p_user_id, p_color, p_summary, p_description,
+    v_next_seq, p_user_id, p_summary, p_description,
     p_start_date, p_due_date, p_original_estimate_minutes,
     v_default_state_id, p_goal_id
   );
   
   -- 获取新插入的任务ID
-  SET p_task_id = LAST_INSERT_ID();
+  SET v_task_id = LAST_INSERT_ID();
+  
+  -- 返回结果
+  SELECT v_task_id as task_id, v_next_seq as code;
   
   COMMIT;
 END //

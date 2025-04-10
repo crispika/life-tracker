@@ -95,12 +95,11 @@ model UC_TASK {
   task_id                   Int           @id @default(autoincrement()) @db.UnsignedInt
   code                      Int           @db.UnsignedInt
   user_id                   Int           @db.UnsignedInt
-  color                     String        @db.VarChar(7)
   summary                   String        @db.VarChar(300)
   description               String?       @db.Text
-  start_date                DateTime
-  due_date                  DateTime
-  original_estimate_minutes Int
+  start_date                DateTime?
+  due_date                  DateTime?
+  original_estimate_minutes Int?
   time_spent_minutes        Int           @default(0)
   state_id                  Int           @db.UnsignedInt
   goal_id                   Int           @db.UnsignedInt

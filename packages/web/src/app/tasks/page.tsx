@@ -31,8 +31,8 @@ export default async function Tasks({
   // 处理日期字段
   const processedTasks: Task[] = tasks.map((task) => ({
     ...task,
-    startDate: new Date(task.startDate),
-    dueDate: new Date(task.dueDate)
+    startDate: task.startDate ? new Date(task.startDate) : null,
+    dueDate: task.dueDate ? new Date(task.dueDate) : null
   }))
 
   // 排序任务
@@ -81,15 +81,17 @@ export default async function Tasks({
               </div>
               <div className="flex-1 font-medium truncate">{task.summary}</div>
               <div className="w-28 text-sm text-gray-500 px-1">
-                {task.startDate.toLocaleDateString()}
+                {task.startDate ? task.startDate.toLocaleDateString() : '-'}
               </div>
               <div className="w-28 text-sm text-gray-500 px-1">
-                {task.dueDate.toLocaleDateString()}
+                {task.dueDate ? task.dueDate.toLocaleDateString() : '-'}
               </div>
               <div className="w-24 text-sm text-gray-500 px-1">
-                {formatTimeEstimate(
-                  minutesToTimeEstimate(task.originalEstimate)
-                )}
+                {task.originalEstimate
+                  ? formatTimeEstimate(
+                      minutesToTimeEstimate(task.originalEstimate)
+                    )
+                  : '-'}
               </div>
               <div className="w-24 text-sm text-gray-500 px-1">
                 {formatTimeEstimate(minutesToTimeEstimate(task.timeSpent))}

@@ -66,7 +66,7 @@ CALL create_goal(
   @demo_user_id,
   @color_blue,
   '运动健身',
-  '保持运动习惯',
+  '保持运动习保持运动习惯,这能很好的帮助你其他的目标达成惯',
   @health_goal_id,
   NULL,
   FALSE,
@@ -78,7 +78,7 @@ CALL create_goal(
   @demo_user_id,
   @color_blue,
   '健康饮食',
-  '健康饮食计划',
+  '健康的饮食是所有体能产生的基础，好的食物在强健你的身体，差的食物在消耗你的身体和源动力。',
   @health_goal_id,
   NULL,
   FALSE,
@@ -133,18 +133,6 @@ CALL create_goal(
   FALSE,
   @work_career_goal_id,
   @work_career_prefix_id
-);
-
-CALL create_goal(
-  @demo_user_id,
-  @color_blue,
-  '日常锻炼',
-  '保持身体健康的锻炼',
-  @health_goal_id,
-  NULL,
-  FALSE,
-  @health_exercise_goal_id,
-  @health_exercise_prefix_id
 );
 
 CALL create_goal(

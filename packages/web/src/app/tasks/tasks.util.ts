@@ -17,18 +17,9 @@ export const getTaskStateName = (systemDefined: boolean, name: string) => {
 
 // 辅助函数：将分钟转换为 TimeEstimate 对象
 export function minutesToTimeEstimate(minutes: number): TimeEstimate {
-  const weeks = Math.floor(minutes / (7 * 24 * 60))
-  let remainingMinutes = minutes - weeks * 7 * 24 * 60
-
-  const days = Math.floor(remainingMinutes / (24 * 60))
-  remainingMinutes -= days * 24 * 60
-
-  const hours = Math.floor(remainingMinutes / 60)
-  remainingMinutes -= hours * 60
-
+  const hours = Math.floor(minutes / 60)
+  const remainingMinutes = minutes % 60
   return {
-    weeks,
-    days,
     hours,
     minutes: remainingMinutes
   }
@@ -38,17 +29,31 @@ export function minutesToTimeEstimate(minutes: number): TimeEstimate {
 export function formatTimeEstimate(estimate: TimeEstimate): string {
   const parts: string[] = []
 
-  if (estimate.weeks > 0) parts.push(`${estimate.weeks}w`)
-  if (estimate.days > 0) parts.push(`${estimate.days}d`)
   if (estimate.hours > 0) parts.push(`${estimate.hours}h`)
   if (estimate.minutes > 0) parts.push(`${estimate.minutes}m`)
 
-  return parts.join(' ') || '0m'
+  return parts.join('') || '0m'
 }
 
 // 辅助函数：将分钟直接格式化为字符串
 export function formatMinutesToTimeString(minutes: number): string {
   return formatTimeEstimate(minutesToTimeEstimate(minutes))
+}
+
+// 辅助函数：将时间字符串转换为分钟数
+export function timeStringToMinutes(timeString: string): number {
+  const hoursMatch = timeString.match(/(\d+)h/)
+  const minutesMatch = timeString.match(/(\d+)m/)
+
+  const hours = hoursMatch ? parseInt(hoursMatch[1]) : 0
+  const minutes = minutesMatch ? parseInt(minutesMatch[1]) : 0
+
+  return hours * 60 + minutes
+}
+
+// 辅助函数：验证时间字符串格式
+export function isValidTimeString(timeString: string): boolean {
+  return /^(\d+h)?(\d+m)?$/.test(timeString)
 }
 
 export function sortTasks(
@@ -67,11 +72,15 @@ export function sortTasks(
       case 'state':
         return factor * (a.state.name || '').localeCompare(b.state.name || '')
       case 'startDate':
-        return factor * (a.startDate.getTime() - b.startDate.getTime())
+        return (
+          factor * (a.startDate?.getTime() || 0 - (b.startDate?.getTime() || 0))
+        )
       case 'dueDate':
-        return factor * (a.dueDate.getTime() - b.dueDate.getTime())
+        return (
+          factor * (a.dueDate?.getTime() || 0 - (b.dueDate?.getTime() || 0))
+        )
       case 'estimate':
-        return factor * (a.originalEstimate - b.originalEstimate)
+        return factor * (a.originalEstimate || 0 - (b.originalEstimate || 0))
       case 'timeSpent':
         return factor * (a.timeSpent - b.timeSpent)
       case 'summary':
@@ -80,67 +89,4 @@ export function sortTasks(
         return 0
     }
   })
-}
-
-export const formatTaskDuration = (minutes: number) => {
-  const hours = Math.floor(minutes / 60)
-  const remainingMinutes = minutes % 60
-
-  if (hours === 0) {
-    return `${remainingMinutes}分钟`
-  } else if (remainingMinutes === 0) {
-    return `${hours}小时`
-  } else {
-    return `${hours}小时${remainingMinutes}分钟`
-  }
-}
-
-export const formatTaskProgress = (
-  timeSpent: number,
-  originalEstimate: number
-) => {
-  if (originalEstimate === 0) return '0%'
-  const progress = (timeSpent / originalEstimate) * 100
-  return `${Math.min(Math.round(progress), 100)}%`
-}
-
-export const getTaskStateDisplayName = (task: Task) => {
-  return getTaskStateName(task.state.systemDefined, task.state.name)
-}
-
-export const getTaskStatusColor = (task: Task) => {
-  switch (task.state.name) {
-    case 'OPEN':
-      return 'bg-gray-100 text-gray-800'
-    case 'IN_PROGRESS':
-      return 'bg-blue-100 text-blue-800'
-    case 'COMPLETED':
-      return 'bg-green-100 text-green-800'
-    case 'ON_HOLD':
-      return 'bg-yellow-100 text-yellow-800'
-    case 'ABORTED':
-      return 'bg-red-100 text-red-800'
-    case 'ARCHIVED':
-      return 'bg-gray-100 text-gray-800'
-    default:
-      return 'bg-gray-100 text-gray-800'
-  }
-}
-
-export const getTaskPriorityColor = (task: Task) => {
-  const now = new Date()
-  const dueDate = new Date(task.dueDate)
-  const daysUntilDue = Math.ceil(
-    (dueDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
-  )
-
-  if (daysUntilDue < 0) {
-    return 'text-red-600'
-  } else if (daysUntilDue <= 3) {
-    return 'text-orange-600'
-  } else if (daysUntilDue <= 7) {
-    return 'text-yellow-600'
-  } else {
-    return 'text-green-600'
-  }
 }

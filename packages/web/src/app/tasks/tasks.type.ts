@@ -9,9 +9,9 @@ export interface Task {
   code: number
   summary: string
   description: string | null
-  startDate: Date
-  dueDate: Date
-  originalEstimate: number
+  startDate: Date | null
+  dueDate: Date | null
+  originalEstimate: number | null
   timeSpent: number
   goalSummary: string
   goalColor: string
@@ -22,8 +22,6 @@ export interface Task {
 
 // 时间估计类型（UI 显示用）
 export type TimeEstimate = {
-  weeks: number
-  days: number
   hours: number
   minutes: number
 }

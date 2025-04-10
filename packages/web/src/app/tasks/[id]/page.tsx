@@ -63,16 +63,22 @@ export default async function ProjectDetail({
           </div>
           <div>
             <div className="text-gray-500">
-              {task.dueDate.toLocaleDateString()}
+              {task.dueDate ? task.dueDate.toLocaleDateString() : ' - '}
             </div>
             <div className="text-gray-500">
-              {task.startDate.toLocaleDateString()}
+              {task.startDate ? task.startDate.toLocaleDateString() : ' - '}
             </div>
             <div className="text-gray-500">
-              {formatTimeEstimate(minutesToTimeEstimate(task.originalEstimate))}
+              {task.originalEstimate
+                ? formatTimeEstimate(
+                    minutesToTimeEstimate(task.originalEstimate)
+                  )
+                : ' - '}
             </div>
             <div className="text-gray-500">
-              {formatTimeEstimate(minutesToTimeEstimate(task.timeSpent))}
+              {task.timeSpent
+                ? formatTimeEstimate(minutesToTimeEstimate(task.timeSpent))
+                : ' - '}
             </div>
           </div>
         </div>

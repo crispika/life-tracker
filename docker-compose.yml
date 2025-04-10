@@ -8,6 +8,7 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
       MYSQL_DATABASE: life_tracker
+      TZ: UTC
     volumes:
       # 挂载数据库数据
       - mysql_data:/var/lib/mysql
@@ -39,7 +40,8 @@ services:
         '--collation-server=utf8mb4_unicode_ci',
         '--require_secure_transport=OFF',
         '--ssl=0',
-        '--skip_ssl'
+        '--skip_ssl',
+        '--default-time-zone=+00:00'
       ]
 
   web:

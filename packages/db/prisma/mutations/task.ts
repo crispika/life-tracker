@@ -1,5 +1,29 @@
 import { prisma } from '../../index'
 
+export const createTask = async (
+  userId: number,
+  goalId: number,
+  summary: string,
+  description: string,
+  startDate: string | null,
+  dueDate: string | null,
+  originalEstimateMinutes: number | null
+) => {
+  // 格式化日期为MySQL可接受的格式
+  const formatDate = (dateStr: string | null) => {
+    if (!dateStr) return 'NULL'
+    const date = new Date(dateStr)
+    return `'${date.toISOString().slice(0, 19).replace('T', ' ')}'`
+  }
+
+  const [result] = await prisma.$queryRawUnsafe<
+    [{ task_id: number; code: number }]
+  >(
+    `CALL create_task(${userId}, '${summary}', '${description}', ${formatDate(startDate)}, ${formatDate(dueDate)}, ${originalEstimateMinutes ?? 'NULL'}, ${goalId})`
+  )
+  return result.task_id
+}
+
 const updateTaskState = async (taskId: number, newStateId: number) => {
   const task = await prisma.uC_TASK.findUnique({
     where: { task_id: taskId },
@@ -28,5 +52,6 @@ const updateTaskState = async (taskId: number, newStateId: number) => {
 }
 
 export default {
+  createTask,
   updateTaskState
 }

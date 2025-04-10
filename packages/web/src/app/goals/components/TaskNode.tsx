@@ -1,4 +1,8 @@
 import { Task } from '@/app/tasks/tasks.type'
+import {
+  formatTimeEstimate,
+  minutesToTimeEstimate
+} from '@/app/tasks/tasks.util'
 import { Button } from '@/components/ui/button'
 import { TimeProgressBar } from '@/components/ui/progress-bar'
 import { formatDate } from '@/lib/utils'
@@ -16,19 +20,14 @@ import { Handle, NodeProps, NodeToolbar, Position } from 'reactflow'
 export function TaskNode({ data, selected }: NodeProps) {
   const task = data as Task
 
-  // 计算时间进度
-  const timeProgress = (task.timeSpent / task.originalEstimate) * 100
-  const isOvertime = timeProgress > 100
-
-  // 格式化时间显示
-  const formatTimeDetail = (hours: number) => {
-    if (hours < 1) {
-      return `${Math.round(hours * 60)}分钟`
-    }
-    const fullHours = Math.floor(hours)
-    const minutes = Math.round((hours - fullHours) * 60)
-    return minutes > 0 ? `${fullHours}小时${minutes}分钟` : `${fullHours}小时`
-  }
+  // 添加调试日志
+  console.log('Task data:', {
+    timeSpent: task.timeSpent,
+    originalEstimate: task.originalEstimate,
+    progress: task.originalEstimate
+      ? (task.timeSpent / task.originalEstimate) * 100
+      : 0
+  })
 
   return (
     <>
@@ -126,47 +125,63 @@ export function TaskNode({ data, selected }: NodeProps) {
           </div>
 
           {/* 时间信息 */}
-          <div className="grid grid-cols-2 gap-3 rounded-lg bg-gray-50 p-3 mt-3">
-            <div className="space-y-2">
-              <div className="flex items-center gap-1.5 text-xs text-gray-500">
-                <Calendar className="h-3.5 w-3.5" />
-                <span>时间安排</span>
-              </div>
-              <div className="space-y-1">
-                <div className="flex items-center justify-between text-xs">
-                  <span className="text-gray-500">开始:</span>
-                  <span className="font-medium text-gray-700">
-                    {task.startDate ? formatDate(task.startDate) : '-'}
-                  </span>
+          <div className="mt-4 rounded-lg overflow-hidden border border-gray-100">
+            <div className="grid grid-cols-2 divide-x divide-gray-100">
+              {/* 左侧：时间安排 */}
+              <div className="bg-gray-100/50">
+                <div className="py-2 px-3 bg-gray-200/50 border-b border-gray-100">
+                  <div className="flex items-center gap-1.5 text-xs font-medium text-gray-700">
+                    <Calendar className="h-3.5 w-3.5" />
+                    <span>时间安排</span>
+                  </div>
                 </div>
-                <div className="flex items-center justify-between text-xs">
-                  <span className="text-gray-500">截止:</span>
-                  <span className="font-medium text-gray-700">
-                    {task.dueDate ? formatDate(task.dueDate) : '-'}
-                  </span>
+                <div className="p-3 space-y-2">
+                  <div className="flex items-center gap-2 text-xs">
+                    <div className="w-1.5 h-1.5 rounded-full bg-gray-400"></div>
+                    <span className="text-gray-500 min-w-[36px]">开始:</span>
+                    <span className="font-medium text-gray-700 ml-auto">
+                      {task.startDate ? formatDate(task.startDate) : '未设置'}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2 text-xs">
+                    <div className="w-1.5 h-1.5 rounded-full bg-gray-600"></div>
+                    <span className="text-gray-500 min-w-[36px]">截止:</span>
+                    <span className="font-medium text-gray-700 ml-auto">
+                      {task.dueDate ? formatDate(task.dueDate) : '未设置'}
+                    </span>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            <div className="space-y-2">
-              <div className="flex items-center gap-1.5 text-xs text-gray-500">
-                <Timer className="h-3.5 w-3.5" />
-                <span>时间统计</span>
-              </div>
-              <div className="space-y-1">
-                <div className="flex items-center justify-between text-xs">
-                  <span className="text-gray-500">预估:</span>
-                  <span className="font-medium text-gray-700">
-                    {formatTimeDetail(task.originalEstimate)}
-                  </span>
+              {/* 右侧：时间统计 */}
+              <div className="bg-gray-100/50">
+                <div className="py-2 px-3 bg-gray-200/50 border-b border-gray-100">
+                  <div className="flex items-center gap-1.5 text-xs font-medium text-gray-700">
+                    <Timer className="h-3.5 w-3.5" />
+                    <span>时间统计</span>
+                  </div>
                 </div>
-                <div className="flex items-center justify-between text-xs">
-                  <span className="text-gray-500">已用:</span>
-                  <span
-                    className={`font-medium ${isOvertime ? 'text-red-500' : 'text-gray-700'}`}
-                  >
-                    {formatTimeDetail(task.timeSpent)}
-                  </span>
+                <div className="p-3 space-y-2">
+                  <div className="flex items-center gap-2 text-xs">
+                    <div className="w-1.5 h-1.5 rounded-full bg-gray-400"></div>
+                    <span className="text-gray-500 min-w-[36px]">预估:</span>
+                    <span className="font-medium text-gray-700 ml-auto">
+                      {task.originalEstimate
+                        ? formatTimeEstimate(
+                            minutesToTimeEstimate(task.originalEstimate)
+                          )
+                        : '未设置'}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2 text-xs">
+                    <div className="w-1.5 h-1.5 rounded-full bg-gray-600"></div>
+                    <span className="text-gray-500 min-w-[36px]">已用:</span>
+                    <span className={'font-medium ml-auto text-gray-700'}>
+                      {formatTimeEstimate(
+                        minutesToTimeEstimate(task.timeSpent)
+                      )}
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>

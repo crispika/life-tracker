@@ -7,7 +7,7 @@ import {
 
 interface TimeProgressBarProps {
   timeSpent: number
-  originalEstimate: number
+  originalEstimate: number | null
   className?: string
   showTooltip?: boolean
 }
@@ -25,18 +25,20 @@ export function TimeProgressBar({
   className = '',
   showTooltip = true
 }: TimeProgressBarProps) {
-  const progress = (timeSpent / originalEstimate) * 100
+  const progress = originalEstimate ? (timeSpent / originalEstimate) * 100 : 100
   const isOvertime = progress > 100
 
   const progressBar = (
     <div
-      className={`h-1.5 w-full overflow-hidden rounded-full bg-gray-100 ${className}`}
+      className={`h-1.5 w-16 overflow-hidden rounded-full bg-gray-100 ${className}`}
     >
       <div
         className={`h-full rounded-full transition-all ${
           isOvertime ? 'bg-red-400' : 'bg-blue-400'
         }`}
-        style={{ width: `${Math.min(progress, 100)}%` }}
+        style={{
+          width: originalEstimate ? `${Math.min(progress, 100)}%` : '100%'
+        }}
       />
     </div>
   )
@@ -44,10 +46,10 @@ export function TimeProgressBar({
   const tooltipContent = (
     <div className="text-xs">
       <div className="flex items-center gap-2">
-        <span>花费时间: {formatTime(timeSpent)}</span>
+        <span>已用: {formatTime(timeSpent)}</span>
         <span className="text-gray-300">|</span>
         <span className={isOvertime ? 'text-red-400' : ''}>
-          预估时间: {formatTime(originalEstimate)}
+          预估: {originalEstimate ? formatTime(originalEstimate) : ' - '}
         </span>
       </div>
       {isOvertime && (
