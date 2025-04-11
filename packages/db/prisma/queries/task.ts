@@ -87,6 +87,7 @@ const getTaskDetailById = async (taskId: number) => {
         select: {
           summary: true,
           color: true,
+          goal_id: true,
           UC_GOAL_PREFIX: {
             select: {
               prefix: true
@@ -115,7 +116,8 @@ const getTaskDetailById = async (taskId: number) => {
     },
     prefix: task.UC_GOAL?.UC_GOAL_PREFIX.prefix,
     goalSummary: task.UC_GOAL?.summary,
-    goalColor: task.UC_GOAL?.color
+    goalColor: task.UC_GOAL?.color,
+    goalId: task.UC_GOAL?.goal_id
   }
 }
 
