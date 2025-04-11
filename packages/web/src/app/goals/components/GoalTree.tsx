@@ -27,19 +27,15 @@ const nodeTypes = {
   task: TaskNode
 }
 
-const getLayoutedElements = (
-  nodes: Node[],
-  edges: Edge[],
-  direction: 'TB' | 'LR' = 'LR'
-) => {
+const getLayoutedElements = (nodes: Node[], edges: Edge[]) => {
   const dagreGraph = new dagre.graphlib.Graph()
   dagreGraph.setDefaultEdgeLabel(() => ({}))
 
   // 设置图的方向和节点间距
   dagreGraph.setGraph({
-    rankdir: direction,
-    nodesep: 100 // 水平间距
-    // ranksep: 150 // 垂直间距
+    rankdir: 'LR',
+    nodesep: 50,
+    ranksep: 80
   })
 
   // 添加节点

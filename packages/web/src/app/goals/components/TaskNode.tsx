@@ -49,7 +49,7 @@ export function TaskNode({ data, selected }: NodeProps) {
             : 'border-transparent shadow-sm hover:shadow-md'
         }`}
         style={{
-          backgroundColor: `${goalColor}05`
+          backgroundColor: `${goalColor}07`
         }}
       >
         {/* 左侧连接点 */}
