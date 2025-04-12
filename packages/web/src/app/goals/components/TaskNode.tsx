@@ -1,11 +1,10 @@
-import { Task } from '@/app/tasks/tasks.type'
+import { Task } from '@/app/tasks/tasks.type';
 import {
   formatTimeEstimate,
   minutesToTimeEstimate
-} from '@/app/tasks/tasks.util'
-import { Button } from '@/components/ui/button'
-import { TimeProgressBar } from '@/components/ui/progress-bar'
-import { formatDate } from '@/lib/utils'
+} from '@/app/tasks/tasks.util';
+import { Button } from '@/components/ui/button';
+import { TimeProgressBar } from '@/components/ui/progress-bar';
 import {
   Calendar,
   ExternalLink,
@@ -13,14 +12,14 @@ import {
   Pencil,
   Timer,
   Trash2
-} from 'lucide-react'
-import Link from 'next/link'
-import { useState } from 'react'
-import { Handle, NodeProps, NodeToolbar, Position } from 'reactflow'
-import { AddTaskDialog } from './AddTaskDialog'
-import { DeleteTaskDialog } from './DeleteTaskDialog'
-import { UpdateTaskStateDropdown } from './UpdateTaskStateDropdown'
-
+} from 'lucide-react';
+import Link from 'next/link';
+import { useState } from 'react';
+import { Handle, NodeProps, NodeToolbar, Position } from 'reactflow';
+import { AddTaskDialog } from './AddTaskDialog';
+import { DeleteTaskDialog } from './DeleteTaskDialog';
+import { UpdateTaskStateDropdown } from './UpdateTaskStateDropdown';
+import { format } from 'date-fns';
 export function TaskNode({ data, selected }: NodeProps) {
   const {
     id: taskId,
@@ -35,10 +34,10 @@ export function TaskNode({ data, selected }: NodeProps) {
     originalEstimate,
     timeSpent,
     goalId
-  } = data as Task
+  } = data as Task;
 
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   return (
     <>
@@ -159,14 +158,14 @@ export function TaskNode({ data, selected }: NodeProps) {
                     <div className="w-1.5 h-1.5 rounded-full bg-gray-400"></div>
                     <span className="text-gray-500 min-w-[36px]">开始:</span>
                     <span className="font-medium text-gray-700 ml-auto">
-                      {startDate ? formatDate(startDate) : ' - '}
+                      {startDate ? format(startDate, 'yyyy-MM-dd') : ' - '}
                     </span>
                   </div>
                   <div className="flex items-center gap-2 text-xs">
                     <div className="w-1.5 h-1.5 rounded-full bg-gray-600"></div>
                     <span className="text-gray-500 min-w-[36px]">截止:</span>
                     <span className="font-medium text-gray-700 ml-auto">
-                      {dueDate ? formatDate(dueDate) : ' - '}
+                      {dueDate ? format(dueDate, 'yyyy-MM-dd') : ' - '}
                     </span>
                   </div>
                 </div>
@@ -224,5 +223,5 @@ export function TaskNode({ data, selected }: NodeProps) {
         onOpenChange={setIsDeleteDialogOpen}
       />
     </>
-  )
+  );
 }

@@ -1,6 +1,6 @@
-'use client'
-import { useState, useEffect } from 'react'
-import { Button } from '@/components/ui/button'
+'use client';
+import { useState, useEffect } from 'react';
+import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
@@ -9,21 +9,21 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger
-} from '@/components/ui/dialog'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
-import { useToast } from '@/hooks/use-toast'
-import { AlertCircle } from 'lucide-react'
-import { LifeGoal } from '../goals.type'
-import { useRouter } from 'next/navigation'
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { useToast } from '@/hooks/use-toast';
+import { AlertCircle } from 'lucide-react';
+import { LifeGoal } from '../goals.type';
+import { useRouter } from 'next/navigation';
 
 interface SetLifeGoalDialogProps {
-  mode?: 'create' | 'edit'
-  initialData?: LifeGoal
-  open?: boolean
-  onOpenChange?: (open: boolean) => void
-  setLifeGoal?: React.Dispatch<React.SetStateAction<LifeGoal>>
+  mode?: 'create' | 'edit';
+  initialData?: LifeGoal;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  setLifeGoal?: React.Dispatch<React.SetStateAction<LifeGoal>>;
 }
 
 export function SetLifeGoalDialog({
@@ -33,44 +33,44 @@ export function SetLifeGoalDialog({
   onOpenChange,
   setLifeGoal
 }: SetLifeGoalDialogProps) {
-  const [summary, setSummary] = useState(initialData?.summary || '')
-  const [sidenote, setSidenote] = useState(initialData?.sidenote || '')
-  const [internalOpen, setInternalOpen] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
-  const { toast } = useToast()
+  const [summary, setSummary] = useState(initialData?.summary || '');
+  const [sidenote, setSidenote] = useState(initialData?.sidenote || '');
+  const [internalOpen, setInternalOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
   const [errors, setErrors] = useState<{
-    summary?: string
-  }>({})
-  const router = useRouter()
+    summary?: string;
+  }>({});
+  const router = useRouter();
   // 使用受控或非受控的open状态
-  const open = controlledOpen !== undefined ? controlledOpen : internalOpen
-  const setOpen = onOpenChange || setInternalOpen
+  const open = controlledOpen !== undefined ? controlledOpen : internalOpen;
+  const setOpen = onOpenChange || setInternalOpen;
 
   // 当initialData变化时更新表单
   useEffect(() => {
     if (initialData) {
-      setSummary(initialData.summary || '')
-      setSidenote(initialData.sidenote || '')
+      setSummary(initialData.summary || '');
+      setSidenote(initialData.sidenote || '');
     }
-  }, [initialData])
+  }, [initialData]);
 
   const validateForm = () => {
-    const newErrors: typeof errors = {}
+    const newErrors: typeof errors = {};
 
     if (!summary.trim()) {
-      newErrors.summary = '目标概述不能为空'
+      newErrors.summary = '目标概述不能为空';
     }
 
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
-  }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleSubmit = async () => {
     if (!validateForm()) {
-      return
+      return;
     }
 
-    setIsLoading(true)
+    setIsLoading(true);
     try {
       const response = await fetch('/api/life-goal', {
         method: mode === 'create' ? 'POST' : 'PUT',
@@ -79,31 +79,31 @@ export function SetLifeGoalDialog({
           'x-user-id': '100000'
         },
         body: JSON.stringify({ summary, sidenote })
-      })
+      });
 
       if (!response.ok) {
-        const error = await response.json()
+        const error = await response.json();
         throw new Error(
           error.error || `${mode === 'create' ? '设置' : '更新'}人生目标失败`
-        )
+        );
       }
 
-      setOpen(false)
+      setOpen(false);
       toast({
         title: '成功',
         description: `人生目标已${mode === 'create' ? '设置' : '更新'}`
-      })
+      });
       if (mode === 'edit' && setLifeGoal) {
-        setLifeGoal((prev) => ({ ...prev, summary, sidenote }))
+        setLifeGoal((prev) => ({ ...prev, summary, sidenote }));
       }
       if (mode === 'create') {
-        router.refresh()
+        router.refresh();
       }
     } catch (error) {
       console.error(
         `${mode === 'create' ? '设置' : '更新'}人生目标失败:`,
         error
-      )
+      );
       toast({
         title: '错误',
         description:
@@ -111,11 +111,11 @@ export function SetLifeGoalDialog({
             ? error.message
             : `${mode === 'create' ? '设置' : '更新'}人生目标失败`,
         variant: 'destructive'
-      })
+      });
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -138,14 +138,14 @@ export function SetLifeGoalDialog({
         <div className="grid gap-4 py-4">
           <div className="grid gap-2">
             <Label htmlFor="summary" className="flex items-center">
-              人生目标概述
+              人生终极目标
               <span className="text-red-500 ml-1">*</span>
             </Label>
             <Input
               id="summary"
               value={summary}
               onChange={(e) => setSummary(e.target.value)}
-              placeholder="用一句话描述你的人生目标"
+              placeholder="用一句话描述你的人生终极目标"
               autoComplete="off"
             />
             {errors.summary && (
@@ -172,5 +172,5 @@ export function SetLifeGoalDialog({
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

@@ -1,4 +1,4 @@
-import { prisma } from '../../index'
+import { prisma } from '../../index';
 
 const getTasksByUserId = async (userId: number) => {
   const tasks = await prisma.uC_TASK.findMany({
@@ -39,7 +39,7 @@ const getTasksByUserId = async (userId: number) => {
         goal_id: 'asc'
       }
     }
-  })
+  });
 
   return tasks.map((t) => ({
     id: t.task_id,
@@ -59,8 +59,8 @@ const getTasksByUserId = async (userId: number) => {
       id: t.UC_TASK_STATE.state_id,
       systemDefined: t.UC_TASK_STATE.system_defined
     }
-  }))
-}
+  }));
+};
 
 const getTaskDetailById = async (taskId: number) => {
   const task = await prisma.uC_TASK.findUnique({
@@ -96,9 +96,9 @@ const getTaskDetailById = async (taskId: number) => {
         }
       }
     }
-  })
+  });
   if (!task) {
-    throw new Error('Task not found')
+    throw new Error('Task not found');
   }
   return {
     id: task.task_id,
@@ -118,8 +118,8 @@ const getTaskDetailById = async (taskId: number) => {
     goalSummary: task.UC_GOAL?.summary,
     goalColor: task.UC_GOAL?.color,
     goalId: task.UC_GOAL?.goal_id
-  }
-}
+  };
+};
 
 const getTaskStatesByUserId = async (userId: number) => {
   const states = await prisma.uC_TASK_STATE.findMany({
@@ -131,13 +131,13 @@ const getTaskStatesByUserId = async (userId: number) => {
       state_id: true,
       system_defined: true
     }
-  })
+  });
   return states.map((state) => ({
     name: state.name,
     id: state.state_id,
     systemDefined: state.system_defined
-  }))
-}
+  }));
+};
 
 const getTaskCurrentState = async (taskId: number) => {
   const currentState = await prisma.uC_TASK.findUnique({
@@ -153,22 +153,50 @@ const getTaskCurrentState = async (taskId: number) => {
         }
       }
     }
-  })
+  });
 
   if (!currentState) {
-    throw new Error('Task state not found')
+    throw new Error('Task state not found');
   }
 
   return {
     name: currentState.UC_TASK_STATE.name,
     id: currentState.UC_TASK_STATE.state_id,
     systemDefined: currentState.UC_TASK_STATE.system_defined
-  }
-}
+  };
+};
+
+const getTaskWorklogs = async (taskId: number, userId: number) => {
+  const worklogs = await prisma.uC_TASK_WORKLOG.findMany({
+    where: {
+      task_id: taskId,
+      user_id: userId
+    },
+    select: {
+      worklog_id: true,
+      time_spent_minutes: true,
+      note: true,
+      log_date: true,
+      task_id: true
+    },
+    orderBy: {
+      log_date: 'desc'
+    }
+  });
+
+  return worklogs.map((worklog) => ({
+    logId: worklog.worklog_id,
+    timeSpent: worklog.time_spent_minutes,
+    note: worklog.note || '',
+    logDate: worklog.log_date,
+    taskId: worklog.task_id
+  }));
+};
 
 export default {
   getTasksByUserId,
   getTaskDetailById,
   getTaskStatesByUserId,
-  getTaskCurrentState
-}
+  getTaskCurrentState,
+  getTaskWorklogs
+};

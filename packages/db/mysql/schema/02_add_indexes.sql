@@ -1,5 +1,6 @@
 USE life_tracker;
 
+-- TODO Optimize indexes, currently use AI generated temporarily
 -- GOAL_STATE表索引
 CREATE INDEX idx_goal_state_name ON GOAL_STATE(name);
 
@@ -18,3 +19,9 @@ CREATE INDEX idx_uc_task_user ON UC_TASK(user_id);
 CREATE INDEX idx_uc_task_goal ON UC_TASK(goal_id);
 CREATE INDEX idx_uc_task_user_state ON UC_TASK(user_id, state_id);
 CREATE INDEX idx_uc_task_user_goal ON UC_TASK(user_id, goal_id);
+
+-- UC_TASK_WORKLOG表索引
+CREATE INDEX idx_uc_task_worklog_task ON UC_TASK_WORKLOG(task_id);
+CREATE INDEX idx_uc_task_worklog_user ON UC_TASK_WORKLOG(user_id);
+CREATE INDEX idx_uc_task_worklog_created ON UC_TASK_WORKLOG(created_at);
+CREATE INDEX idx_uc_task_worklog_date ON UC_TASK_WORKLOG(log_date);

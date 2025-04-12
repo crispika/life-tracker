@@ -1,17 +1,17 @@
-import { Task } from '@/app/tasks/tasks.type'
+import { Task } from '@/app/tasks/tasks.type';
 import {
   formatTimeEstimate,
   isValidTimeString,
   minutesToTimeEstimate,
   timeStringToMinutes
-} from '@/app/tasks/tasks.util'
-import { Button } from '@/components/ui/button'
+} from '@/app/tasks/tasks.util';
+import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle
-} from '@/components/ui/dialog'
+} from '@/components/ui/dialog';
 import {
   Form,
   FormControl,
@@ -19,16 +19,16 @@ import {
   FormItem,
   FormLabel,
   FormMessage
-} from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
-import { Textarea } from '@/components/ui/textarea'
-import { useToast } from '@/hooks/use-toast'
-import { formatDate } from '@/lib/utils'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { useRouter } from 'next/navigation'
-import { useEffect } from 'react'
-import { useForm } from 'react-hook-form'
-import * as z from 'zod'
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { useToast } from '@/hooks/use-toast';
+import { format } from 'date-fns';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import * as z from 'zod';
 
 // 定义表单的schema
 const taskFormSchema = z
@@ -50,25 +50,25 @@ const taskFormSchema = z
   .refine(
     (data) => {
       if (data.startDate && data.dueDate) {
-        return new Date(data.startDate) <= new Date(data.dueDate)
+        return new Date(data.startDate) <= new Date(data.dueDate);
       }
-      return true
+      return true;
     },
     {
       message: '截止日期不能早于开始日期',
       path: ['dueDate']
     }
-  )
+  );
 
-type TaskFormValues = z.infer<typeof taskFormSchema>
+type TaskFormValues = z.infer<typeof taskFormSchema>;
 
 interface AddTaskDialogProps {
-  goalId: number
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  taskId?: number
-  task?: Task
-  mode?: 'add' | 'edit'
+  goalId: number;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  taskId?: number;
+  task?: Task;
+  mode?: 'add' | 'edit';
 }
 
 export function AddTaskDialog({
@@ -79,9 +79,9 @@ export function AddTaskDialog({
   task,
   mode = 'add'
 }: AddTaskDialogProps) {
-  const { toast } = useToast()
-  const router = useRouter()
-  const isEditMode = mode === 'edit'
+  const { toast } = useToast();
+  const router = useRouter();
+  const isEditMode = mode === 'edit';
 
   const form = useForm<TaskFormValues>({
     resolver: zodResolver(taskFormSchema),
@@ -92,7 +92,7 @@ export function AddTaskDialog({
       dueDate: '',
       originalEstimateMinutes: ''
     }
-  })
+  });
 
   // 当对话框打开且是编辑模式时，填充表单数据
   useEffect(() => {
@@ -100,14 +100,14 @@ export function AddTaskDialog({
       form.reset({
         summary: task.summary,
         description: task.description || '',
-        startDate: task.startDate ? formatDate(task.startDate) : '',
-        dueDate: task.dueDate ? formatDate(task.dueDate) : '',
+        startDate: task.startDate ? format(task.startDate, 'yyyy-MM-dd') : '',
+        dueDate: task.dueDate ? format(task.dueDate, 'yyyy-MM-dd') : '',
         originalEstimateMinutes: task.originalEstimate
           ? formatTimeEstimate(minutesToTimeEstimate(task.originalEstimate))
           : ''
-      })
+      });
     }
-  }, [open, isEditMode, task, form])
+  }, [open, isEditMode, task, form]);
 
   const onSubmit = async (values: TaskFormValues) => {
     try {
@@ -122,7 +122,7 @@ export function AddTaskDialog({
         originalEstimateMinutes: values.originalEstimateMinutes
           ? timeStringToMinutes(values.originalEstimateMinutes)
           : null
-      })
+      });
 
       if (isEditMode) {
         // 更新任务
@@ -133,17 +133,17 @@ export function AddTaskDialog({
             'x-user-id': '100000'
           },
           body
-        })
+        });
 
         if (!response.ok) {
-          const error = await response.json()
-          throw new Error(error.error || '更新任务失败')
+          const error = await response.json();
+          throw new Error(error.error || '更新任务失败');
         }
 
         toast({
           title: '更新成功',
           description: '任务已成功更新'
-        })
+        });
       } else {
         // 创建任务
         const response = await fetch('/api/tasks', {
@@ -153,24 +153,24 @@ export function AddTaskDialog({
             'x-user-id': '100000'
           },
           body
-        })
+        });
 
         if (!response.ok) {
-          const error = await response.json()
-          throw new Error(error.error || '创建任务失败')
+          const error = await response.json();
+          throw new Error(error.error || '创建任务失败');
         }
 
         toast({
           title: '创建成功',
           description: '任务已成功创建'
-        })
+        });
       }
 
-      form.reset()
-      onOpenChange(false)
-      router.refresh()
+      form.reset();
+      onOpenChange(false);
+      router.refresh();
     } catch (error) {
-      console.error(isEditMode ? '更新任务失败:' : '创建任务失败:', error)
+      console.error(isEditMode ? '更新任务失败:' : '创建任务失败:', error);
       toast({
         title: isEditMode ? '更新失败' : '创建失败',
         description:
@@ -180,18 +180,18 @@ export function AddTaskDialog({
               ? '更新任务失败'
               : '创建任务失败',
         variant: 'destructive'
-      })
+      });
     }
-  }
+  };
 
   return (
     <Dialog
       open={open}
       onOpenChange={(open) => {
         if (!open) {
-          form.reset()
+          form.reset();
         }
-        onOpenChange(open)
+        onOpenChange(open);
       }}
     >
       <DialogContent className="bg-white/95 backdrop-blur-sm">
@@ -316,5 +316,5 @@ export function AddTaskDialog({
         </Form>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

@@ -3,34 +3,38 @@ import {
   TooltipContent,
   TooltipProvider,
   TooltipTrigger
-} from '@/components/ui/tooltip'
+} from '@/components/ui/tooltip';
 
 interface TimeProgressBarProps {
-  timeSpent: number
-  originalEstimate: number | null
-  className?: string
-  showTooltip?: boolean
+  timeSpent: number;
+  originalEstimate: number | null;
+  className?: string;
+  showTooltip?: boolean;
+  width?: number | string;
 }
 
 const formatTime = (hours: number) => {
   if (hours < 1) {
-    return `${Math.round(hours * 60)}分钟`
+    return `${Math.round(hours * 60)}分钟`;
   }
-  return `${Math.round(hours * 10) / 10}小时`
-}
+  return `${Math.round(hours * 10) / 10}小时`;
+};
 
 export function TimeProgressBar({
   timeSpent,
   originalEstimate,
   className = '',
+  width = 16,
   showTooltip = true
 }: TimeProgressBarProps) {
-  const progress = originalEstimate ? (timeSpent / originalEstimate) * 100 : 100
-  const isOvertime = progress > 100
+  const progress = originalEstimate
+    ? (timeSpent / originalEstimate) * 100
+    : 100;
+  const isOvertime = progress > 100;
 
   const progressBar = (
     <div
-      className={`h-1.5 w-16 overflow-hidden rounded-full bg-gray-100 ${className}`}
+      className={`h-1.5 w-${width} overflow-hidden rounded-full bg-gray-100 ${className}`}
     >
       <div
         className={`h-full rounded-full transition-all ${
@@ -41,7 +45,7 @@ export function TimeProgressBar({
         }}
       />
     </div>
-  )
+  );
 
   const tooltipContent = (
     <div className="text-xs">
@@ -58,10 +62,10 @@ export function TimeProgressBar({
         </div>
       )}
     </div>
-  )
+  );
 
   if (!showTooltip) {
-    return progressBar
+    return progressBar;
   }
 
   return (
@@ -80,5 +84,5 @@ export function TimeProgressBar({
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>
-  )
+  );
 }
