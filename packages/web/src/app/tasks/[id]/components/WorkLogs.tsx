@@ -5,6 +5,16 @@ import {
   formatTimeEstimate,
   minutesToTimeEstimate
 } from '@/app/tasks/tasks.util';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle
+} from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { format } from 'date-fns';
 import { Clock, Pencil, Plus, Trash2 } from 'lucide-react';
@@ -26,6 +36,8 @@ export function WorkLogs({
     mode: 'add',
     initialData: null
   });
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [workLogToDelete, setWorkLogToDelete] = useState<WorkLog | null>(null);
 
   const addWorkLog = () => {
     setModalConfig({
@@ -43,24 +55,32 @@ export function WorkLogs({
     setModalOpen(true);
   };
 
-  const deleteWorkLog = async (workLog: WorkLog) => {
-    if (confirm('确定要删除这条工作日志吗？')) {
-      try {
-        const response = await fetch(
-          `/api/tasks/${taskId}/worklogs/${workLog.logId}`,
-          {
-            method: 'DELETE'
-          }
-        );
+  const handleDeleteClick = (workLog: WorkLog) => {
+    setWorkLogToDelete(workLog);
+    setDeleteDialogOpen(true);
+  };
 
-        if (!response.ok) {
-          throw new Error('删除工作日志失败');
+  const handleDeleteConfirm = async () => {
+    if (!workLogToDelete) return;
+
+    try {
+      const response = await fetch(
+        `/api/tasks/${taskId}/worklogs/${workLogToDelete.logId}`,
+        {
+          method: 'DELETE'
         }
+      );
 
-        window.location.reload();
-      } catch (error) {
-        console.error('删除工作日志失败:', error);
+      if (!response.ok) {
+        throw new Error('删除工作日志失败');
       }
+
+      window.location.reload();
+    } catch (error) {
+      console.error('删除工作日志失败:', error);
+    } finally {
+      setDeleteDialogOpen(false);
+      setWorkLogToDelete(null);
     }
   };
 
@@ -113,7 +133,7 @@ export function WorkLogs({
                       <Button
                         variant="ghost"
                         size="icon"
-                        onClick={() => deleteWorkLog(workLog)}
+                        onClick={() => handleDeleteClick(workLog)}
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>
@@ -141,6 +161,23 @@ export function WorkLogs({
         onOpenChange={setModalOpen}
         {...modalConfig}
       />
+
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>确认删除</AlertDialogTitle>
+            <AlertDialogDescription>
+              确定要删除这条工作日志吗？此操作不可撤销。
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>取消</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteConfirm}>
+              删除
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }

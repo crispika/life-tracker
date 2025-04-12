@@ -78,6 +78,7 @@ export function WorkLogDialog({
         note: initialData.note
       });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialData]);
 
   const handleSubmit = async (values: WorkLogFormValues) => {

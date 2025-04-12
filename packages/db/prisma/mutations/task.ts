@@ -240,6 +240,20 @@ const updateTaskWorklog = async (
   }
 };
 
+const deleteTaskWorklog = async (logId: number, userId: number) => {
+  try {
+    await prisma.uC_TASK_WORKLOG.delete({
+      where: { worklog_id: logId, user_id: userId }
+    });
+  } catch (error) {
+    console.error('删除任务工作记录失败:', error);
+    throw new Error(
+      '删除任务工作记录失败: ' +
+        (error instanceof Error ? error.message : String(error))
+    );
+  }
+};
+
 export default {
   createTask,
   updateTaskStateByStateId,
@@ -247,5 +261,6 @@ export default {
   updateTask,
   deleteTask,
   addTaskWorklog,
-  updateTaskWorklog
+  updateTaskWorklog,
+  deleteTaskWorklog
 };
