@@ -18,7 +18,7 @@ import { useState } from 'react';
 import { Handle, NodeProps, NodeToolbar, Position } from 'reactflow';
 import { AddTaskDialog } from './AddTaskDialog';
 import { DeleteTaskDialog } from './DeleteTaskDialog';
-import { UpdateTaskStateDropdown } from './UpdateTaskStateDropdown';
+import { UpdateTaskStateDropdown } from '../../tasks/components/UpdateTaskStateDropdown';
 import { format } from 'date-fns';
 export function TaskNode({ data, selected }: NodeProps) {
   const {

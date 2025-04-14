@@ -1,34 +1,34 @@
-import { Badge } from '@/components/ui/badge'
+import { Badge } from '@/components/ui/badge';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger
-} from '@/components/ui/dropdown-menu'
-import { GoalState } from '../goals.type'
-import { toast } from '@/hooks/use-toast'
-import { useState } from 'react'
+} from '@/components/ui/dropdown-menu';
+import { GoalState } from '../goals.type';
+import { toast } from '@/hooks/use-toast';
+import { useState } from 'react';
 
 //TODO hardcode now, use api to fetch all available states in the future
 
 const stateMap: Record<string, string> = {
-  ACTIVE: '进行中',
-  ON_HOLD: '暂停',
+  ACTIVE: '活跃',
+  ON_HOLD: '已暂停',
   COMPLETED: '已完成',
   ABORTED: '已中止',
   ARCHIVED: '已归档'
-}
+};
 
 export interface GoalStateDropdownProps {
-  goalId: number
-  currentState: GoalState
+  goalId: number;
+  currentState: GoalState;
 }
 
 export function UpdateGoalStateDropdown({
   goalId,
   currentState
 }: GoalStateDropdownProps) {
-  const [_goalState, setGoalState] = useState(currentState.name)
+  const [_goalState, setGoalState] = useState(currentState.name);
 
   const handleGoalStateChange = async (newState: string) => {
     try {
@@ -39,20 +39,20 @@ export function UpdateGoalStateDropdown({
           'x-user-id': '100000'
         },
         body: JSON.stringify({ state: newState })
-      })
+      });
       if (!response.ok) {
-        const error = await response.json()
-        throw new Error(error.error || '更新目标状态失败')
+        const error = await response.json();
+        throw new Error(error.error || '更新目标状态失败');
       }
       toast({
         title: '状态更新成功',
         description: '目标状态已更新'
-      })
-      setGoalState(newState)
+      });
+      setGoalState(newState);
     } catch (error) {
-      console.error(error)
+      console.error(error);
     }
-  }
+  };
 
   return (
     <DropdownMenu>
@@ -77,5 +77,5 @@ export function UpdateGoalStateDropdown({
           ))}
       </DropdownMenuContent>
     </DropdownMenu>
-  )
+  );
 }

@@ -73,6 +73,7 @@ model UC_GOAL {
   prefix_id      Int            @db.UnsignedInt
   code           Int?           @db.UnsignedInt
   is_first_level Boolean        @default(false)
+  goal_path      String         @db.VarChar(1000)
   created_at     DateTime       @default(now())
   updated_at     DateTime       @default(now())
   UC_GOAL        UC_GOAL?       @relation("UC_GOALToUC_GOAL", fields: [parent_id], references: [goal_id], onUpdate: NoAction, map: "fk_uc_goal_parent")

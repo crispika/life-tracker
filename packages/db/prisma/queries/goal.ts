@@ -1,4 +1,4 @@
-import { prisma } from '../../index'
+import { prisma } from '../../index';
 
 // 递归构建树形结构的辅助函数
 function buildGoalTree(goals: any[], parentId: number | null = null): any[] {
@@ -7,7 +7,7 @@ function buildGoalTree(goals: any[], parentId: number | null = null): any[] {
     .map((goal) => ({
       ...goal,
       children: buildGoalTree(goals, goal.id)
-    }))
+    }));
 }
 
 // 获取用户的目标树形结构
@@ -38,7 +38,7 @@ async function getUserGoalTree(userId: number) {
           }
         }
       }
-    })
+    });
 
     return buildGoalTree(
       goals.map((g) => ({
@@ -58,10 +58,10 @@ async function getUserGoalTree(userId: number) {
           name: g.GOAL_STATE.name
         }
       }))
-    )
+    );
   } catch (error) {
-    console.error('Error fetching goal tree:', error)
-    throw error
+    console.error('Error fetching goal tree:', error);
+    throw error;
   }
 }
 
@@ -77,19 +77,19 @@ async function getUserUltimateGoal(userId: number) {
         summary: true,
         sidenote: true
       }
-    })
+    });
     return lifeGoal
       ? {
           id: lifeGoal.goal_id,
           summary: lifeGoal.summary,
           sidenote: lifeGoal.sidenote
         }
-      : null
+      : null;
   } catch (error) {
     throw new Error(
       '获取终极目标失败: ' +
         (error instanceof Error ? error.message : String(error))
-    )
+    );
   }
 }
 
@@ -103,10 +103,10 @@ async function getGoalById(goalId: number) {
         GOAL_STATE: true,
         UC_GOAL_PREFIX: true
       }
-    })
+    });
 
     if (!goal) {
-      return null
+      return null;
     }
 
     return {
@@ -124,10 +124,10 @@ async function getGoalById(goalId: number) {
         id: goal.GOAL_STATE.state_id,
         name: goal.GOAL_STATE.name
       }
-    }
+    };
   } catch (error) {
-    console.error('Error fetching goal:', error)
-    throw error
+    console.error('Error fetching goal:', error);
+    throw error;
   }
 }
 
@@ -135,4 +135,4 @@ export const goalQueries = {
   getUserGoalTree,
   getUserUltimateGoal,
   getGoalById
-}
+};

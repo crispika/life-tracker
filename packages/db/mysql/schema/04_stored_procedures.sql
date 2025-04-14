@@ -55,6 +55,7 @@ BEGIN
   DECLARE v_active_state_id INT UNSIGNED;
   DECLARE v_next_seq INT UNSIGNED;
   DECLARE v_code INT UNSIGNED;
+  DECLARE v_goal_path VARCHAR(1000);
   
   -- 开始事务
   START TRANSACTION;
@@ -88,6 +89,7 @@ BEGIN
     -- 获取新创建的前缀ID
     SET p_prefix_id = LAST_INSERT_ID();
     SET v_code = NULL;  -- 一级目标没有code
+    SET v_goal_path = '/';  -- 一级目标的初始路径为根路径
   ELSE
     -- 如果不是一级目标，必须有父目标
     IF p_parent_id IS NULL THEN
@@ -95,14 +97,16 @@ BEGIN
       SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = '非一级目标必须指定父目标';
     END IF;
     
-    -- 检查父目标是否存在
-    IF NOT EXISTS (SELECT 1 FROM UC_GOAL WHERE goal_id = p_parent_id AND user_id = p_user_id) THEN
+    -- 检查父目标是否存在，并获取父目标路径
+    SELECT prefix_id, goal_path 
+    INTO v_parent_prefix_id, v_goal_path
+    FROM UC_GOAL 
+    WHERE goal_id = p_parent_id AND user_id = p_user_id;
+    
+    IF v_parent_prefix_id IS NULL THEN
       ROLLBACK;
       SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = '父目标不存在';
     END IF;
-    
-    -- 获取父目标的前缀ID
-    SELECT prefix_id INTO v_parent_prefix_id FROM UC_GOAL WHERE goal_id = p_parent_id;
     
     -- 子目标必须使用父目标的前缀ID
     IF p_prefix IS NOT NULL THEN
@@ -131,14 +135,23 @@ BEGIN
   -- 插入目标记录
   INSERT INTO UC_GOAL (
     user_id, color, summary, description,
-    state_id, parent_id, prefix_id, code, is_first_level
+    state_id, parent_id, prefix_id, code, is_first_level, goal_path
   ) VALUES (
     p_user_id, p_color, p_summary, p_description,
-    v_active_state_id, p_parent_id, p_prefix_id, v_code, p_is_first_level
+    v_active_state_id, p_parent_id, p_prefix_id, v_code, p_is_first_level, v_goal_path
   );
   
   -- 获取新创建的目标ID
   SET p_goal_id = LAST_INSERT_ID();
+  
+  -- 更新目标的完整路径
+  UPDATE UC_GOAL 
+  SET goal_path = IF(
+    p_is_first_level,
+    CONCAT('/', p_goal_id, '/'),
+    CONCAT(v_goal_path, p_goal_id, '/')
+  )
+  WHERE goal_id = p_goal_id;
   
   -- 提交事务
   COMMIT;

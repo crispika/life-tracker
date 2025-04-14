@@ -1,3 +1,5 @@
+import { Goal } from '../goals/goals.type';
+
 export interface TaskState {
   id: number;
   name: string;
@@ -38,4 +40,10 @@ export interface WorkLog {
   timeSpent: number;
   note: string;
   logDate: Date;
+}
+
+export interface ActiveTask extends Task {
+  goalPath: string;
+  pathedGoals: Pick<Goal, 'id' | 'summary' | 'color'>[];
+  rootGoal: Pick<Goal, 'id' | 'summary' | 'color'>;
 }

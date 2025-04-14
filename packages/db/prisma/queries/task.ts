@@ -193,10 +193,129 @@ const getTaskWorklogs = async (taskId: number, userId: number) => {
   }));
 };
 
+const getActiveTasksWithGoalPath = async (userId: number) => {
+  // 1. 首先获取所有符合条件的任务
+  const tasks = await prisma.uC_TASK.findMany({
+    where: {
+      user_id: userId,
+      UC_TASK_STATE: {
+        name: 'IN_PROGRESS'
+      }
+    },
+    select: {
+      task_id: true,
+      code: true,
+      summary: true,
+      description: true,
+      start_date: true,
+      due_date: true,
+      original_estimate_minutes: true,
+      time_spent_minutes: true,
+      UC_GOAL: {
+        select: {
+          goal_id: true,
+          summary: true,
+          color: true,
+          goal_path: true,
+          UC_GOAL_PREFIX: {
+            select: {
+              prefix: true
+            }
+          }
+        }
+      },
+      UC_TASK_STATE: {
+        select: {
+          name: true,
+          state_id: true,
+          system_defined: true
+        }
+      }
+    }
+  });
+
+  // 2. 收集所有需要的goal_id
+  const goalIds = new Set<number>();
+  tasks.forEach((task) => {
+    if (task.UC_GOAL?.goal_path) {
+      // 解析goal_path中的goal_id
+      const ids = task.UC_GOAL.goal_path
+        .split('/')
+        .filter((id) => id !== '')
+        .map((id) => parseInt(id));
+      ids.forEach((id) => goalIds.add(id));
+    }
+  });
+
+  // 3. 一次性查询所有相关的目标
+  const goals = await prisma.uC_GOAL.findMany({
+    where: {
+      goal_id: {
+        in: Array.from(goalIds)
+      }
+    },
+    select: {
+      goal_id: true,
+      summary: true,
+      color: true
+    }
+  });
+
+  // 4. 创建目标ID到目标对象的映射
+  const goalMap = new Map(
+    goals.map((goal) => [
+      goal.goal_id,
+      {
+        id: goal.goal_id,
+        summary: goal.summary,
+        color: goal.color
+      }
+    ])
+  );
+
+  // 5. 返回任务列表，每个任务包含其路径中的所有目标
+  return tasks.map((t) => {
+    const goalPath = t.UC_GOAL?.goal_path || '';
+    const goals = goalPath
+      .split('/')
+      .filter((id) => id !== '')
+      .map((id) => parseInt(id))
+      .map((id) => goalMap.get(id))
+      .filter(
+        (goal): goal is { id: number; summary: string; color: string } =>
+          goal !== undefined
+      );
+
+    return {
+      id: t.task_id,
+      code: t.code,
+      summary: t.summary,
+      description: t.description,
+      startDate: t.start_date,
+      dueDate: t.due_date,
+      originalEstimate: t.original_estimate_minutes,
+      timeSpent: t.time_spent_minutes,
+      goalSummary: t.UC_GOAL.summary,
+      goalColor: t.UC_GOAL.color,
+      prefix: t.UC_GOAL.UC_GOAL_PREFIX.prefix,
+      goalId: t.UC_GOAL.goal_id,
+      rootGoal: goals[0],
+      goalPath,
+      pathedGoals: goals.slice(1),
+      state: {
+        name: t.UC_TASK_STATE.name,
+        id: t.UC_TASK_STATE.state_id,
+        systemDefined: t.UC_TASK_STATE.system_defined
+      }
+    };
+  });
+};
+
 export default {
   getTasksByUserId,
   getTaskDetailById,
   getTaskStatesByUserId,
   getTaskCurrentState,
-  getTaskWorklogs
+  getTaskWorklogs,
+  getActiveTasksWithGoalPath
 };
