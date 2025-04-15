@@ -1,15 +1,15 @@
-import { Handle, NodeToolbar, Position } from 'reactflow'
-import { Button } from '@/components/ui/button'
-import { Pencil, Target } from 'lucide-react'
-import { SetLifeGoalDialog } from './SetLifeGoalDialog'
-import { AddFirstLevelGoalDialog } from './AddFirstLevelGoalDialog'
-import { useState } from 'react'
-import { LifeGoal } from '../goals.type'
+import { Handle, NodeToolbar, Position } from 'reactflow';
+import { Button } from '@/components/ui/button';
+import { Pencil, Target } from 'lucide-react';
+import { SetLifeGoalDialog } from './SetLifeGoalDialog';
+import { AddFirstLevelGoalDialog } from './AddFirstLevelGoalDialog';
+import { useState } from 'react';
+import { LifeGoal } from '../goals.type';
 
 export const LifeGoalNode = ({ data }: { data: LifeGoal }) => {
-  const [lifeGoal, setLifeGoal] = useState<LifeGoal>(data)
-  const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false)
-  const [isAddGoalDialogOpen, setIsAddGoalDialogOpen] = useState(false)
+  const [lifeGoal, setLifeGoal] = useState<LifeGoal>(data);
+  const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false);
+  const [isAddGoalDialogOpen, setIsAddGoalDialogOpen] = useState(false);
   return (
     <>
       <NodeToolbar position={Position.Top} offset={6} align={'start'}>
@@ -85,5 +85,5 @@ export const LifeGoalNode = ({ data }: { data: LifeGoal }) => {
         onOpenChange={setIsAddGoalDialogOpen}
       />
     </>
-  )
-}
+  );
+};

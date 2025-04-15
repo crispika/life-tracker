@@ -1,12 +1,12 @@
-import { Button } from '@/components/ui/button'
-import { ListTodo, Pencil, Target, Trash2 } from 'lucide-react'
-import { useState } from 'react'
-import { Handle, NodeProps, NodeToolbar, Position } from 'reactflow'
-import { AddGoalDialog } from './AddGoalDialog'
-import { AddTaskDialog } from './AddTaskDialog'
-import { DeleteGoalDialog } from './DeleteGoalDialog'
-import { UpdateGoalStateDropdown } from './UpdateGoalStateDropdown'
-import { UpdateGoalDialog } from './UpdateGoalDialog'
+import { Button } from '@/components/ui/button';
+import { ListTodo, Pencil, Target, Trash2 } from 'lucide-react';
+import { useState } from 'react';
+import { Handle, NodeProps, NodeToolbar, Position } from 'reactflow';
+import { AddGoalDialog } from './AddGoalDialog';
+import { AddTaskDialog } from './AddTaskDialog';
+import { DeleteGoalDialog } from './DeleteGoalDialog';
+import { UpdateGoalStateDropdown } from './UpdateGoalStateDropdown';
+import { UpdateGoalDialog } from './UpdateGoalDialog';
 
 export function GoalNode({ data, selected }: NodeProps) {
   const {
@@ -20,19 +20,19 @@ export function GoalNode({ data, selected }: NodeProps) {
     state,
     code,
     hasSubTasks
-  } = data
-  const [isAddGoalOpen, setIsAddGoalOpen] = useState(false)
-  const [isAddTaskOpen, setIsAddTaskOpen] = useState(false)
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
-  const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false)
+  } = data;
+  const [isAddGoalOpen, setIsAddGoalOpen] = useState(false);
+  const [isAddTaskOpen, setIsAddTaskOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false);
 
-  const hasChildren = hasSubTasks || (children && children.length > 0)
+  const hasChildren = hasSubTasks || (children && children.length > 0);
 
   return (
     <>
       <div
         className={`relative min-w-[300px] max-w-[300px] rounded-lg border bg-white p-3 shadow-sm ${
-          selected ? 'border-gray-300  ring-1 ring-gray-300' : 'border-gray-200'
+          selected ? 'border-gray-200  ring-1 ring-gray-300' : 'border-gray-200'
         }`}
         style={{ borderLeftColor: color, borderLeftWidth: '4px' }}
       >
@@ -53,7 +53,7 @@ export function GoalNode({ data, selected }: NodeProps) {
         )}
 
         {/* 节点内容 */}
-        <div className="space-y-2">
+        <div className="space-y-2.5">
           {/* Prefix Section */}
           <div className="flex items-center gap-2">
             <Target className="h-4 w-4 text-gray-500" />
@@ -87,7 +87,7 @@ export function GoalNode({ data, selected }: NodeProps) {
               size="icon"
               className="h-8 w-8 text-gray-500 hover:text-gray-700 hover:bg-gray-100"
               onClick={() => {
-                setIsUpdateDialogOpen(true)
+                setIsUpdateDialogOpen(true);
               }}
               title="编辑当前目标"
             >
@@ -98,7 +98,7 @@ export function GoalNode({ data, selected }: NodeProps) {
               size="icon"
               className="h-8 w-8 text-gray-500 hover:text-gray-700 hover:bg-gray-100"
               onClick={() => {
-                setIsAddGoalOpen(true)
+                setIsAddGoalOpen(true);
               }}
               title="添加子目标"
             >
@@ -109,7 +109,7 @@ export function GoalNode({ data, selected }: NodeProps) {
               size="icon"
               className="h-8 w-8 text-gray-500 hover:text-gray-700 hover:bg-gray-100"
               onClick={() => {
-                setIsAddTaskOpen(true)
+                setIsAddTaskOpen(true);
               }}
               title="添加任务"
             >
@@ -120,7 +120,7 @@ export function GoalNode({ data, selected }: NodeProps) {
               size="icon"
               className="h-8 w-8 text-gray-500 hover:text-red-500 hover:bg-gray-100"
               onClick={() => {
-                setIsDeleteDialogOpen(true)
+                setIsDeleteDialogOpen(true);
               }}
               title="删除目标"
             >
@@ -173,5 +173,5 @@ export function GoalNode({ data, selected }: NodeProps) {
         onOpenChange={setIsUpdateDialogOpen}
       />
     </>
-  )
+  );
 }

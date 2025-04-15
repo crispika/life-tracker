@@ -1,69 +1,38 @@
-'use client'
+'use client';
 
-import dagre from 'dagre'
-import { useCallback, useEffect } from 'react'
+import { Task } from '@/app/tasks/tasks.type';
+import { hierarchy, tree } from 'd3-hierarchy';
+import { useEffect } from 'react';
 import ReactFlow, {
-  Background,
   Controls,
   Edge,
+  MiniMap,
   Node,
   Position,
   useEdgesState,
   useNodesState
-} from 'reactflow'
-import 'reactflow/dist/style.css'
-import { Goal, LifeGoal } from '../goals.type'
-import { GoalNode } from './GoalNode'
-import { LifeGoalNode } from './LifeGoalNode'
-import { Task } from '@/app/tasks/tasks.type'
-import { TaskNode } from './TaskNode'
+} from 'reactflow';
+import 'reactflow/dist/style.css';
+import { Goal, LifeGoal } from '../goals.type';
+import { GoalNode } from './GoalNode';
+import { LifeGoalNode } from './LifeGoalNode';
+import { TaskNode } from './TaskNode';
 
-const nodeWidth = 300
-const nodeHeight = 100
+const nodeWidth = 300;
+const nodeHeight = 100;
 
 const nodeTypes = {
   root: LifeGoalNode,
   goal: GoalNode,
   task: TaskNode
-}
+};
 
-const getLayoutedElements = (nodes: Node[], edges: Edge[]) => {
-  const dagreGraph = new dagre.graphlib.Graph()
-  dagreGraph.setDefaultEdgeLabel(() => ({}))
-
-  // 设置图的方向和节点间距
-  dagreGraph.setGraph({
-    rankdir: 'LR',
-    nodesep: 50,
-    ranksep: 80
-  })
-
-  // 添加节点
-  nodes.forEach((node) => {
-    dagreGraph.setNode(node.id, { width: nodeWidth, height: nodeHeight })
-  })
-
-  // 添加边
-  edges.forEach((edge) => {
-    dagreGraph.setEdge(edge.source, edge.target)
-  })
-
-  // 计算布局
-  dagre.layout(dagreGraph)
-
-  // 获取新的节点位置
-  const layoutedNodes = nodes.map((node) => {
-    const nodeWithPosition = dagreGraph.node(node.id)
-    return {
-      ...node,
-      position: {
-        x: nodeWithPosition.x - nodeWidth / 2,
-        y: nodeWithPosition.y - nodeHeight / 2
-      }
-    }
-  })
-
-  return { nodes: layoutedNodes, edges }
+interface TreeNodeData {
+  id: string;
+  type: 'task' | 'goal' | 'root';
+  children?: TreeNodeData[];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  [key: string]: any;
 }
 
 function processGoals(
@@ -71,69 +40,75 @@ function processGoals(
   goals: Goal[],
   tasks: Task[]
 ): { nodes: Node[]; edges: Edge[] } {
-  const nodes: Node[] = []
-  const edges: Edge[] = []
+  // 递归处理目标树
+  const processTreeNode = (goal: Goal): TreeNodeData => {
+    // 获取当前目标的任务
+    const subTasks = tasks.filter((task) => task.goalId === goal.id);
 
-  // 添加根节点（用户的人生目标）
-  nodes.push({
-    id: 'root',
+    return {
+      data: { ...goal, hasSubTasks: subTasks.length > 0 },
+      id: `goal_${goal.id}`,
+      type: 'goal' as const,
+      children: [
+        // 递归处理子目标
+        ...(goal.children?.map(processTreeNode) || []),
+        // 添加当前目标的任务
+        ...subTasks.map((task) => ({
+          data: task,
+          id: `task_${task.id}`,
+          type: 'task' as const
+        }))
+      ]
+    };
+  };
+
+  // 1. 构建完整的树形结构
+  const treeData: TreeNodeData = {
     data: rootGoal,
-    position: { x: 0, y: 0 },
-    type: 'root',
-    targetPosition: Position.Left,
-    sourcePosition: Position.Right
-  })
+    id: 'root',
+    type: 'root' as const,
+    children: goals.map(processTreeNode)
+  };
 
-  const processNode = (goal: Goal, parentId: string, tasks: Task[]) => {
-    const goalNodeId = `goal_${goal.id}`
-    const subTasks = tasks.filter((task) => task.goalId === goal.id)
+  // 2. 使用 d3-hierarchy 计算布局
+  const root = hierarchy(treeData);
+  const treeLayout = tree<TreeNodeData>()
+    .nodeSize([nodeHeight * 1.2, nodeWidth * 1.5])
+    .separation((a, b) => (a.parent === b.parent ? 1.1 : 1.5));
+
+  const layoutedTree = treeLayout(root);
+
+  // 3. 将层次结构转换为 react-flow 的格式
+  const nodes: Node[] = [];
+  const edges: Edge[] = [];
+
+  // 处理所有节点
+  layoutedTree.descendants().forEach((node) => {
+    const id = node.data.id;
 
     nodes.push({
-      id: goalNodeId,
-      data: { ...goal, hasSubTasks: subTasks.length > 0 },
-      position: { x: 0, y: 0 },
-      type: 'goal',
+      id,
+      data: node.data.data,
+      position: {
+        x: node.y,
+        y: node.x
+      },
+      type: node.data.type,
       targetPosition: Position.Left,
       sourcePosition: Position.Right
-    })
+    });
 
-    // 创建与父节点的连接
-    edges.push({
-      id: `e${parentId}-${goalNodeId}`,
-      source: parentId,
-      target: goalNodeId
-    })
-
-    // 先创建所有任务节点
-    subTasks.forEach((task) => {
-      const taskNodeId = `task_${task.id}`
-      nodes.push({
-        id: taskNodeId,
-        data: task,
-        position: { x: 0, y: 0 },
-        type: 'task',
-        targetPosition: Position.Left,
-        sourcePosition: Position.Right
-      })
-
-      // 立即为每个任务创建与目标的连接
+    // 添加边
+    if (node.parent) {
       edges.push({
-        id: `e${goalNodeId}-${taskNodeId}`,
-        source: goalNodeId,
-        target: taskNodeId
-      })
-    })
-
-    // 处理子节点
-    if (goal.children) {
-      goal.children.forEach((child) => processNode(child, goalNodeId, tasks))
+        id: `e${node.parent.data.id}-${id}`,
+        source: node.parent.data.id,
+        target: id
+      });
     }
-  }
+  });
 
-  // 处理所有顶层目标，将它们连接到根节点
-  goals.forEach((goal) => processNode(goal, 'root', tasks))
-
-  return getLayoutedElements(nodes, edges)
+  return { nodes, edges };
 }
 
 export function GoalsTree({
@@ -141,27 +116,23 @@ export function GoalsTree({
   goals,
   tasks
 }: {
-  lifeGoal: LifeGoal
-  goals: Goal[]
-  tasks: Task[]
+  lifeGoal: LifeGoal;
+  goals: Goal[];
+  tasks: Task[];
 }) {
-  const [nodes, setNodes, onNodesChange] = useNodesState([])
-  const [edges, setEdges, onEdgesChange] = useEdgesState([])
+  const [nodes, setNodes, onNodesChange] = useNodesState([]);
+  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
 
-  const onLayout = useCallback(() => {
+  useEffect(() => {
     const { nodes: layoutedNodes, edges: layoutedEdges } = processGoals(
       lifeGoal,
       goals,
       tasks
-    )
-    setNodes(layoutedNodes)
-    setEdges(layoutedEdges)
-  }, [lifeGoal, goals, tasks, setNodes, setEdges])
-
-  // 初始化布局
-  useEffect(() => {
-    onLayout()
-  }, [onLayout])
+    );
+    setNodes(layoutedNodes);
+    setEdges(layoutedEdges);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lifeGoal, goals, tasks]);
 
   return (
     <div className="w-full h-screen p-4">
@@ -172,19 +143,29 @@ export function GoalsTree({
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
           fitView
-          fitViewOptions={{ padding: 0.3 }}
+          fitViewOptions={{
+            padding: 0.2,
+            maxZoom: 1,
+            minZoom: 0.4
+          }}
           defaultEdgeOptions={{
-            type: 'smoothstep'
+            type: 'smoothstep',
+            style: {
+              stroke: '#b1b1b7',
+              strokeWidth: 1.5,
+              opacity: 0.8
+            }
           }}
           nodeTypes={nodeTypes}
           nodesDraggable={false}
           nodesConnectable={false}
           elementsSelectable={true}
+          zoomOnDoubleClick={false}
         >
-          <Background />
-          <Controls />
+          <Controls showInteractive={false} position={'bottom-left'} />
+          <MiniMap className="hidden md:block" />
         </ReactFlow>
       </div>
     </div>
-  )
+  );
 }

@@ -48,7 +48,10 @@ export function TaskNode({ data, selected }: NodeProps) {
             : 'border-transparent shadow-sm hover:shadow-md'
         }`}
         style={{
-          backgroundColor: `${goalColor}07`
+          backgroundColor: `${goalColor}07`,
+          //FIX: 与goalNode的样式统一，这样能解决edge连接时，children 同时为task/goal时，edge连接会有不正确重叠的样式问题
+          borderLeftColor: 'transparent',
+          borderLeftWidth: '4px'
         }}
       >
         {/* 左侧连接点 */}
@@ -61,23 +64,20 @@ export function TaskNode({ data, selected }: NodeProps) {
         {/* 节点内容 */}
         <div className="space-y-2.5">
           {/* 任务代码和状态 */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div className="flex h-5 w-5 items-center justify-center rounded-full bg-gray-100">
-                <ListTodo className="h-3.5 w-3.5 text-gray-500" />
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="rounded bg-white/80 px-2 py-0.5 text-xs font-medium text-gray-600 shadow-sm ring-1 ring-gray-100">
-                  {prefix}-{code}
-                </span>
-                <TimeProgressBar
-                  timeSpent={timeSpent}
-                  originalEstimate={originalEstimate}
-                  className="w-20"
-                />
-              </div>
+          <div className="flex items-center gap-2">
+            <div className="flex h-4 w-4 items-center justify-center rounded-full bg-gray-100">
+              <ListTodo className="h-3.5 w-3.5 text-gray-500" />
             </div>
-            <UpdateTaskStateDropdown taskId={taskId} currentState={state} />
+            <div className="flex items-center gap-2">
+              <span className="rounded bg-white/80 px-2 py-0.5 text-xs font-medium text-gray-600 shadow-sm ring-1 ring-gray-100">
+                {prefix}-{code}
+              </span>
+              <TimeProgressBar
+                timeSpent={timeSpent}
+                originalEstimate={originalEstimate}
+                className="w-20"
+              />
+            </div>
           </div>
 
           {/* 任务摘要 */}
@@ -92,6 +92,9 @@ export function TaskNode({ data, selected }: NodeProps) {
             </p>
           )}
         </div>
+      </div>
+      <div className="absolute top-2 right-2 z-10">
+        <UpdateTaskStateDropdown taskId={taskId} currentState={state} />
       </div>
 
       {/* 顶部工具栏 */}
