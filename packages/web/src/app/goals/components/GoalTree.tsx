@@ -2,7 +2,7 @@
 
 import { Task } from '@/app/tasks/tasks.type';
 import { hierarchy, tree } from 'd3-hierarchy';
-import { useEffect } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import ReactFlow, {
   Controls,
   Edge,
@@ -10,13 +10,15 @@ import ReactFlow, {
   Node,
   Position,
   useEdgesState,
-  useNodesState
+  useNodesState,
+  ControlButton
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 import { Goal, LifeGoal } from '../goals.type';
 import { GoalNode } from './GoalNode';
 import { LifeGoalNode } from './LifeGoalNode';
 import { TaskNode } from './TaskNode';
+import { Maximize2, Minimize2 } from 'lucide-react';
 
 const nodeWidth = 300;
 const nodeHeight = 100;
@@ -35,18 +37,22 @@ interface TreeNodeData {
   [key: string]: any;
 }
 
-function processGoals(
+function processTreeData(
   rootGoal: LifeGoal,
   goals: Goal[],
   tasks: Task[]
-): { nodes: Node[]; edges: Edge[] } {
+): { metaTreeData: TreeNodeData; allGoalIds: Set<number> } {
+  const allGoalIds = new Set<number>();
   // 递归处理目标树
   const processTreeNode = (goal: Goal): TreeNodeData => {
     // 获取当前目标的任务
     const subTasks = tasks.filter((task) => task.goalId === goal.id);
-
+    allGoalIds.add(goal.id);
     return {
-      data: { ...goal, hasSubTasks: subTasks.length > 0 },
+      data: {
+        ...goal,
+        hasSubTasks: subTasks.length > 0
+      },
       id: `goal_${goal.id}`,
       type: 'goal' as const,
       children: [
@@ -62,29 +68,52 @@ function processGoals(
     };
   };
 
-  // 1. 构建完整的树形结构
-  const treeData: TreeNodeData = {
-    data: rootGoal,
-    id: 'root',
-    type: 'root' as const,
-    children: goals.map(processTreeNode)
+  return {
+    metaTreeData: {
+      data: rootGoal,
+      id: 'root',
+      type: 'root' as const,
+      children: goals.map(processTreeNode)
+    },
+    allGoalIds
+  };
+}
+
+const layoutedTreeData = (
+  treeData: TreeNodeData,
+  setExpandedNodes: (nodes: Set<number>) => void
+) => {
+  //filter out children info of treeData when is Collapsed
+  const filterCollapsedChildren = (node: TreeNodeData) => {
+    node.children?.forEach(filterCollapsedChildren);
+    if (node.data.collapsed) {
+      node.children = [];
+    }
   };
 
-  // 2. 使用 d3-hierarchy 计算布局
+  filterCollapsedChildren(treeData);
+
+  console.log('treeData', treeData);
+
+  // 1. 使用 d3-hierarchy 计算布局
   const root = hierarchy(treeData);
   const treeLayout = tree<TreeNodeData>()
     .nodeSize([nodeHeight * 1.2, nodeWidth * 1.5])
-    .separation((a, b) => (a.parent === b.parent ? 1.1 : 1.5));
+    .separation((a, b) => (a.parent === b.parent ? 1.3 : 1.3));
 
   const layoutedTree = treeLayout(root);
 
-  // 3. 将层次结构转换为 react-flow 的格式
+  // 2. 将层次结构转换为 react-flow 的格式
   const nodes: Node[] = [];
   const edges: Edge[] = [];
 
   // 处理所有节点
   layoutedTree.descendants().forEach((node) => {
     const id = node.data.id;
+
+    if (node.data.type === 'goal') {
+      node.data.data.setExpandedNodes = setExpandedNodes;
+    }
 
     nodes.push({
       id,
@@ -109,7 +138,7 @@ function processGoals(
   });
 
   return { nodes, edges };
-}
+};
 
 export function GoalsTree({
   lifeGoal,
@@ -122,18 +151,37 @@ export function GoalsTree({
 }) {
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+  //by default, all nodes are collapsed
+  const [expandedNodes, setExpandedNodes] = useState<Set<number>>(new Set());
+
+  const { metaTreeData, allGoalIds } = useMemo(() => {
+    return processTreeData(lifeGoal, goals, tasks);
+  }, [lifeGoal, goals, tasks]);
 
   useEffect(() => {
-    const { nodes: layoutedNodes, edges: layoutedEdges } = processGoals(
-      lifeGoal,
-      goals,
-      tasks
+    const dfsAddCollapsedInfo = (node: TreeNodeData) => {
+      if (!node.children) return;
+      node.children.forEach((child) => {
+        if (child.children?.length) {
+          child.data.collapsed = !expandedNodes.has(child.data.id);
+          dfsAddCollapsedInfo(child);
+        }
+      });
+    };
+
+    const treeDataWithCollapsed = JSON.parse(JSON.stringify(metaTreeData));
+    dfsAddCollapsedInfo(treeDataWithCollapsed);
+
+    const { nodes: layoutedNodes, edges: layoutedEdges } = layoutedTreeData(
+      treeDataWithCollapsed,
+      setExpandedNodes
     );
     setNodes(layoutedNodes);
     setEdges(layoutedEdges);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [lifeGoal, goals, tasks]);
+  }, [expandedNodes, metaTreeData]);
 
+  console.log('allGoalIds', allGoalIds);
   return (
     <div className="w-full h-screen p-4">
       <div className="w-full h-full bg-white rounded-lg shadow-lg">
@@ -146,7 +194,7 @@ export function GoalsTree({
           fitViewOptions={{
             padding: 0.2,
             maxZoom: 1,
-            minZoom: 0.4
+            minZoom: 0.1
           }}
           defaultEdgeOptions={{
             type: 'smoothstep',
@@ -162,7 +210,22 @@ export function GoalsTree({
           elementsSelectable={true}
           zoomOnDoubleClick={false}
         >
-          <Controls showInteractive={false} position={'bottom-left'} />
+          <Controls
+            showInteractive={false}
+            position={'bottom-left'}
+            fitViewOptions={{
+              padding: 0.2,
+              maxZoom: 1,
+              minZoom: 0.1
+            }}
+          >
+            <ControlButton onClick={() => setExpandedNodes(allGoalIds)}>
+              <Maximize2 className="w-4 h-4 text-black" />
+            </ControlButton>
+            <ControlButton onClick={() => setExpandedNodes(new Set())}>
+              <Minimize2 className="w-4 h-4 text-black" />
+            </ControlButton>
+          </Controls>
           <MiniMap className="hidden md:block" />
         </ReactFlow>
       </div>

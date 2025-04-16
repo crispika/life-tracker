@@ -1,12 +1,12 @@
 import { Button } from '@/components/ui/button';
-import { ListTodo, Pencil, Target, Trash2 } from 'lucide-react';
+import { ListTodo, Minus, Pencil, Plus, Target, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { Handle, NodeProps, NodeToolbar, Position } from 'reactflow';
 import { AddGoalDialog } from './AddGoalDialog';
 import { AddTaskDialog } from './AddTaskDialog';
 import { DeleteGoalDialog } from './DeleteGoalDialog';
-import { UpdateGoalStateDropdown } from './UpdateGoalStateDropdown';
 import { UpdateGoalDialog } from './UpdateGoalDialog';
+import { UpdateGoalStateDropdown } from './UpdateGoalStateDropdown';
 
 export function GoalNode({ data, selected }: NodeProps) {
   const {
@@ -19,7 +19,9 @@ export function GoalNode({ data, selected }: NodeProps) {
     children,
     state,
     code,
-    hasSubTasks
+    hasSubTasks,
+    collapsed,
+    setExpandedNodes
   } = data;
   const [isAddGoalOpen, setIsAddGoalOpen] = useState(false);
   const [isAddTaskOpen, setIsAddTaskOpen] = useState(false);
@@ -31,7 +33,7 @@ export function GoalNode({ data, selected }: NodeProps) {
   return (
     <>
       <div
-        className={`relative min-w-[300px] max-w-[300px] rounded-lg border bg-white p-3 shadow-sm ${
+        className={`relative min-w-[300px] max-w-[300px] rounded-lg border bg-white p-3 shadow-sm hover:shadow-md ${
           selected ? 'border-gray-200  ring-1 ring-gray-300' : 'border-gray-200'
         }`}
         style={{ borderLeftColor: color, borderLeftWidth: '4px' }}
@@ -44,7 +46,7 @@ export function GoalNode({ data, selected }: NodeProps) {
         />
 
         {/* 右侧连接点 - 只在有子节点时显示 */}
-        {hasChildren && (
+        {!collapsed && hasChildren && (
           <Handle
             type="source"
             position={Position.Right}
@@ -79,7 +81,47 @@ export function GoalNode({ data, selected }: NodeProps) {
             <UpdateGoalStateDropdown goalId={id} currentState={state} />
           </div>
         )}
+        {collapsed && (
+          <div className="absolute top-1/2 -translate-y-1/2 -right-3 z-10">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-6 w-6 text-gray-500 hover:text-gray-700 bg-gray-100 rounded-full"
+              onClick={(e) => {
+                e.stopPropagation();
+                setExpandedNodes((prev: Set<number>) => {
+                  const newSet = new Set(prev);
+                  newSet.add(id);
+                  return newSet;
+                });
+              }}
+              title="展开目标所有子项"
+            >
+              <Plus className="h-4 w-4" />
+            </Button>
+          </div>
+        )}
 
+        {!collapsed && hasChildren && (
+          <div className="absolute top-1/2 -translate-y-1/2 -right-3 z-10">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-6 w-6 text-gray-500 hover:text-gray-700 bg-gray-100 rounded-full"
+              onClick={(e) => {
+                e.stopPropagation();
+                setExpandedNodes((prev: Set<number>) => {
+                  const newSet = new Set(prev);
+                  newSet.delete(id);
+                  return newSet;
+                });
+              }}
+              title="折叠目标所有子项"
+            >
+              <Minus className="h-4 w-4" />
+            </Button>
+          </div>
+        )}
         <NodeToolbar position={Position.Top} offset={6} align={'start'}>
           <div className="flex space-x-1 bg-white p-1 rounded-lg shadow-lg border border-gray-200">
             <Button
