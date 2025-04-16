@@ -1,18 +1,18 @@
-import { GoalErrorCode } from '@/app/api/goals/error.types'
-import { Button } from '@/components/ui/button'
+import { GoalErrorCode } from '@/app/api/goals/error.types';
+import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle
-} from '@/components/ui/dialog'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
-import { useToast } from '@/hooks/use-toast'
-import { AlertCircle } from 'lucide-react'
-import { useRouter } from 'next/navigation'
-import { useState } from 'react'
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { useToast } from '@/hooks/use-toast';
+import { AlertCircle } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
 const COLORS = [
   { name: '红', value: '#ff4d4f' },
@@ -25,60 +25,60 @@ const COLORS = [
   { name: '褐', value: '#8B4513' },
   { name: '灰', value: '#8c8c8c' },
   { name: '黑', value: '#000000' }
-]
+];
 
 interface AddFirstLevelGoalDialogProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
 }
 
 export function AddFirstLevelGoalDialog({
   open,
   onOpenChange
 }: AddFirstLevelGoalDialogProps) {
-  const [summary, setSummary] = useState('')
-  const [description, setDescription] = useState('')
-  const [prefix, setPrefix] = useState('')
-  const [color, setColor] = useState(COLORS[0].value)
+  const [summary, setSummary] = useState('');
+  const [description, setDescription] = useState('');
+  const [prefix, setPrefix] = useState('');
+  const [color, setColor] = useState(COLORS[0].value);
   const [errors, setErrors] = useState<{
-    summary?: string
-    prefix?: string
-  }>({})
-  const { toast } = useToast()
-  const router = useRouter()
+    summary?: string;
+    prefix?: string;
+  }>({});
+  const { toast } = useToast();
+  const router = useRouter();
 
   const resetState = () => {
-    setSummary('')
-    setDescription('')
-    setPrefix('')
-    setColor(COLORS[0].value)
-    setErrors({})
-  }
+    setSummary('');
+    setDescription('');
+    setPrefix('');
+    setColor(COLORS[0].value);
+    setErrors({});
+  };
 
   const validateForm = () => {
-    const newErrors: typeof errors = {}
+    const newErrors: typeof errors = {};
 
     if (!summary.trim()) {
-      newErrors.summary = '目标名称不能为空'
+      newErrors.summary = '目标名称不能为空';
     } else if (summary.length > 100) {
-      newErrors.summary = '目标名称不能超过100个字符'
+      newErrors.summary = '目标名称不能超过100个字符';
     }
 
     if (!prefix.trim()) {
-      newErrors.prefix = '前缀不能为空'
+      newErrors.prefix = '前缀不能为空';
     } else if (prefix.length > 15) {
-      newErrors.prefix = '前缀不能超过15个字符'
+      newErrors.prefix = '前缀不能超过15个字符';
     }
 
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
-  }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
 
     if (!validateForm()) {
-      return
+      return;
     }
 
     try {
@@ -95,32 +95,32 @@ export function AddFirstLevelGoalDialog({
           prefix,
           isFirstLevel: true
         })
-      })
+      });
       if (!response.ok) {
-        const error = await response.json()
+        const error = await response.json();
         if (error.code === GoalErrorCode.PREFIX_EXISTS) {
-          setErrors((prev) => ({ ...prev, prefix: '该前缀已被其他目标使用' }))
-          return
+          setErrors((prev) => ({ ...prev, prefix: '该前缀已被其他目标使用' }));
+          return;
         }
-        throw new Error(error.error || '创建目标失败')
+        throw new Error(error.error || '创建目标失败');
       }
       toast({
         title: '创建成功',
         description: '目标已成功创建'
-      })
-      handleOpenChange(false)
-      router.refresh()
+      });
+      handleOpenChange(false);
+      router.refresh();
     } catch (error) {
-      console.error('创建目标失败:', error)
+      console.error('创建目标失败:', error);
     }
-  }
+  };
 
   const handleOpenChange = (open: boolean) => {
     if (!open) {
-      resetState()
+      resetState();
     }
-    onOpenChange(open)
-  }
+    onOpenChange(open);
+  };
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
@@ -223,5 +223,5 @@ export function AddFirstLevelGoalDialog({
         </form>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

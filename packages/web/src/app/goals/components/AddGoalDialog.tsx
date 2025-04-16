@@ -1,22 +1,22 @@
-import { Button } from '@/components/ui/button'
+import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle
-} from '@/components/ui/dialog'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
-import { useToast } from '@/hooks/use-toast'
-import { AlertCircle } from 'lucide-react'
-import { useRouter } from 'next/navigation'
-import { useState } from 'react'
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { useToast } from '@/hooks/use-toast';
+import { AlertCircle } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
 interface AddGoalDialogProps {
-  parentId: number
-  open: boolean
-  onOpenChange: (open: boolean) => void
+  parentId: number;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
 }
 
 export function AddGoalDialog({
@@ -24,38 +24,38 @@ export function AddGoalDialog({
   open,
   onOpenChange
 }: AddGoalDialogProps) {
-  const [summary, setSummary] = useState('')
-  const [description, setDescription] = useState('')
+  const [summary, setSummary] = useState('');
+  const [description, setDescription] = useState('');
   const [errors, setErrors] = useState<{
-    summary?: string
-  }>({})
-  const { toast } = useToast()
-  const router = useRouter()
+    summary?: string;
+  }>({});
+  const { toast } = useToast();
+  const router = useRouter();
 
   const resetState = () => {
-    setSummary('')
-    setDescription('')
-    setErrors({})
-  }
+    setSummary('');
+    setDescription('');
+    setErrors({});
+  };
 
   const validateForm = () => {
-    const newErrors: typeof errors = {}
+    const newErrors: typeof errors = {};
 
     if (!summary.trim()) {
-      newErrors.summary = '目标名称不能为空'
+      newErrors.summary = '目标名称不能为空';
     } else if (summary.length > 100) {
-      newErrors.summary = '目标名称不能超过100个字符'
+      newErrors.summary = '目标名称不能超过100个字符';
     }
 
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
-  }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
 
     if (!validateForm()) {
-      return
+      return;
     }
 
     try {
@@ -71,31 +71,31 @@ export function AddGoalDialog({
           parentId,
           isFirstLevel: false
         })
-      })
+      });
       if (!response.ok) {
-        const error = await response.json()
-        throw new Error(error.error || '创建目标失败')
+        const error = await response.json();
+        throw new Error(error.error || '创建目标失败');
       }
       toast({
         title: '创建成功',
         description: '目标已成功创建'
-      })
-      resetState()
-      onOpenChange(false)
-      router.refresh()
+      });
+      resetState();
+      onOpenChange(false);
+      router.refresh();
     } catch (error) {
-      console.error('创建目标失败:', error)
+      console.error('创建目标失败:', error);
     }
-  }
+  };
 
   return (
     <Dialog
       open={open}
       onOpenChange={(open) => {
         if (!open) {
-          resetState()
+          resetState();
         }
-        onOpenChange(open)
+        onOpenChange(open);
       }}
     >
       <DialogContent className="bg-white/95 backdrop-blur-sm">
@@ -155,5 +155,5 @@ export function AddGoalDialog({
         </form>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

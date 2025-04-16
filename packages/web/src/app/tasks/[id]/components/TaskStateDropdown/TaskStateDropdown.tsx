@@ -1,48 +1,48 @@
-'use client'
+'use client';
 
-import { Badge } from '@/components/ui/badge'
+import { Badge } from '@/components/ui/badge';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger
-} from '@/components/ui/dropdown-menu'
-import { ChevronDown } from 'lucide-react'
-import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { fetchUserTaskStates, updateTaskState } from './taskState.api'
-import { fetchCurrentState } from './taskState.api'
-import { getTaskStateName } from '@/app/tasks/tasks.util'
+} from '@/components/ui/dropdown-menu';
+import { ChevronDown } from 'lucide-react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { fetchUserTaskStates, updateTaskState } from './taskState.api';
+import { fetchCurrentState } from './taskState.api';
+import { getTaskStateName } from '@/app/tasks/tasks.util';
 
 export interface TaskStateDropdownProps {
-  taskId: number
+  taskId: number;
 }
 
 export function TaskStateDropdown({ taskId }: TaskStateDropdownProps) {
-  const queryClient = useQueryClient()
+  const queryClient = useQueryClient();
 
   const { data: currentState, isLoading: isLoadingCurrentState } = useQuery({
     queryKey: ['taskCurrentState', taskId],
     queryFn: () => fetchCurrentState(taskId)
-  })
+  });
 
   const { data: availableStates = [], isLoading: isLoadingStates } = useQuery({
     queryKey: ['userTaskStates'],
     queryFn: fetchUserTaskStates
-  })
+  });
 
-  const isLoading = isLoadingCurrentState || isLoadingStates
+  const isLoading = isLoadingCurrentState || isLoadingStates;
 
   if (isLoading || !currentState) {
-    return <Badge variant="secondary">Loading...</Badge>
+    return <Badge variant="secondary">Loading...</Badge>;
   }
 
   const handleStateChange = async (stateId: number) => {
-    await updateTaskState(taskId, stateId)
+    await updateTaskState(taskId, stateId);
     // 使缓存失效，触发重新获取
     queryClient.invalidateQueries({
       queryKey: ['taskCurrentState', taskId]
-    })
-  }
+    });
+  };
 
   return (
     <DropdownMenu>
@@ -68,5 +68,5 @@ export function TaskStateDropdown({ taskId }: TaskStateDropdownProps) {
           ))}
       </DropdownMenuContent>
     </DropdownMenu>
-  )
+  );
 }

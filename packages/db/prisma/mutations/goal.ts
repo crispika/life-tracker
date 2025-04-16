@@ -1,10 +1,10 @@
-import { prisma } from '../../index'
+import { prisma } from '../../index';
 
 async function upsertUltimateGoal(
   userId: number,
   data: {
-    summary: string
-    sidenote?: string | null
+    summary: string;
+    sidenote?: string | null;
   }
 ) {
   try {
@@ -21,24 +21,24 @@ async function upsertUltimateGoal(
         summary: data.summary,
         sidenote: data.sidenote
       }
-    })
+    });
   } catch (error) {
     throw new Error(
       '创建或更新终极目标失败: ' +
         (error instanceof Error ? error.message : String(error))
-    )
+    );
   }
 }
 
 async function createGoal(
   userId: number,
   data: {
-    color: string
-    summary: string
-    description?: string | null
-    parentId?: number | null
-    prefix?: string
-    isFirstLevel: boolean
+    color: string;
+    summary: string;
+    description?: string | null;
+    parentId?: number | null;
+    prefix?: string;
+    isFirstLevel: boolean;
   }
 ) {
   try {
@@ -54,33 +54,33 @@ async function createGoal(
         @goal_id,
         @prefix_id
       )
-    `
-    return result
+    `;
+    return result;
   } catch (error) {
     throw new Error(
       '创建目标失败: ' +
         (error instanceof Error ? error.message : String(error))
-    )
+    );
   }
 }
 
 async function deleteGoalWithAllChildren(userId: number, goalId: number) {
   try {
-    console.log(`尝试删除目标: userId=${userId}, goalId=${goalId}`)
+    console.log(`尝试删除目标: userId=${userId}, goalId=${goalId}`);
     // 使用$queryRawUnsafe来执行存储过程，这样可以捕获所有结果集
     await prisma.$queryRawUnsafe(`
       CALL delete_goal_with_all_children(${userId}, ${goalId})
-    `)
+    `);
 
     return {
       success: true
-    }
+    };
   } catch (error) {
-    console.error('删除目标失败:', error)
+    console.error('删除目标失败:', error);
     throw new Error(
       '删除目标失败: ' +
         (error instanceof Error ? error.message : String(error))
-    )
+    );
   }
 }
 
@@ -96,10 +96,10 @@ async function updateGoalStateByStateName(
         goal_id: goalId,
         user_id: userId
       }
-    })
+    });
 
     if (!goal) {
-      throw new Error('目标不存在或不属于当前用户')
+      throw new Error('目标不存在或不属于当前用户');
     }
 
     // 获取状态ID
@@ -107,10 +107,10 @@ async function updateGoalStateByStateName(
       where: {
         name: stateName
       }
-    })
+    });
 
     if (!state) {
-      throw new Error(`无效的状态名称: ${stateName}`)
+      throw new Error(`无效的状态名称: ${stateName}`);
     }
 
     // 使用Prisma更新目标状态
@@ -122,13 +122,13 @@ async function updateGoalStateByStateName(
         state_id: state.state_id,
         updated_at: new Date()
       }
-    })
+    });
   } catch (error) {
-    console.error('更新目标状态失败:', error)
+    console.error('更新目标状态失败:', error);
     throw new Error(
       '更新目标状态失败: ' +
         (error instanceof Error ? error.message : String(error))
-    )
+    );
   }
 }
 
@@ -145,10 +145,10 @@ async function updateGoalBasicInfo(
         goal_id: goalId,
         user_id: userId
       }
-    })
+    });
 
     if (!goal) {
-      throw new Error('目标不存在或不属于当前用户')
+      throw new Error('目标不存在或不属于当前用户');
     }
 
     // 使用Prisma更新目标
@@ -161,13 +161,13 @@ async function updateGoalBasicInfo(
         description,
         updated_at: new Date()
       }
-    })
+    });
   } catch (error) {
-    console.error('更新目标失败:', error)
+    console.error('更新目标失败:', error);
     throw new Error(
       '更新目标失败: ' +
         (error instanceof Error ? error.message : String(error))
-    )
+    );
   }
 }
 
@@ -177,4 +177,4 @@ export const goalMutations = {
   deleteGoalWithAllChildren,
   updateGoalStateByStateName,
   updateGoalBasicInfo
-}
+};

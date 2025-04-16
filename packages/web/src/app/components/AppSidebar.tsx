@@ -2,7 +2,7 @@ import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger
-} from '@/components/ui/collapsible'
+} from '@/components/ui/collapsible';
 import {
   Sidebar,
   SidebarContent,
@@ -15,10 +15,10 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
   SidebarRail
-} from '@/components/ui/sidebar'
-import { ChevronRight } from 'lucide-react'
-import Link from 'next/link'
-import * as React from 'react'
+} from '@/components/ui/sidebar';
+import { ChevronRight } from 'lucide-react';
+import Link from 'next/link';
+import * as React from 'react';
 
 const data = {
   navMain: [
@@ -93,7 +93,7 @@ const data = {
       ]
     }
   ]
-}
+};
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
@@ -116,7 +116,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   </SidebarMenuButton>
                 </SidebarGroupLabel>
               </SidebarGroup>
-            )
+            );
           }
           return (
             <Collapsible
@@ -150,10 +150,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 </CollapsibleContent>
               </SidebarGroup>
             </Collapsible>
-          )
+          );
         })}
       </SidebarContent>
       <SidebarRail />
     </Sidebar>
-  )
+  );
 }

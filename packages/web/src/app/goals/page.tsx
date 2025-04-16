@@ -1,19 +1,19 @@
-import { queries } from '@life-tracker/db'
+import { queries } from '@life-tracker/db';
 import {
   Breadcrumb,
   BreadcrumbItem,
   BreadcrumbLink,
   BreadcrumbList
-} from '@/components/ui/breadcrumb'
-import { Separator } from '@/components/ui/separator'
-import { SidebarTrigger } from '@/components/ui/sidebar'
-import { SetLifeGoalDialog } from './components/SetLifeGoalDialog'
-import { GoalsTree } from './components/GoalTree'
+} from '@/components/ui/breadcrumb';
+import { Separator } from '@/components/ui/separator';
+import { SidebarTrigger } from '@/components/ui/sidebar';
+import { SetLifeGoalDialog } from './components/SetLifeGoalDialog';
+import { GoalsTree } from './components/GoalTree';
 
 export default async function Goals() {
-  const lifeGoal = await queries.goal.getUserUltimateGoal(100000)
-  const goals = await queries.goal.getUserGoalTree(100000)
-  const tasks = await queries.task.getTasksByUserId(100000)
+  const lifeGoal = await queries.goal.getUserUltimateGoal(100000);
+  const goals = await queries.goal.getUserGoalTree(100000);
+  const tasks = await queries.task.getTasksByUserId(100000);
   return (
     <>
       <header className="flex bg-background h-16 shrink-0 items-center gap-2 border-b px-4">
@@ -41,5 +41,5 @@ export default async function Goals() {
         )}
       </div>
     </>
-  )
+  );
 }

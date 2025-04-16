@@ -1,4 +1,4 @@
-import { Button } from '@/components/ui/button'
+import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
@@ -6,20 +6,20 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle
-} from '@/components/ui/dialog'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
-import { useToast } from '@/hooks/use-toast'
-import { useRouter } from 'next/navigation'
-import { useState } from 'react'
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { useToast } from '@/hooks/use-toast';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
 interface UpdateGoalDialogProps {
-  goalId: number
-  goalSummary: string
-  goalDescription?: string | null
-  open: boolean
-  onOpenChange: (open: boolean) => void
+  goalId: number;
+  goalSummary: string;
+  goalDescription?: string | null;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
 }
 
 export function UpdateGoalDialog({
@@ -29,15 +29,15 @@ export function UpdateGoalDialog({
   open,
   onOpenChange
 }: UpdateGoalDialogProps) {
-  const [summary, setSummary] = useState(goalSummary)
-  const [description, setDescription] = useState(goalDescription || '')
-  const [isLoading, setIsLoading] = useState(false)
-  const { toast } = useToast()
-  const router = useRouter()
+  const [summary, setSummary] = useState(goalSummary);
+  const [description, setDescription] = useState(goalDescription || '');
+  const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsLoading(true)
+    e.preventDefault();
+    setIsLoading(true);
 
     try {
       const response = await fetch(`/api/goals/${goalId}`, {
@@ -47,23 +47,23 @@ export function UpdateGoalDialog({
           'x-user-id': '100000'
         },
         body: JSON.stringify({ summary, description })
-      })
+      });
       if (!response.ok) {
-        const error = await response.json()
-        throw new Error(error.error || '更新目标失败')
+        const error = await response.json();
+        throw new Error(error.error || '更新目标失败');
       }
       toast({
         title: '目标已更新',
         description: '目标信息已成功更新'
-      })
-      onOpenChange(false)
-      router.refresh()
+      });
+      onOpenChange(false);
+      router.refresh();
     } catch (error) {
-      console.error(error)
+      console.error(error);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -122,5 +122,5 @@ export function UpdateGoalDialog({
         </form>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

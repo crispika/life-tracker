@@ -1,12 +1,12 @@
-import { SidebarTrigger } from '@/components/ui/sidebar'
+import { SidebarTrigger } from '@/components/ui/sidebar';
 
 import {
   Breadcrumb,
   BreadcrumbItem,
   BreadcrumbLink,
   BreadcrumbList
-} from '@/components/ui/breadcrumb'
-import { Separator } from '@/components/ui/separator'
+} from '@/components/ui/breadcrumb';
+import { Separator } from '@/components/ui/separator';
 
 export default async function Home() {
   return (
@@ -23,7 +23,7 @@ export default async function Home() {
         </Breadcrumb>
       </header>
     </>
-  )
+  );
 }
 
-export const dynamic = 'force-dynamic'
+export const dynamic = 'force-dynamic';
