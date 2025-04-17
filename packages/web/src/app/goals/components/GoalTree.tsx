@@ -2,23 +2,24 @@
 
 import { Task } from '@/app/tasks/tasks.type';
 import { hierarchy, tree } from 'd3-hierarchy';
+import { Layers2Icon, Layers3Icon } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import ReactFlow, {
+  ControlButton,
   Controls,
   Edge,
   MiniMap,
   Node,
   Position,
+  ReactFlowProvider,
   useEdgesState,
-  useNodesState,
-  ControlButton
+  useNodesState
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 import { Goal, LifeGoal } from '../goals.type';
 import { GoalNode } from './GoalNode';
 import { LifeGoalNode } from './LifeGoalNode';
 import { TaskNode } from './TaskNode';
-import { Maximize2, Minimize2 } from 'lucide-react';
 
 const nodeWidth = 300;
 const nodeHeight = 100;
@@ -27,6 +28,12 @@ const nodeTypes = {
   root: LifeGoalNode,
   goal: GoalNode,
   task: TaskNode
+};
+
+const fitViewOptions = {
+  padding: 0.2,
+  maxZoom: 1,
+  minZoom: 0.1
 };
 
 interface TreeNodeData {
@@ -70,7 +77,7 @@ function processTreeData(
 
   return {
     metaTreeData: {
-      data: rootGoal,
+      data: { ...rootGoal, hasChildren: goals.length > 0 },
       id: 'root',
       type: 'root' as const,
       children: goals.map(processTreeNode)
@@ -140,7 +147,7 @@ const layoutedTreeData = (
   return { nodes, edges };
 };
 
-export function GoalsTree({
+function GoalsTreeContent({
   lifeGoal,
   goals,
   tasks
@@ -181,7 +188,6 @@ export function GoalsTree({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [expandedNodes, metaTreeData]);
 
-  console.log('allGoalIds', allGoalIds);
   return (
     <div className="w-full h-screen p-4">
       <div className="w-full h-full bg-white rounded-lg shadow-lg">
@@ -191,11 +197,7 @@ export function GoalsTree({
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
           fitView
-          fitViewOptions={{
-            padding: 0.2,
-            maxZoom: 1,
-            minZoom: 0.1
-          }}
+          fitViewOptions={fitViewOptions}
           defaultEdgeOptions={{
             type: 'smoothstep',
             style: {
@@ -212,23 +214,43 @@ export function GoalsTree({
         >
           <Controls
             showInteractive={false}
-            position={'bottom-left'}
-            fitViewOptions={{
-              padding: 0.2,
-              maxZoom: 1,
-              minZoom: 0.1
-            }}
+            position={'top-left'}
+            fitViewOptions={fitViewOptions}
           >
-            <ControlButton onClick={() => setExpandedNodes(allGoalIds)}>
-              <Maximize2 className="w-4 h-4 text-black" />
+            <ControlButton
+              onClick={() => {
+                //FIXME 这里需要优化，展开后最好自动fit to screen
+                setExpandedNodes(allGoalIds);
+              }}
+            >
+              <Layers2Icon className=" text-black" />
             </ControlButton>
-            <ControlButton onClick={() => setExpandedNodes(new Set())}>
-              <Minimize2 className="w-4 h-4 text-black" />
+            <ControlButton
+              onClick={() => {
+                setExpandedNodes(new Set());
+              }}
+              title="折叠所有目标"
+            >
+              <Layers3Icon className=" text-black" />
             </ControlButton>
           </Controls>
-          <MiniMap className="hidden md:block" />
+          <MiniMap className="hidden md:block" position={'bottom-left'} />
         </ReactFlow>
       </div>
     </div>
   );
+}
+
+export const GoalsTree = withReactFlow(GoalsTreeContent);
+
+function withReactFlow<T extends object>(Component: React.ComponentType<T>) {
+  const WrappedComponent = (props: T) => {
+    return (
+      <ReactFlowProvider>
+        <Component {...props} />
+      </ReactFlowProvider>
+    );
+  };
+  WrappedComponent.displayName = `withReactFlow(${Component.displayName || Component.name || 'Component'})`;
+  return WrappedComponent;
 }

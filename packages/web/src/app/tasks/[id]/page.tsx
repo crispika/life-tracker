@@ -8,8 +8,7 @@ import {
   BreadcrumbSeparator
 } from '@/components/ui/breadcrumb';
 import { Card, CardContent } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
-import { SidebarTrigger } from '@/components/ui/sidebar';
+import { TimeProgressBar } from '@/components/ui/progress-bar';
 import { queries } from '@life-tracker/db';
 import { format } from 'date-fns';
 import { Calendar, Clock, Target } from 'lucide-react';
@@ -17,7 +16,6 @@ import { Task, WorkLog } from '../tasks.type';
 import { formatTimeEstimate, minutesToTimeEstimate } from '../tasks.util';
 import { TaskStateDropdown } from './components/TaskStateDropdown/TaskStateDropdown';
 import { WorkLogs } from './components/WorkLogs';
-import { TimeProgressBar } from '@/components/ui/progress-bar';
 
 export default async function TaskDetail({
   params
@@ -41,25 +39,27 @@ export default async function TaskDetail({
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <header className="flex sticky top-0 bg-background h-16 shrink-0 items-center gap-2 border-b px-4">
-        <SidebarTrigger className="-ml-1" />
-        <Separator orientation="vertical" className="mr-2 h-4" />
-        <Breadcrumb>
-          <BreadcrumbList>
-            <BreadcrumbItem className="hidden md:block">
-              <BreadcrumbLink href="/tasks">Tasks</BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbPage className="truncate max-w-64">
-                {task.summary}
-              </BreadcrumbPage>
-            </BreadcrumbItem>
-          </BreadcrumbList>
-        </Breadcrumb>
-      </header>
-
       <main className="container mx-auto px-4 py-8 max-w-4xl">
+        <div className="mb-6">
+          <Breadcrumb>
+            <BreadcrumbList>
+              <BreadcrumbItem className="hidden md:block">
+                <BreadcrumbLink
+                  href="/tasks"
+                  className="text-gray-600 hover:text-gray-900"
+                >
+                  Tasks
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbPage className="truncate max-w-64 text-gray-900">
+                  {task.summary}
+                </BreadcrumbPage>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
+        </div>
         <Card className="mb-6">
           <CardContent className="pt-6">
             {/* 任务标识和状态 */}

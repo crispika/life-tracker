@@ -6,7 +6,11 @@ import { AddFirstLevelGoalDialog } from './AddFirstLevelGoalDialog';
 import { useState } from 'react';
 import { LifeGoal } from '../goals.type';
 
-export const LifeGoalNode = ({ data }: { data: LifeGoal }) => {
+export const LifeGoalNode = ({
+  data
+}: {
+  data: LifeGoal & { hasChildren: boolean };
+}) => {
   const [lifeGoal, setLifeGoal] = useState<LifeGoal>(data);
   const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false);
   const [isAddGoalDialogOpen, setIsAddGoalDialogOpen] = useState(false);
@@ -64,12 +68,19 @@ export const LifeGoalNode = ({ data }: { data: LifeGoal }) => {
           </div>
         </div>
 
-        {/* 右侧连接点 */}
-        <Handle
-          type="source"
-          position={Position.Right}
-          className="!bg-gray-400"
-        />
+        {data.hasChildren ? (
+          <Handle
+            type="source"
+            position={Position.Right}
+            className="!bg-gray-400"
+          />
+        ) : (
+          <div className="absolute left-1/2 -translate-x-1/2 -bottom-2 rounded bg-gray-500/50">
+            <div className="flex items-center justify-center h-full text-white text-sm">
+              &nbsp;点击元素激活工具条&nbsp;
+            </div>
+          </div>
+        )}
       </div>
 
       <SetLifeGoalDialog

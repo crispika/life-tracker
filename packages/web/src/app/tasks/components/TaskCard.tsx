@@ -49,17 +49,16 @@ export function TaskCard({ task }: { task: Task }) {
           <Calendar className="h-3.5 w-3.5" />
           <span>
             开始:{' '}
-            {task.startDate ? format(task.startDate, 'yyyy-MM-dd') : '未开始'}
+            {task.startDate ? format(task.startDate, 'yyyy-MM-dd') : ' - '}
           </span>
         </div>
-        {task.dueDate && (
-          <div className="flex items-center gap-1.5">
-            <Calendar className="h-3.5 w-3.5" />
-            <span className={isOverdue ? 'text-red-500' : 'text-gray-500'}>
-              截止: {format(task.dueDate, 'yyyy-MM-dd')}
-            </span>
-          </div>
-        )}
+
+        <div className="flex items-center gap-1.5">
+          <Calendar className="h-3.5 w-3.5" />
+          <span className={isOverdue ? 'text-red-500' : 'text-gray-500'}>
+            截止: {task.dueDate ? format(task.dueDate, 'yyyy-MM-dd') : ' - '}
+          </span>
+        </div>
       </div>
     </Link>
   );
