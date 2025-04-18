@@ -10,7 +10,7 @@ import {
 import { format } from 'date-fns';
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from 'recharts';
 import { formatMinutesToTimeString } from '../tasks/tasks.util';
-import { generateChartConfig, processColor } from './dashboard.util';
+import { generateChartConfig } from './dashboard.util';
 
 interface FirstLevelGoal {
   goalId: number;
@@ -83,7 +83,7 @@ export function RecentActivityStackedAreaChart({
             dataKey={goal.goalId}
             name={goal.summary}
             stackId="1"
-            fill={processColor(goal.color)}
+            fill={goal.color}
           />
         ))}
         <ChartLegend content={<ChartLegendContent />} />

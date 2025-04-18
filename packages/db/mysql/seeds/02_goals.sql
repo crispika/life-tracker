@@ -4,14 +4,14 @@ USE life_tracker;
 SET @demo_user_id = (SELECT user_id FROM USER WHERE email = 'demo@example.com');
 
 -- 定义颜色变量
-SET @color_red = '#ff4d4f';
-SET @color_orange = '#fa8c16';
-SET @color_yellow = '#fadb14';
-SET @color_green = '#52c41a';
-SET @color_cyan = '#13c2c2';
-SET @color_blue = '#1890ff';
-SET @color_purple = '#722ed1';
-SET @color_brown = '#8B4513';
+SET @color_red = '#ff6469';
+SET @color_orange = '#ffab64';
+SET @color_yellow = '#ffe76a';
+SET @color_green = '#d8e664';
+SET @color_cyan = '#7ee7c4';
+SET @color_blue = '#7ed3f0';
+SET @color_purple = '#c5b5fa';
+SET @color_brown = '#DCAF8E';
 SET @color_gray = '#8c8c8c';
 SET @color_black = '#000000';
 
@@ -37,7 +37,7 @@ CALL create_goal(
 
 CALL create_goal(
   @demo_user_id,
-  @color_brown,
+  @color_red,
   '职业发展',
   '职业发展相关目标',
   NULL,
@@ -88,7 +88,7 @@ CALL create_goal(
 
 CALL create_goal(
   @demo_user_id,
-  @color_brown,
+  @color_red,
   '项目开发',
   '项目开发相关目标',
   @work_goal_id,
@@ -101,7 +101,7 @@ CALL create_goal(
 -- 创建更多子目标
 CALL create_goal(
   @demo_user_id,
-  @color_brown,
+  @color_red,
   '技术开发能力',
   '提升技术能力',
   @work_goal_id,
@@ -113,7 +113,7 @@ CALL create_goal(
 
 CALL create_goal(
   @demo_user_id,
-  @color_brown,
+  @color_red,
   '项目管理能力',
   '提升项目管理能力',
   @work_goal_id,
@@ -125,7 +125,7 @@ CALL create_goal(
 
 CALL create_goal(
   @demo_user_id,
-  @color_brown,
+  @color_red,
   '职业发展规划',
   '长期职业发展规划',
   @work_goal_id,

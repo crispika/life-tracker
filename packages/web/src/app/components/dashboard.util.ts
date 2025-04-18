@@ -20,9 +20,8 @@ export const formatters: Record<string, (value: number) => string> = {
     formatMinutesToTimeString(value)
 };
 
-//FIXME : 暂时这样让颜色不那么刺眼，有空了挑选一些好颜色
+//FIXME : 暂时这样让颜色不那么刺眼，有空了挑选一些好颜色 - TO DELETE
 // 将颜色处理逻辑抽取为独立函数
-
 /* eslint-disable @typescript-eslint/no-unused-vars */
 export const processColor = (color: string) => {
   const hex = color.replace('#', '');
@@ -95,10 +94,9 @@ export const processColor = (color: string) => {
 export const generateChartConfig = (rawData: any[]) => {
   const config: Record<string, { label: string; color: string }> = {};
   rawData.forEach((item) => {
-    const processedColor = processColor(item.color);
     config[String(item.goalId)] = {
       label: item.summary,
-      color: processedColor
+      color: item.color
     };
   });
   return config satisfies ChartConfig;
@@ -109,6 +107,6 @@ export const generateChartData = (rawData: any[]) => {
   return rawData.map((item) => ({
     goalId: item.goalId,
     count: item.count,
-    fill: processColor(item.color) // 使用处理过的颜色
+    fill: item.color
   }));
 };

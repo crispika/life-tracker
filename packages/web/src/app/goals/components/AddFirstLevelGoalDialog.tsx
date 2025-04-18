@@ -15,14 +15,14 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 const COLORS = [
-  { name: '红', value: '#ff4d4f' },
-  { name: '橙', value: '#fa8c16' },
-  { name: '黄', value: '#fadb14' },
-  { name: '绿', value: '#52c41a' },
-  { name: '青', value: '#13c2c2' },
-  { name: '蓝', value: '#1890ff' },
-  { name: '紫', value: '#722ed1' },
-  { name: '褐', value: '#8B4513' },
+  { name: '红', value: '#ff6469' },
+  { name: '橙', value: '#ffab64' },
+  { name: '黄', value: '#ffe76a' },
+  { name: '绿', value: '#d8e664' },
+  { name: '青', value: '#7ee7c4' },
+  { name: '蓝', value: '#7ed3f0' },
+  { name: '紫', value: '#c5b5fa' },
+  { name: '褐', value: '#DCAF8E' },
   { name: '灰', value: '#8c8c8c' },
   { name: '黑', value: '#000000' }
 ];
