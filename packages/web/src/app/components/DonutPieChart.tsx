@@ -36,7 +36,9 @@ export const DonutPieChart = <D extends string, N extends string>({
 
   const formatter = formatters[formatterType];
 
-  if (!chartData.length) {
+  console.log('chartData', chartData);
+
+  if (!chartData.length || total === 0) {
     return (
       <ChartContainer
         config={chartConfig}

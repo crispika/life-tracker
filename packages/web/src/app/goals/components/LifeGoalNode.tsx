@@ -1,6 +1,6 @@
 import { Handle, NodeToolbar, Position } from 'reactflow';
 import { Button } from '@/components/ui/button';
-import { Pencil, Target } from 'lucide-react';
+import { Pencil, Target, TargetIcon } from 'lucide-react';
 import { SetLifeGoalDialog } from './SetLifeGoalDialog';
 import { AddFirstLevelGoalDialog } from './AddFirstLevelGoalDialog';
 import { useState } from 'react';
@@ -75,9 +75,13 @@ export const LifeGoalNode = ({
             className="!bg-gray-400"
           />
         ) : (
-          <div className="absolute left-1/2 -translate-x-1/2 -bottom-2 rounded bg-gray-500/50">
-            <div className="flex items-center justify-center h-full text-white text-sm">
-              &nbsp;点击元素激活工具条&nbsp;
+          <div className="absolute left-1/2 -translate-x-1/2 -bottom-4 rounded bg-gray-500/50 px-1">
+            <div className="flex items-center flex-col justify-center h-full text-white text-sm">
+              <span>点击元素激活工具条</span>
+              <span className="flex items-center text-xs">
+                <TargetIcon className="h-3 w-3" />
+                添加一级目标
+              </span>
             </div>
           </div>
         )}

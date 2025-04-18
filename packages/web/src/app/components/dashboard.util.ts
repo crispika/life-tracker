@@ -1,4 +1,5 @@
 import { ChartConfig } from '@/components/ui/chart';
+import { formatMinutesToTimeString } from '../tasks/tasks.util';
 
 export type ChartDataItem<D extends string, N extends string> = {
   [K in N]: string;
@@ -15,12 +16,8 @@ export enum ValueFormatterType {
 
 export const formatters: Record<string, (value: number) => string> = {
   [ValueFormatterType.DEFAULT]: (value) => value.toString(),
-  [ValueFormatterType.MINUTES_TO_TIME]: (value) => {
-    const minutes = Number(value);
-    const hours = Math.floor(minutes / 60);
-    const remainingMinutes = minutes % 60;
-    return `${hours}h ${remainingMinutes}m`;
-  }
+  [ValueFormatterType.MINUTES_TO_TIME]: (value) =>
+    formatMinutesToTimeString(value)
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

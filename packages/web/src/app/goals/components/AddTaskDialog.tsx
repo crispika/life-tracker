@@ -1,8 +1,7 @@
 import { Task } from '@/app/tasks/tasks.type';
 import {
-  formatTimeEstimate,
+  formatMinutesToTimeString,
   isValidTimeString,
-  minutesToTimeEstimate,
   timeStringToMinutes
 } from '@/app/tasks/tasks.util';
 import { Button } from '@/components/ui/button';
@@ -69,6 +68,7 @@ interface AddTaskDialogProps {
   taskId?: number;
   task?: Task;
   mode?: 'add' | 'edit';
+  onSuccess?: () => void;
 }
 
 export function AddTaskDialog({
@@ -77,7 +77,8 @@ export function AddTaskDialog({
   onOpenChange,
   taskId,
   task,
-  mode = 'add'
+  mode = 'add',
+  onSuccess
 }: AddTaskDialogProps) {
   const { toast } = useToast();
   const router = useRouter();
@@ -103,7 +104,7 @@ export function AddTaskDialog({
         startDate: task.startDate ? format(task.startDate, 'yyyy-MM-dd') : '',
         dueDate: task.dueDate ? format(task.dueDate, 'yyyy-MM-dd') : '',
         originalEstimateMinutes: task.originalEstimate
-          ? formatTimeEstimate(minutesToTimeEstimate(task.originalEstimate))
+          ? formatMinutesToTimeString(task.originalEstimate)
           : ''
       });
     }
@@ -168,6 +169,7 @@ export function AddTaskDialog({
 
       form.reset();
       onOpenChange(false);
+      onSuccess?.();
       router.refresh();
     } catch (error) {
       console.error(isEditMode ? '更新任务失败:' : '创建任务失败:', error);

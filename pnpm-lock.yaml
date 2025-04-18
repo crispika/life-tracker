@@ -92,6 +92,9 @@ importers:
       '@types/dagre':
         specifier: ^0.7.52
         version: 0.7.52
+      '@types/lodash':
+        specifier: ^4.17.16
+        version: 4.17.16
       '@types/node':
         specifier: 22.10.2
         version: 22.10.2
@@ -122,6 +125,9 @@ importers:
       eslint-config-next:
         specifier: 15.1.2
         version: 15.1.2(eslint@9.17.0(jiti@1.21.7))(typescript@5.7.2)
+      lodash:
+        specifier: ^4.17.21
+        version: 4.17.21
       lucide-react:
         specifier: ^0.477.0
         version: 0.477.0(react@19.0.0)
@@ -1825,6 +1831,12 @@ packages:
     resolution:
       {
         integrity: sha512-dRLjCWHYg4oaA77cxO64oO+7JwCwnIzkZPdrrC71jQmQtlhM556pwKo5bUzqvZndkVbeFLIIi+9TC40JNF5hNQ==
+      }
+
+  '@types/lodash@4.17.16':
+    resolution:
+      {
+        integrity: sha512-HX7Em5NYQAXKW+1T+FiuG27NGwzJfCX3s1GjOa7ujxZa52kjJLOr4FUxT+giF6Tgxv1e+/czV/iTtBw27WTU9g==
       }
 
   '@types/node@22.10.2':
@@ -5884,6 +5896,8 @@ snapshots:
   '@types/json-schema@7.0.15': {}
 
   '@types/json5@0.0.29': {}
+
+  '@types/lodash@4.17.16': {}
 
   '@types/node@22.10.2':
     dependencies:

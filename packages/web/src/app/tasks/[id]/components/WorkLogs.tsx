@@ -1,10 +1,7 @@
 'use client';
 
 import { WorkLog } from '@/app/tasks/tasks.type';
-import {
-  formatTimeEstimate,
-  minutesToTimeEstimate
-} from '@/app/tasks/tasks.util';
+import { formatMinutesToTimeString } from '@/app/tasks/tasks.util';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -115,9 +112,7 @@ export function WorkLogs({
                       <div className="text-sm space-y-1">
                         <div className="text-gray-900">
                           花费时间：
-                          {formatTimeEstimate(
-                            minutesToTimeEstimate(workLog.timeSpent)
-                          )}
+                          {formatMinutesToTimeString(workLog.timeSpent)}
                         </div>
                         <div className="text-gray-500">{workLog.note}</div>
                       </div>

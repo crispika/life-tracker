@@ -1,10 +1,8 @@
 import { Task } from '@/app/tasks/tasks.type';
-import {
-  formatTimeEstimate,
-  minutesToTimeEstimate
-} from '@/app/tasks/tasks.util';
+import { formatMinutesToTimeString } from '@/app/tasks/tasks.util';
 import { Button } from '@/components/ui/button';
 import { TimeProgressBar } from '@/components/ui/progress-bar';
+import { format } from 'date-fns';
 import {
   Calendar,
   ExternalLink,
@@ -16,10 +14,9 @@ import {
 import Link from 'next/link';
 import { useState } from 'react';
 import { Handle, NodeProps, NodeToolbar, Position } from 'reactflow';
+import { UpdateTaskStateDropdown } from '../../tasks/components/UpdateTaskStateDropdown';
 import { AddTaskDialog } from './AddTaskDialog';
 import { DeleteTaskDialog } from './DeleteTaskDialog';
-import { UpdateTaskStateDropdown } from '../../tasks/components/UpdateTaskStateDropdown';
-import { format } from 'date-fns';
 export function TaskNode({ data, selected }: NodeProps) {
   const {
     id: taskId,
@@ -100,16 +97,6 @@ export function TaskNode({ data, selected }: NodeProps) {
       {/* 顶部工具栏 */}
       <NodeToolbar position={Position.Top} offset={6} align={'start'}>
         <div className="flex space-x-1 bg-white p-1 rounded-lg shadow-lg border border-gray-200">
-          <Link href={`/tasks/${taskId}`} target="_blank">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8 text-gray-500 hover:text-gray-700 hover:bg-gray-100"
-              title="查看任务详情"
-            >
-              <ExternalLink className="h-4 w-4" />
-            </Button>
-          </Link>
           <Button
             variant="ghost"
             size="icon"
@@ -127,6 +114,17 @@ export function TaskNode({ data, selected }: NodeProps) {
             onClick={() => setIsDeleteDialogOpen(true)}
           >
             <Trash2 className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 text-gray-500 hover:text-gray-700 hover:bg-gray-100"
+            title="查看任务详情"
+            asChild
+          >
+            <Link href={`/tasks/${taskId}`} target="_blank">
+              <ExternalLink className="h-4 w-4" />
+            </Link>
           </Button>
         </div>
       </NodeToolbar>
@@ -188,9 +186,7 @@ export function TaskNode({ data, selected }: NodeProps) {
                     <span className="text-gray-500 min-w-[36px]">预估:</span>
                     <span className="font-medium text-gray-700 ml-auto">
                       {originalEstimate
-                        ? formatTimeEstimate(
-                            minutesToTimeEstimate(originalEstimate)
-                          )
+                        ? formatMinutesToTimeString(originalEstimate)
                         : ' - '}
                     </span>
                   </div>
@@ -198,7 +194,7 @@ export function TaskNode({ data, selected }: NodeProps) {
                     <div className="w-1.5 h-1.5 rounded-full bg-gray-600"></div>
                     <span className="text-gray-500 min-w-[36px]">已用:</span>
                     <span className={'font-medium ml-auto text-gray-700'}>
-                      {formatTimeEstimate(minutesToTimeEstimate(timeSpent))}
+                      {formatMinutesToTimeString(timeSpent)}
                     </span>
                   </div>
                 </div>

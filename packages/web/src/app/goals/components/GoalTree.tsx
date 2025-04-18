@@ -100,8 +100,6 @@ const layoutedTreeData = (
 
   filterCollapsedChildren(treeData);
 
-  console.log('treeData', treeData);
-
   // 1. 使用 d3-hierarchy 计算布局
   const root = hierarchy(treeData);
   const treeLayout = tree<TreeNodeData>()

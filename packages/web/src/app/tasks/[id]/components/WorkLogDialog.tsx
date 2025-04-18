@@ -1,3 +1,9 @@
+import { WorkLog } from '@/app/tasks/tasks.type';
+import {
+  formatMinutesToTimeString,
+  isValidTimeString,
+  timeStringToMinutes
+} from '@/app/tasks/tasks.util';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -17,19 +23,14 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { WorkLog } from '@/app/tasks/tasks.type';
-import {
-  formatTimeEstimate,
-  isValidTimeString,
-  minutesToTimeEstimate,
-  timeStringToMinutes
-} from '@/app/tasks/tasks.util';
+import { useThrottle } from '@/hooks/use-throttle';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
-import * as z from 'zod';
+import { format } from 'date-fns';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
-import { format } from 'date-fns';
+import { useForm } from 'react-hook-form';
+import * as z from 'zod';
+
 const workLogFormSchema = z.object({
   logDate: z.string().min(1, { message: '请选择工作日期' }),
   timeSpent: z
@@ -51,6 +52,12 @@ interface WorkLogDialogProps {
   mode: 'add' | 'edit';
 }
 
+const workLogFormDefaultValues: WorkLogFormValues = {
+  logDate: new Date().toISOString().slice(0, 16),
+  timeSpent: '',
+  note: ''
+};
+
 export function WorkLogDialog({
   taskId,
   open,
@@ -61,27 +68,25 @@ export function WorkLogDialog({
   const router = useRouter();
   const form = useForm<WorkLogFormValues>({
     resolver: zodResolver(workLogFormSchema),
-    defaultValues: {
-      logDate: new Date().toISOString().slice(0, 16),
-      timeSpent: '',
-      note: ''
-    }
+    defaultValues: workLogFormDefaultValues
   });
 
   useEffect(() => {
-    if (initialData) {
+    if (mode === 'add') {
+      form.reset(workLogFormDefaultValues);
+      return;
+    }
+    if (initialData && mode === 'edit') {
       form.reset({
         logDate: format(initialData.logDate, 'yyyy-MM-dd HH:mm'),
-        timeSpent: formatTimeEstimate(
-          minutesToTimeEstimate(initialData.timeSpent)
-        ),
+        timeSpent: formatMinutesToTimeString(initialData.timeSpent),
         note: initialData.note
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [initialData]);
+  }, [initialData, mode]);
 
-  const handleSubmit = async (values: WorkLogFormValues) => {
+  const handleSubmit = useThrottle(async (values: WorkLogFormValues) => {
     try {
       const body = JSON.stringify({
         taskId,
@@ -116,19 +121,16 @@ export function WorkLogDialog({
         if (!response.ok) {
           throw new Error('添加工作日志失败');
         }
-        form.reset({
-          logDate: new Date().toISOString().slice(0, 16),
-          timeSpent: '',
-          note: ''
-        });
+        form.reset(workLogFormDefaultValues);
+        // FIXME : temporary fix - 每次添加工作日志后，再打开添加对话框，时间field报错
+        form.clearErrors();
       }
-
       onOpenChange(false);
       router.refresh();
     } catch (error) {
       console.error('添加工作日志失败:', error);
     }
-  };
+  }, 3000);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

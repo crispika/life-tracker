@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { ListTodo, Minus, Pencil, Plus, Target, Trash2 } from 'lucide-react';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { Handle, NodeProps, NodeToolbar, Position } from 'reactflow';
 import { AddGoalDialog } from './AddGoalDialog';
 import { AddTaskDialog } from './AddTaskDialog';
@@ -29,6 +29,22 @@ export function GoalNode({ data, selected }: NodeProps) {
   const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false);
 
   const hasChildren = hasSubTasks || (children && children.length > 0);
+
+  const expandNode = useCallback(() => {
+    setExpandedNodes((prev: Set<number>) => {
+      const newSet = new Set(prev);
+      newSet.add(id);
+      return newSet;
+    });
+  }, [id, setExpandedNodes]);
+
+  const collapseNode = useCallback(() => {
+    setExpandedNodes((prev: Set<number>) => {
+      const newSet = new Set(prev);
+      newSet.delete(id);
+      return newSet;
+    });
+  }, [id, setExpandedNodes]);
 
   return (
     <>
@@ -89,11 +105,7 @@ export function GoalNode({ data, selected }: NodeProps) {
               className="h-6 w-6 text-gray-500 hover:text-gray-700 bg-gray-100 rounded-full"
               onClick={(e) => {
                 e.stopPropagation();
-                setExpandedNodes((prev: Set<number>) => {
-                  const newSet = new Set(prev);
-                  newSet.add(id);
-                  return newSet;
-                });
+                expandNode();
               }}
               title="展开目标所有子项"
             >
@@ -110,11 +122,7 @@ export function GoalNode({ data, selected }: NodeProps) {
               className="h-6 w-6 text-gray-500 hover:text-gray-700 bg-gray-100 rounded-full"
               onClick={(e) => {
                 e.stopPropagation();
-                setExpandedNodes((prev: Set<number>) => {
-                  const newSet = new Set(prev);
-                  newSet.delete(id);
-                  return newSet;
-                });
+                collapseNode();
               }}
               title="折叠目标所有子项"
             >
@@ -191,12 +199,14 @@ export function GoalNode({ data, selected }: NodeProps) {
         parentId={data.id}
         open={isAddGoalOpen}
         onOpenChange={setIsAddGoalOpen}
+        onSuccess={expandNode}
       />
 
       <AddTaskDialog
         goalId={data.id}
         open={isAddTaskOpen}
         onOpenChange={setIsAddTaskOpen}
+        onSuccess={expandNode}
       />
 
       <DeleteGoalDialog

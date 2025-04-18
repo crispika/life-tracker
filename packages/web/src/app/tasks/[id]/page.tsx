@@ -13,7 +13,7 @@ import { queries } from '@life-tracker/db';
 import { format } from 'date-fns';
 import { Calendar, Clock, Target } from 'lucide-react';
 import { Task, WorkLog } from '../tasks.type';
-import { formatTimeEstimate, minutesToTimeEstimate } from '../tasks.util';
+import { formatMinutesToTimeString } from '../tasks.util';
 import { TaskStateDropdown } from './components/TaskStateDropdown/TaskStateDropdown';
 import { WorkLogs } from './components/WorkLogs';
 
@@ -126,7 +126,7 @@ export default async function TaskDetail({
                 <div className="font-mono">
                   {task.dueDate
                     ? format(new Date(task.dueDate), 'yyyy/MM/dd')
-                    : '-'}
+                    : ' - '}
                 </div>
               </div>
             </div>
@@ -139,16 +139,14 @@ export default async function TaskDetail({
                   <span className="text-sm text-gray-500">预计耗时</span>
                   <span className="font-medium">
                     {task.originalEstimate
-                      ? formatTimeEstimate(
-                          minutesToTimeEstimate(task.originalEstimate)
-                        )
-                      : '-'}
+                      ? formatMinutesToTimeString(task.originalEstimate)
+                      : ' - '}
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="text-sm text-gray-500">已用时间</span>
                   <span className="font-medium">
-                    {formatTimeEstimate(minutesToTimeEstimate(task.timeSpent))}
+                    {formatMinutesToTimeString(task.timeSpent)}
                   </span>
                 </div>
               </div>

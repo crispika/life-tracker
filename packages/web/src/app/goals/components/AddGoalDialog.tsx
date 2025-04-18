@@ -17,12 +17,14 @@ interface AddGoalDialogProps {
   parentId: number;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onSuccess?: () => void;
 }
 
 export function AddGoalDialog({
   parentId,
   open,
-  onOpenChange
+  onOpenChange,
+  onSuccess
 }: AddGoalDialogProps) {
   const [summary, setSummary] = useState('');
   const [description, setDescription] = useState('');
@@ -82,6 +84,7 @@ export function AddGoalDialog({
       });
       resetState();
       onOpenChange(false);
+      onSuccess?.();
       router.refresh();
     } catch (error) {
       console.error('创建目标失败:', error);

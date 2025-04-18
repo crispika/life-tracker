@@ -4,7 +4,7 @@ import {
   TooltipProvider,
   TooltipTrigger
 } from '@/components/ui/tooltip';
-
+import { formatMinutesToTimeString } from '@/app/tasks/tasks.util';
 interface TimeProgressBarProps {
   timeSpent: number;
   originalEstimate: number | null;
@@ -12,13 +12,6 @@ interface TimeProgressBarProps {
   showTooltip?: boolean;
   width?: number | string;
 }
-
-const formatTime = (hours: number) => {
-  if (hours < 1) {
-    return `${Math.round(hours * 60)}分钟`;
-  }
-  return `${Math.round(hours * 10) / 10}小时`;
-};
 
 export function TimeProgressBar({
   timeSpent,
@@ -50,10 +43,13 @@ export function TimeProgressBar({
   const tooltipContent = (
     <div className="text-xs">
       <div className="flex items-center gap-2">
-        <span>已用: {formatTime(timeSpent)}</span>
+        <span>已用: {formatMinutesToTimeString(timeSpent)}</span>
         <span className="text-gray-300">|</span>
         <span className={isOvertime ? 'text-red-400' : ''}>
-          预估: {originalEstimate ? formatTime(originalEstimate) : ' - '}
+          预估:{' '}
+          {originalEstimate
+            ? formatMinutesToTimeString(originalEstimate)
+            : ' - '}
         </span>
       </div>
       {isOvertime && (
