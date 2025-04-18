@@ -29,7 +29,7 @@ CALL create_goal(
   '健康管理',
   '保持身体健康',
   NULL,
-  'HT',
+  'Health',
   TRUE,
   @health_goal_id,
   @health_prefix_id
@@ -37,11 +37,11 @@ CALL create_goal(
 
 CALL create_goal(
   @demo_user_id,
-  @color_red,
+  @color_brown,
   '职业发展',
   '职业发展相关目标',
   NULL,
-  'WK',
+  'Work',
   TRUE,
   @work_goal_id,
   @work_prefix_id
@@ -50,11 +50,11 @@ CALL create_goal(
 
 CALL create_goal(
   @demo_user_id,
-  @color_green,
-  '休闲娱乐',
-  '休闲娱乐相关目标',
+  @color_cyan,
+  '兴趣爱好',
+  '兴趣爱好相关目标',
   NULL,
-  'RL',
+  'Relax',
   TRUE,
   @relax_goal_id,
   @relax_prefix_id
@@ -88,7 +88,7 @@ CALL create_goal(
 
 CALL create_goal(
   @demo_user_id,
-  @color_red,
+  @color_brown,
   '项目开发',
   '项目开发相关目标',
   @work_goal_id,
@@ -101,7 +101,7 @@ CALL create_goal(
 -- 创建更多子目标
 CALL create_goal(
   @demo_user_id,
-  @color_red,
+  @color_brown,
   '技术开发能力',
   '提升技术能力',
   @work_goal_id,
@@ -113,7 +113,7 @@ CALL create_goal(
 
 CALL create_goal(
   @demo_user_id,
-  @color_red,
+  @color_brown,
   '项目管理能力',
   '提升项目管理能力',
   @work_goal_id,
@@ -125,7 +125,7 @@ CALL create_goal(
 
 CALL create_goal(
   @demo_user_id,
-  @color_red,
+  @color_brown,
   '职业发展规划',
   '长期职业发展规划',
   @work_goal_id,
@@ -149,7 +149,7 @@ CALL create_goal(
 
 CALL create_goal(
   @demo_user_id,
-  @color_green,
+  @color_cyan,
   '阅读计划',
   '阅读各类书籍',
   @relax_goal_id,
@@ -161,7 +161,7 @@ CALL create_goal(
 
 CALL create_goal(
   @demo_user_id,
-  @color_green,
+  @color_cyan,
   '旅行计划',
   '探索新地方',
   @relax_goal_id,
@@ -173,7 +173,7 @@ CALL create_goal(
 
 CALL create_goal(
   @demo_user_id,
-  @color_green,
+  @color_cyan,
   '摄影技能',
   '提高摄影技巧',
   @relax_goal_id,

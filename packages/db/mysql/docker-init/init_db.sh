@@ -126,6 +126,7 @@ execute_sql "./schema/01_tables.sql" "创建表结构" || log_error "创建表�
 execute_sql "./schema/04_stored_procedures.sql" "创建存储过程" || log_error "创建存储过程失败，但继续执行"
 execute_sql "./schema/03_add_triggers.sql" "创建触发器" || log_error "创建触发器失败，但继续执行"
 execute_sql "./schema/02_add_indexes.sql" "创建索引" || log_error "创建索引失败，但继续执行"
+execute_sql "./schema/05_views.sql" "创建视图" || log_error "创建视图失败，但继续执行"
 
 # 导入种子数据
 log_info "开始导入种子数据"
@@ -133,7 +134,7 @@ execute_sql "./seeds/00_states.sql" "导入状态数据" || log_error "导入状
 execute_sql "./seeds/01_users.sql" "导入用户数据" || log_error "导入用户数据失败，但继续执行"
 execute_sql "./seeds/02_goals.sql" "导入目标数据" || log_error "导入目标数据失败，但继续执行"
 execute_sql "./seeds/03_tasks.sql" "导入任务数据" || log_error "导入任务数据失败，但继续执行"
-
+execute_sql "./seeds/04_worklogs.sql" "导入工作日志数据" || log_error "导入工作日志数据失败，但继续执行"
 # 验证数据库结构
 log_info "验证数据库结构"
 echo "数据库表:"

@@ -107,30 +107,37 @@ export default async function Tasks() {
                   </div>
 
                   <div className="mt-4 space-y-6">
-                    {Object.entries(taskGroups).map(([path, tasks]) => (
-                      <div key={path} className="space-y-4">
-                        {path && (
-                          <div className="flex items-center gap-2 text-sm text-gray-500">
-                            {tasks[0].pathedGoals.map(
-                              (
-                                g: Pick<Goal, 'id' | 'summary' | 'color'>,
-                                index: number
-                              ) => (
-                                <span key={g.id} className="flex items-center">
-                                  {index > 0 && <span className="mx-2">/</span>}
-                                  <span>{g.summary}</span>
-                                </span>
-                              )
-                            )}
+                    {Object.entries(taskGroups)
+                      .sort(([pathA], [pathB]) => pathA.localeCompare(pathB))
+                      .map(([path, tasks]) => (
+                        <div key={path} className="space-y-4">
+                          {path && (
+                            <div className="flex items-center gap-2 text-sm text-gray-500">
+                              {tasks[0].pathedGoals.map(
+                                (
+                                  g: Pick<Goal, 'id' | 'summary' | 'color'>,
+                                  index: number
+                                ) => (
+                                  <span
+                                    key={g.id}
+                                    className="flex items-center"
+                                  >
+                                    {index > 0 && (
+                                      <span className="mx-2">/</span>
+                                    )}
+                                    <span>{g.summary}</span>
+                                  </span>
+                                )
+                              )}
+                            </div>
+                          )}
+                          <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+                            {tasks.map((task: ActiveTask) => (
+                              <TaskCard key={task.id} task={task} />
+                            ))}
                           </div>
-                        )}
-                        <div className="grid gap-4 grid-cols-1 md:grid-cols-2">
-                          {tasks.map((task: ActiveTask) => (
-                            <TaskCard key={task.id} task={task} />
-                          ))}
                         </div>
-                      </div>
-                    ))}
+                      ))}
                   </div>
                 </div>
               ))}

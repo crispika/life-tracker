@@ -481,43 +481,30 @@ async function getWorklogTimeByFirstLevelGoal(userId: number) {
 
 async function getWorklogTimeByDateAndFirstLevelGoal(userId: number) {
   try {
-    // 获取最近30天有worklog的日期的所有worklog
-    const thirtyDaysAgo = new Date();
-    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-
-    const worklogs = await prisma.uC_TASK_WORKLOG.findMany({
-      where: {
-        user_id: userId,
-        log_date: {
-          gte: thirtyDaysAgo
-        }
-      },
-      select: {
-        time_spent_minutes: true,
-        log_date: true,
-        UC_TASK: {
-          select: {
-            UC_GOAL: {
-              select: {
-                goal_path: true,
-                summary: true,
-                color: true
-              }
-            }
-          }
-        }
-      },
-      orderBy: {
-        log_date: 'asc'
-      }
-    });
+    // 使用视图获取数据
+    const worklogs = await prisma.$queryRaw<
+      Array<{
+        user_id: number;
+        date: Date;
+        task_id: number;
+        time_spent_minutes: number;
+        goal_id: number;
+        goal_summary: string;
+        goal_color: string;
+        goal_path: string;
+        task_summary: string;
+        task_description: string | null;
+      }>
+    >`
+      SELECT * FROM vw_recent_worklog_by_date
+      WHERE user_id = ${userId}
+    `;
 
     // 按日期和一级目标分组
     const groupedData = worklogs.reduce<Record<string, Record<string, number>>>(
       (acc, worklog) => {
-        const date = worklog.log_date.toISOString().split('T')[0];
-        const firstLevelGoalId =
-          worklog.UC_TASK.UC_GOAL.goal_path.split('/')[1];
+        const date = worklog.date.toISOString().split('T')[0];
+        const firstLevelGoalId = worklog.goal_path.split('/')[1];
 
         if (!acc[date]) {
           acc[date] = {};
@@ -536,7 +523,7 @@ async function getWorklogTimeByDateAndFirstLevelGoal(userId: number) {
     // 获取所有涉及的一级目标信息
     const firstLevelGoalIds = new Set<number>();
     worklogs.forEach((worklog) => {
-      const firstLevelGoalId = worklog.UC_TASK.UC_GOAL.goal_path.split('/')[1];
+      const firstLevelGoalId = worklog.goal_path.split('/')[1];
       if (firstLevelGoalId) {
         firstLevelGoalIds.add(Number(firstLevelGoalId));
       }
@@ -559,14 +546,18 @@ async function getWorklogTimeByDateAndFirstLevelGoal(userId: number) {
     const result = Object.entries(groupedData).map(([date, goals]) => {
       const dataPoint: any = { date };
       firstLevelGoals.forEach((goal) => {
-        dataPoint[goal.summary] = goals[goal.goal_id] || 0;
+        dataPoint[goal.goal_id] = goals[goal.goal_id] || 0;
       });
       return dataPoint;
     });
 
     return {
       data: result,
-      goals: firstLevelGoals
+      firstLevelGoals: firstLevelGoals.map((goal) => ({
+        goalId: goal.goal_id,
+        summary: goal.summary,
+        color: goal.color
+      }))
     };
   } catch (error) {
     console.error(
