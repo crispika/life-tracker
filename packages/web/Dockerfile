@@ -14,7 +14,7 @@ WORKDIR /app
 COPY pnpm-workspace.yaml ./
 COPY pnpm-lock.yaml ./
 COPY package.json ./
-COPY packages/frontend/package.json ./packages/frontend/
+COPY packages/web/package.json ./packages/web/
 COPY packages/db/package.json ./packages/db/
 
 RUN pnpm install --frozen-lockfile
@@ -26,12 +26,10 @@ WORKDIR /app
 # Reinstall pnpm because new docker stage builder 
 RUN corepack enable && corepack prepare pnpm@latest --activate
 
-
 COPY . .
 COPY --from=deps /app/node_modules ./node_modules
-COPY --from=deps /app/packages/frontend/node_modules ./packages/frontend/node_modules
+COPY --from=deps /app/packages/web/node_modules ./packages/web/node_modules
 COPY --from=deps /app/packages/db/node_modules ./packages/db/node_modules
-
 
 # Next.js collects completely anonymous telemetry data about general usage.
 # Learn more here: https://nextjs.org/telemetry
@@ -39,7 +37,7 @@ COPY --from=deps /app/packages/db/node_modules ./packages/db/node_modules
 ENV NEXT_TELEMETRY_DISABLED=1
 
 RUN cd packages/db && npx prisma generate
-RUN cd packages/frontend && pnpm build
+RUN cd packages/web && pnpm build
 
 # Production image, copy all the files and run next
 FROM base AS runner
@@ -51,9 +49,9 @@ ENV NEXT_TELEMETRY_DISABLED 1
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
-# COPY --from=builder /app/packages/frontend/public ./packages/frontend/public
-COPY --from=builder /app/packages/frontend/.next/standalone/. ./
-COPY --from=builder /app/packages/frontend/.next/static ./packages/frontend/.next/static
+# COPY --from=builder /app/packages/web/public ./packages/web/public
+COPY --from=builder /app/packages/web/.next/standalone/. ./
+COPY --from=builder /app/packages/web/.next/static ./packages/web/.next/static
 COPY --from=builder /app/packages/db/ ./packages/db/
 
 USER nextjs
@@ -65,5 +63,5 @@ ENV HOSTNAME="0.0.0.0"
 
 # server.js is created by next build from the standalone output
 # https://nextjs.org/docs/pages/api-reference/config/next-config-js/output
-CMD ["node", "packages/frontend/server.js"]
-# CMD ["sh", "-c", "npx prisma migrate deploy --schema=packages/db/prisma/schema.prisma && node packages/frontend/server.js"]
+CMD ["node", "packages/web/server.js"]
+# CMD ["sh", "-c", "npx prisma migrate deploy --schema=packages/db/prisma/schema.prisma && node packages/web/server.js"]

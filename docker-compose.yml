@@ -47,7 +47,7 @@ services:
   web:
     build:
       context: .
-      dockerfile: packages/frontend/Dockerfile
+      dockerfile: packages/web/Dockerfile
       target: runner
       args:
         - DATABASE_URL=mysql://root:${DB_ROOT_PASSWORD}@db:3306/life_tracker?connect_timeout=300
