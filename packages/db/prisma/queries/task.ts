@@ -311,11 +311,181 @@ const getActiveTasksWithGoalPath = async (userId: number) => {
   });
 };
 
+async function getGroupedTaskCountByTaskState(
+  userId: number,
+  taskState: string
+) {
+  try {
+    // 1. 首先获取所有进行中的任务
+    const inProcessTasks = await prisma.uC_TASK.findMany({
+      where: {
+        user_id: userId,
+        UC_TASK_STATE: {
+          name: taskState
+        }
+      },
+      select: {
+        task_id: true,
+        goal_id: true,
+        UC_GOAL: {
+          select: {
+            goal_path: true
+          }
+        }
+      }
+    });
+
+    // 2. 收集所有需要的一级目标ID
+    const firstLevelGoalIds = new Set<number>();
+    inProcessTasks.forEach((task) => {
+      const firstLevelGoalId = task.UC_GOAL.goal_path.split('/')[1];
+      if (firstLevelGoalId) {
+        firstLevelGoalIds.add(Number(firstLevelGoalId));
+      }
+    });
+
+    // 3. 一次性查询所有一级目标的信息
+    const firstLevelGoals = await prisma.uC_GOAL.findMany({
+      where: {
+        goal_id: {
+          in: Array.from(firstLevelGoalIds)
+        }
+      },
+      select: {
+        goal_id: true,
+        summary: true,
+        color: true
+      }
+    });
+
+    // 4. 创建一级目标ID到目标信息的映射
+    const firstLevelGoalMap = new Map(
+      firstLevelGoals.map((goal) => [goal.goal_id, goal])
+    );
+
+    // 5. 统计每个一级目标下的任务数
+    return Object.values(
+      inProcessTasks.reduce<
+        Record<
+          string,
+          { color: string; count: number; summary: string; goalId: number }
+        >
+      >((acc, curr) => {
+        const firstLevelGoalId = curr.UC_GOAL.goal_path.split('/')[1];
+        if (!acc[firstLevelGoalId]) {
+          const firstLevelGoal = firstLevelGoalMap.get(
+            Number(firstLevelGoalId)
+          );
+          if (firstLevelGoal) {
+            acc[firstLevelGoalId] = {
+              color: firstLevelGoal.color,
+              count: 1,
+              summary: firstLevelGoal.summary,
+              goalId: firstLevelGoal.goal_id
+            };
+          }
+        } else {
+          acc[firstLevelGoalId].count++;
+        }
+        return acc;
+      }, {})
+    );
+  } catch (error) {
+    console.error('Error fetching in-process task count:', error);
+    throw error;
+  }
+}
+
+async function getWorklogTimeByFirstLevelGoal(userId: number) {
+  try {
+    // 1. 获取所有任务的工作日志
+    const worklogs = await prisma.uC_TASK_WORKLOG.findMany({
+      where: {
+        user_id: userId
+      },
+      select: {
+        time_spent_minutes: true,
+        task_id: true,
+        UC_TASK: {
+          select: {
+            UC_GOAL: {
+              select: {
+                goal_path: true
+              }
+            }
+          }
+        }
+      }
+    });
+
+    // 2. 收集所有需要的一级目标ID
+    const firstLevelGoalIds = new Set<number>();
+    worklogs.forEach((worklog) => {
+      const firstLevelGoalId = worklog.UC_TASK.UC_GOAL.goal_path.split('/')[1];
+      if (firstLevelGoalId) {
+        firstLevelGoalIds.add(Number(firstLevelGoalId));
+      }
+    });
+
+    // 3. 一次性查询所有一级目标的信息
+    const firstLevelGoals = await prisma.uC_GOAL.findMany({
+      where: {
+        goal_id: {
+          in: Array.from(firstLevelGoalIds)
+        }
+      },
+      select: {
+        goal_id: true,
+        summary: true,
+        color: true
+      }
+    });
+
+    // 4. 创建一级目标ID到目标信息的映射
+    const firstLevelGoalMap = new Map(
+      firstLevelGoals.map((goal) => [goal.goal_id, goal])
+    );
+
+    // 5. 统计每个一级目标下的总工时
+    return Object.values(
+      worklogs.reduce<
+        Record<
+          string,
+          { color: string; count: number; summary: string; goalId: number }
+        >
+      >((acc, curr) => {
+        const firstLevelGoalId = curr.UC_TASK.UC_GOAL.goal_path.split('/')[1];
+        if (!acc[firstLevelGoalId]) {
+          const firstLevelGoal = firstLevelGoalMap.get(
+            Number(firstLevelGoalId)
+          );
+          if (firstLevelGoal) {
+            acc[firstLevelGoalId] = {
+              color: firstLevelGoal.color,
+              count: curr.time_spent_minutes,
+              summary: firstLevelGoal.summary,
+              goalId: firstLevelGoal.goal_id
+            };
+          }
+        } else {
+          acc[firstLevelGoalId].count += curr.time_spent_minutes;
+        }
+        return acc;
+      }, {})
+    );
+  } catch (error) {
+    console.error('Error fetching worklog time by first level goal:', error);
+    throw error;
+  }
+}
+
 export default {
   getTasksByUserId,
   getTaskDetailById,
   getTaskStatesByUserId,
   getTaskCurrentState,
   getTaskWorklogs,
-  getActiveTasksWithGoalPath
+  getActiveTasksWithGoalPath,
+  getInProcessTaskCount: getGroupedTaskCountByTaskState,
+  getWorklogTimeByFirstLevelGoal
 };

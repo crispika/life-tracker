@@ -1,3 +1,4 @@
+import { count } from 'console';
 import { prisma } from '../../index';
 
 // 递归构建树形结构的辅助函数
@@ -131,8 +132,77 @@ async function getGoalById(goalId: number) {
   }
 }
 
+async function getActiveGoalCount(userId: number) {
+  try {
+    const activeGoals = await prisma.uC_GOAL.findMany({
+      where: {
+        user_id: userId,
+        GOAL_STATE: {
+          name: 'ACTIVE'
+        }
+      },
+      select: {
+        goal_id: true,
+        summary: true,
+        is_first_level: true,
+        parent_id: true,
+        goal_path: true,
+        color: true,
+        UC_GOAL_PREFIX: {
+          select: {
+            prefix: true,
+            prefix_id: true
+          }
+        }
+      }
+    });
+
+    return Object.values(
+      activeGoals
+        .map((g) => ({
+          ...g,
+          goalPath: g.goal_path.split('/').filter(Boolean)
+        }))
+        .reduce<
+          Record<
+            string,
+            { color: string; count: number; summary: string; goalId: number }
+          >
+        >((acc, curr) => {
+          if (curr.is_first_level) {
+            if (!acc[curr.goal_id]) {
+              acc[curr.goal_id] = {
+                color: curr.color,
+                count: 0,
+                summary: curr.summary,
+                goalId: curr.goal_id
+              };
+            } else acc[curr.goal_id].summary = curr.summary;
+            return acc;
+          } else {
+            const firstLevelGoalId = curr.goalPath[0];
+            if (!acc[firstLevelGoalId]) {
+              acc[firstLevelGoalId] = {
+                color: curr.color,
+                count: 1,
+                summary: '',
+                goalId: Number(firstLevelGoalId)
+              };
+            }
+            acc[firstLevelGoalId].count++;
+            return acc;
+          }
+        }, {})
+    );
+  } catch (error) {
+    console.error('Error fetching active goal count:', error);
+    throw error;
+  }
+}
+
 export const goalQueries = {
   getUserGoalTree,
   getUserUltimateGoal,
-  getGoalById
+  getGoalById,
+  getActiveGoalCount
 };
