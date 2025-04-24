@@ -38,7 +38,7 @@ export default async function TaskDetail({
   const firstChar = Array.from(task.prefix)[0] || '';
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-[calc(100vh-4rem)] bg-gray-50">
       <main className="container mx-auto px-4 py-8 max-w-4xl">
         <div className="mb-6">
           <Breadcrumb>

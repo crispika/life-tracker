@@ -8,7 +8,7 @@ export default async function Goals() {
   const tasks = await queries.task.getTasksByUserId(100000);
   return (
     <>
-      <main className=" bg-gray-50">
+      <main className="min-h-[calc(100vh-4rem)] bg-gray-50">
         <div className="flex flex-col items-center justify-center h-[calc(100vh-4rem)] max-w-[105rem] mx-auto">
           {lifeGoal ? (
             <GoalsTree lifeGoal={lifeGoal} goals={goals} tasks={tasks} />

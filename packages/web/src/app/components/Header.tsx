@@ -16,7 +16,7 @@ export const Header = () => {
   const pathname = usePathname();
 
   return (
-    <header className="border-grid sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="max-w-[105rem] mx-auto hidden md:flex h-16 items-center gap-2">
         <Image src={lifetacker} alt="logo" width={85} className="m-2" />
         <nav className="flex items-center w-full text-lg">
@@ -29,7 +29,7 @@ export const Header = () => {
           <Link href="/tasks" className={getClassName(pathname, '/tasks')}>
             Tasks
           </Link>
-          <Link href="#" className={getClassName(pathname, '/docs')}>
+          <Link href="/documents" className={getClassName(pathname, '/docs')}>
             Documents
           </Link>
         </nav>
@@ -55,7 +55,10 @@ export const Header = () => {
               <Link href="/tasks" className={getClassName(pathname, '/tasks')}>
                 Tasks
               </Link>
-              <Link href="#" className={getClassName(pathname, '/docs')}>
+              <Link
+                href="/documents"
+                className={getClassName(pathname, '/docs')}
+              >
                 Documents
               </Link>
             </nav>
@@ -78,8 +81,8 @@ const getClassName = (pathname: string, href: string) => {
     case '/goals':
       selected = pathname.includes('/goals');
       break;
-    case '/docs':
-      selected = pathname.includes('/docs');
+    case '/documents':
+      selected = pathname.includes('/documents');
       break;
   }
   return selected
