@@ -1,8 +1,35 @@
-const { PrismaPlugin } = require('@prisma/nextjs-monorepo-workaround-plugin');
-const withMDX = require('@next/mdx')({
+import { PrismaPlugin } from '@prisma/nextjs-monorepo-workaround-plugin';
+import nextMDX from '@next/mdx';
+import rehypeMdxImportMedia from 'rehype-mdx-import-media';
+import rehypePrettyCode from 'rehype-pretty-code';
+import rehypeSlug from 'rehype-slug';
+import { remarkTableOfContents } from 'remark-table-of-contents';
+
+/** @type {import('rehype-pretty-code').Options} */
+const rehypePrettyCodeOptions = {
+  theme: 'ayu-dark'
+};
+
+/** @type {import('remark-table-of-contents').IRemarkTableOfContentsOptions} */
+const remarkTableOfContentsOptions = {
+  containerAttributes: {
+    id: 'articleToc'
+  },
+  navAttributes: {
+    'aria-label': 'table of contents'
+  },
+  maxDepth: 3
+};
+
+const withMDX = nextMDX({
   extension: /\.(md|mdx)?$/,
   options: {
-    // providerImportSource: '@life-tracker/web/mdx-component'
+    rehypePlugins: [
+      rehypeMdxImportMedia,
+      rehypeSlug,
+      [rehypePrettyCode, rehypePrettyCodeOptions]
+    ],
+    remarkPlugins: [[remarkTableOfContents, remarkTableOfContentsOptions]]
   }
 });
 
@@ -15,7 +42,11 @@ const nextConfig = {
     }
     return config;
   },
-  pageExtensions: ['ts', 'tsx', 'js', 'jsx', 'md', 'mdx']
+  pageExtensions: ['ts', 'tsx', 'js', 'jsx', 'md', 'mdx'],
+  images: {
+    // file formats for next/image
+    formats: ['image/avif', 'image/webp']
+  }
 };
 
-module.exports = withMDX(nextConfig);
+export default withMDX(nextConfig);

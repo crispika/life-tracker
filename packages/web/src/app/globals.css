@@ -96,3 +96,22 @@
     @apply bg-background text-foreground;
   }
 }
+
+#articleToc {
+  width: 100%;
+  max-width: 400px;
+}
+
+#articleToc > nav {
+  position: sticky;
+  top: 6rem;
+}
+
+#articleToc ul {
+  list-style: none;
+  padding-left: 1rem;
+}
+
+#articleToc ul li {
+  margin-bottom: 0.5rem;
+}
