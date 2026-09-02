@@ -2,6 +2,8 @@
 
 Life Tracker is a full-stack application for organizing life goals in a hierarchy and managing the tasks connected to them.
 
+[Live Demo](http://43.157.19.214)
+
 ## Tech Stack
 
 - **Frontend:** Next.js 15, React 19, TypeScript, Tailwind CSS, Radix UI, TanStack Query, and React Flow
