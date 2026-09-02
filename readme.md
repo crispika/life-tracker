@@ -15,6 +15,24 @@ Life Tracker is a full-stack application for organizing life goals in a hierarch
 - pnpm 9
 - Docker and Docker Compose
 
+## Project Structure
+
+```text
+.
+|-- packages/
+|   |-- web/                 # Next.js frontend and API routes
+|   |   |-- src/app/         # Pages, layouts, and route handlers
+|   |   |-- src/components/  # Shared UI components
+|   |   `-- src/hooks/       # Reusable React hooks
+|   `-- db/                  # Prisma client and database package
+|       |-- prisma/          # Prisma schema, queries, and mutations
+|       `-- mysql/           # MySQL schema, seed, and utility scripts
+|-- nginx/conf.d/            # Nginx configuration
+|-- docker-compose.yml       # Local services
+|-- package.json             # Root scripts and shared tooling
+`-- pnpm-workspace.yaml      # Monorepo workspace configuration
+```
+
 ## Getting Started
 
 1. Install the dependencies:
@@ -76,22 +94,4 @@ Next.js provides hot reload for frontend and API changes. Use the browser develo
 
 ```bash
 docker compose logs -f db
-```
-
-## Project Structure
-
-```text
-.
-|-- packages/
-|   |-- web/                 # Next.js frontend and API routes
-|   |   |-- src/app/         # Pages, layouts, and route handlers
-|   |   |-- src/components/  # Shared UI components
-|   |   `-- src/hooks/       # Reusable React hooks
-|   `-- db/                  # Prisma client and database package
-|       |-- prisma/          # Prisma schema, queries, and mutations
-|       `-- mysql/           # MySQL schema, seed, and utility scripts
-|-- nginx/conf.d/            # Nginx configuration
-|-- docker-compose.yml       # Local services
-|-- package.json             # Root scripts and shared tooling
-`-- pnpm-workspace.yaml      # Monorepo workspace configuration
 ```
